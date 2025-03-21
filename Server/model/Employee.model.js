@@ -12,16 +12,16 @@ const EmployeeSchema = new mongoose.Schema(
       required: true,
     },
     salary: {
-      ctc: { type: Number, required: true }, // Cost to Company (Annual)
+      ctc: { type: Number, required: true }, //* Cost to Company (Annual)
       basic: { type: Number, required: true },
-      hra: { type: Number, required: true }, // House Rent Allowance
+      hra: { type: Number, required: true }, //* House Rent Allowance
       allowances: { type: Number, default: 0 },
       deductions: {
         tax: { type: Number, default: 0 },
-        pf: { type: Number, default: 0 }, // Provident Fund
+        pf: { type: Number, default: 0 }, //* Provident Fund
         otherDeductions: { type: Number, default: 0 },
       },
-      netSalary: { type: Number }, // Computed: (Basic + HRA + Allowances - Deductions)
+      netSalary: { type: Number }, //* Computed: (Basic + HRA + Allowances - Deductions)
       currency: { type: String, default: "INR" },
       paymentFrequency: {
         type: String,

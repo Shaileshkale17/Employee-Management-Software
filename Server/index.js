@@ -7,9 +7,10 @@ import { Server } from "socket.io";
 dotenv.config();
 
 const app = express();
-app.use(express.json());
-
 const server = http.createServer(app);
+app.use(express.json());
+app.use(cors());
+
 const io = new Server(server, {
   origin: process.env.ORIGIN || "*",
 });
@@ -18,8 +19,6 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
-
-app.use(cors());
 
 ConnectDB()
   .then(() => {
