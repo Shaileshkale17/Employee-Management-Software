@@ -1,210 +1,182 @@
 # Employee Management Software
 
-## High-Level Flow of the System Diagram
+## Overview
+
+Employee Management Software is a comprehensive solution designed to manage employees, attendance, shifts, leave requests, notifications, reports, and other core HR functionalities. The system ensures efficient management, real-time updates, and scalable architecture using modern web technologies.
+
+## High-Level Flow of the System
 
 ### 1. User Interface (Frontend)
 
 This is where users interact with the system.
 
-**User Actions:** Logging in, managing employees, tracking attendance, requesting reports, assigning shifts, etc.
+**User Actions:**
 
-**Technology:** Web or mobile application (React.js/React Native).
+- Logging in and authentication
+- Managing employees and departments
+- Tracking attendance and shift scheduling
+- Requesting and reviewing reports
+- Applying for and approving leaves
+
+**Technology:** React.js (Web) / React Native (Mobile)
 
 ---
 
 ### 2. Authentication Service
 
-Responsible for verifying credentials.
+Handles user authentication and role-based access control.
 
 **Functionality:**
 
-- Users provide credentials (e.g., username, password).
-- The Authentication Service validates credentials using JWT or Session-based Authentication.
+- Users authenticate using credentials (email/password)
+- JWT-based authentication for secure session management
+- Role-based access control for different user levels (Admin, Manager, Employee)
 
-**Technology:** Node.js (with JWT).
+**Technology:** Node.js, JWT
 
 ---
 
 ### 3. Core Services
 
-These are the key components that handle the business logic.
+These are the key components responsible for business logic.
 
 #### **Attendance Service**
 
-**Functionality:**
+- Employees can mark check-in/check-out.
+- Attendance status (Present, Absent, Leave) is recorded.
+- Sends notifications for missing or delayed check-ins.
+- Stores data in MongoDB for reporting and analysis.
 
-- Users can mark attendance (check-in/check-out).
-- The system verifies if the user has already marked attendance for the day.
-- Data is stored in the Attendance Collection in MongoDB.
-- Tracks attendance status and sends notifications if needed.
-
-**Technology:** Node.js, MongoDB, WebSocket (for real-time updates).
+**Technology:** Node.js, MongoDB, WebSocket
 
 #### **Shift Management Service**
 
-**Functionality:**
+- Assigns and updates shifts for employees.
+- Stores shift schedules in MongoDB.
+- Sends real-time notifications for shift changes.
 
-- Managers assign, update, or view shifts for employees.
-- Shift data is stored in MongoDB.
-- Notification Service alerts employees of shift changes.
+**Technology:** Node.js, MongoDB, WebSocket
 
-**Technology:** Node.js, MongoDB, WebSocket (for real-time updates).
+#### **Leave Management Service**
 
-#### **Free Services**
+- Employees can apply for leave (Sick, Casual, Paid, Unpaid).
+- Managers approve or reject leave requests.
+- Leave status updates are stored and notified.
 
-**Functionality:**
-
-- Add, update, and remove free services.
-- Assign roles and permissions.
-- Store service details in MongoDB.
-
-**Technology:** Node.js, MongoDB.
+**Technology:** Node.js, MongoDB
 
 #### **Notification Service**
 
-**Functionality:**
+- Sends real-time alerts for attendance, shifts, and leave updates.
+- Supports WebSocket for live notifications and scheduled email/SMS alerts.
 
-- Sends real-time notifications via WebSockets or scheduled emails/SMS.
-- Notifications include shift changes, attendance reminders, etc.
-
-**Technology:** Node.js, WebSockets, Email/SMS service (Twilio).
+**Technology:** Node.js, WebSockets, Twilio
 
 #### **Report Generation Service**
 
-**Functionality:**
+- Generates reports on attendance, shift schedules, leave records, and salary details.
+- Data is fetched from MongoDB and formatted for viewing or export.
 
-- Generates reports on attendance, shift schedules, or any custom data.
-- Data is fetched from MongoDB and compiled into report formats.
-- Reports can be viewed or downloaded by users.
-
-**Technology:** Node.js, MongoDB.
+**Technology:** Node.js, MongoDB
 
 #### **Testing Service**
 
-**Functionality:**
-
-- Ensures all services are properly tested before deployment.
+- Ensures all services function correctly before deployment.
 - Implements unit, integration, and end-to-end tests.
-- Stores test logs and reports.
 
-**Technology:** Jest, Mocha, Chai.
+**Technology:** Jest, Mocha, Chai
 
 ---
 
 ### 4. Load Balancer
 
-Distributes incoming traffic across multiple backend instances to prevent bottlenecks.
+Distributes requests across multiple backend instances to improve scalability and fault tolerance.
 
-**Functionality:**
-
-- Distributes requests from the Frontend to multiple backend services (Node.js servers).
-
-**Technology:** Load balancing (Nginx).
+**Technology:** Nginx, Node.js Cluster module
 
 ---
 
 ### 5. Queue System (Asynchronous Processing)
 
-Manages background tasks like notifications and report generation.
+Handles background tasks such as report generation and notifications asynchronously.
 
-**Functionality:**
-
-- Ensures that background tasks are queued and processed asynchronously without blocking user interactions.
-
-**Technology:** RabbitMQ, Kafka, or similar.
+**Technology:** RabbitMQ, Kafka
 
 ---
 
 ### 6. Database (MongoDB)
 
-Stores all system data.
+Stores all system data efficiently for fast retrieval and scalability.
 
-**Functionality:**
-
-- Employee data, attendance records, shift schedules, and reports are stored in collections.
-- MongoDB supports horizontal scaling and can handle large data volumes.
-
-**Technology:** MongoDB (Primary Database), MongoDB Atlas (for scaling and fault tolerance).
+**Technology:** MongoDB, MongoDB Atlas
 
 ---
 
 ### 7. Caching (Redis)
 
-Speeds up responses for frequently accessed data.
+Speeds up frequently accessed data and session management.
 
-**Functionality:**
-
-- Stores session data, frequently accessed queries (e.g., employee details), to reduce database load and improve response times.
-
-**Technology:** Redis.
+**Technology:** Redis
 
 ---
 
 ### 8. Monitoring and Logging
 
-Keeps track of system health, performance, and error logs.
+Monitors system health, performance, and error tracking.
 
-**Functionality:**
-
-- Prometheus or similar tools monitor system metrics like request count, response time, error rates.
-- ELK Stack (Elasticsearch, Logstash, Kibana) tracks logs and errors.
-- Alerts notify admins in case of system failures or unusual activity.
-
-**Technology:** Prometheus, ELK Stack.
+**Technology:** Prometheus, ELK Stack (Elasticsearch, Logstash, Kibana)
 
 ---
 
-## System Diagram Visualization
-
-Here’s how to represent the diagram in Figma or Draw.io:
+## System Diagram
 
 ```
-                      +-------------------+
-                      |     User UI       |
-                      | (Web/Mobile App)  |
-                      +-------------------+
-                            |
-                            v
-                +---------------------------+
-                |   Authentication Service  |
-                |  (JWT, User Role)         |
-                +---------------------------+
-                            |
-                            v
-          +----------------------------------------+
-          |               Load Balancer          |
-          |    (Distributes requests to servers)  |
-          +----------------------------------------+
-                            |
-                            v
-          +---------------------------+        +---------------------------+
-          |  Attendance Service       |        |  Shift Management Service |
-          | (Check-in, Check-out)     |        | (Shift Assignments)        |
-          +---------------------------+        +---------------------------+
-                            |                            |
-                            v                            v
-                    +----------------+          +------------------------+
-                    |   Notification |          |   Report Generation    |
-                    |   Service      |          |     Service            |
-                    +----------------+          +------------------------+
-                            |                            |
-                            v                            v
-                   +----------------+           +--------------------------+
-                   |  MongoDB (DB)  | <------> |   Queue System (RabbitMQ) |
-                   |  (Data Store)  |           |  (Async Background Tasks) |
-                   +----------------+           +--------------------------+
-                            |
-                            v
-                       +------------+
-                       |   Redis    |
-                       | (Caching)  |
-                       +------------+
-                            |
-                            v
-                       +--------------------+
-                       | Monitoring & Logging|
-                       | (Prometheus, ELK)  |
-                       +--------------------+
+                  +-------------------+
+                  |     User UI       |
+                  | (Web/Mobile App)  |
+                  +-------------------+
+                          |
+                          v
+              +---------------------------+
+              |   Authentication Service  |
+              |  (JWT, User Role)         |
+              +---------------------------+
+                          |
+                          v
+        +----------------------------------------+
+        |               Load Balancer          |
+        |    (Distributes requests to servers)  |
+        +----------------------------------------+
+                          |
+                          v
+        +---------------------------+        +---------------------------+
+        |  Attendance Service       |        |  Shift Management Service |
+        | (Check-in, Check-out)     |        | (Shift Assignments)        |
+        +---------------------------+        +---------------------------+
+                          |                            |
+                          v                            v
+                  +----------------+          +------------------------+
+                  |   Notification |          |   Report Generation    |
+                  |   Service      |          |     Service            |
+                  +----------------+          +------------------------+
+                          |                            |
+                          v                            v
+                 +----------------+           +--------------------------+
+                 |  MongoDB (DB)  | <------> |   Queue System (RabbitMQ) |
+                 |  (Data Store)  |           |  (Async Background Tasks) |
+                 +----------------+           +--------------------------+
+                          |
+                          v
+                     +------------+
+                     |   Redis    |
+                     | (Caching)  |
+                     +------------+
+                          |
+                          v
+                     +--------------------+
+                     | Monitoring & Logging|
+                     | (Prometheus, ELK)  |
+                     +--------------------+
 ```
 
 ---
@@ -212,8 +184,8 @@ Here’s how to represent the diagram in Figma or Draw.io:
 ## Scalability Considerations
 
 - **Horizontal Scaling:** Node.js servers can be scaled horizontally to handle more users.
-- **MongoDB:** Supports horizontal scaling with sharding and replica sets for high availability.
-- **Caching with Redis:** Helps in reducing database load by caching commonly queried data.
-- **Asynchronous Processing:** The queue system ensures that long-running tasks (like generating reports) don’t block the main application flow.
+- **MongoDB Scaling:** Supports sharding and replica sets for high availability.
+- **Caching with Redis:** Reduces database load for frequently accessed queries.
+- **Asynchronous Processing:** The queue system ensures background tasks don’t slow down user interactions.
 
 This structure provides a robust, scalable, and efficient design for the Employee Management Software.
