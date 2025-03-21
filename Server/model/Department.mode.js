@@ -1,20 +1,10 @@
 import mongoose from "mongoose";
 
-const departmentSchema = new mongoose.Schema(
+const DepartmentSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    type: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    description: {
-      type: String,
-    },
+    name: { type: String, required: true, unique: true },
+    description: { type: String },
+    head: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" }, // Head of the department
   },
   { timestamps: true }
 );

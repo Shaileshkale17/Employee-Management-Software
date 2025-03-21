@@ -2,37 +2,28 @@ import mongoose from "mongoose";
 
 const LeaveSchema = new mongoose.Schema(
   {
-    user_id: {
+    employeeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
       required: true,
+      index: true,
     },
-    leave_type: {
+    leaveType: {
       type: String,
-      enum: ["Casual", "Sick", "Paid", "Unpaid"],
+      enum: ["Sick", "Casual", "Paid", "Unpaid"],
       required: true,
     },
-    start_date: {
-      type: Date,
-      required: true,
-    },
-    end_date: {
-      type: Date,
-      required: true,
-    },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    reason: { type: String, required: true },
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],
       default: "Pending",
     },
-    reason: {
-      type: String,
-      required: true,
-    },
+    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
   },
-  {
-    timestamps: true, // Adds createdAt and updatedAt timestamps
-  }
+  { timestamps: true }
 );
 
 export const Leave = mongoose.model("Leave", LeaveSchema);

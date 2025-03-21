@@ -1,56 +1,53 @@
 import mongoose from "mongoose";
 
-const EmployeeSchema = mongoose.Schema(
+const EmployeeSchema = new mongoose.Schema(
   {
-    Emp_id: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    First_Name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    Last_Name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    Email: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    Password: {
-      type: String,
-      required: true,
-    },
-    Image: {
-      type: String,
-    },
-    DOB: {
-      type: String,
-    },
-    role: {
-      type: String,
-      required: true,
-      enum: ["Admin", "Employee", "HR"],
-      default: "Employee",
-    },
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true, index: true },
+    password: { type: String, required: true },
+    role: { type: String, required: true },
     department: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Department",
+      required: true,
     },
     salary: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Salary",
+      ctc: { type: Number, required: true }, // Cost to Company (Annual)
+      basic: { type: Number, required: true },
+      hra: { type: Number, required: true }, // House Rent Allowance
+      allowances: { type: Number, default: 0 },
+      deductions: {
+        tax: { type: Number, default: 0 },
+        pf: { type: Number, default: 0 }, // Provident Fund
+        otherDeductions: { type: Number, default: 0 },
+      },
+      netSalary: { type: Number }, // Computed: (Basic + HRA + Allowances - Deductions)
+      currency: { type: String, default: "INR" },
+      paymentFrequency: {
+        type: String,
+        enum: ["Monthly", "Bi-Weekly", "Weekly"],
+        default: "Monthly",
+      },
     },
+    salaryHistory: [
+      {
+        ctc: Number,
+        basic: Number,
+        hra: Number,
+        allowances: Number,
+        deductions: {
+          tax: Number,
+          pf: Number,
+          otherDeductions: Number,
+        },
+        netSalary: Number,
+        effectiveDate: Date,
+      },
+    ],
     joiningDate: { type: Date, default: Date.now },
+    status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export const Employee = mongoose.model("Employee", EmployeeSchema);
