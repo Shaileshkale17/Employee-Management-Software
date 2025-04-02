@@ -133,6 +133,13 @@ export const createEmployee = async (req, res) => {
   }
 };
 
+export const LoginEmployee = async (req, res) => {
+  const { email, password } = req.body;
+  if (!(email && password)) {
+    return res.status(400).json(new ApiError(400, "All fields are required"));
+  }
+};
+
 export const EmployeeAllInfo = async (req, res, io) => {
   try {
     const data = await Employee.aggregate([
