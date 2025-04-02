@@ -4,13 +4,13 @@ import { Employee } from "../model/Employee.model.js";
 import nodemailer from "nodemailer";
 import ApiResponse from "../utils/ApiResponse.js";
 import bcrypt from "bcrypt";
-
+import mongoose from "mongoose";
 const employeeIdCreate = async () => {
-  const lastEmployee = await Employee.findOne().sort({ _id: -1 }); // Get the last created employee
+  const lastEmployee = await Employee.findOne().sort({ _id: -1 });
 
-  let newId = 1; // Default first ID if no employee exists
+  let newId = 1;
   if (lastEmployee) {
-    newId = lastEmployee._id + Math.floor(Math.random(2) * 100); // Increment last employee's ID
+    newId = lastEmployee._id + Math.floor(Math.random(2) * 100);
   }
   console.log(newId.toString().split("").reverse().join(""));
   return newId;
@@ -38,64 +38,68 @@ export const createEmployee = async (req, res) => {
     } = {},
   } = req.body;
 
-  // try {
-  if (
-    [name, email, password, role].some((field) => !field || field.trim() === "")
-  ) {
-    return res.status(400).json(new ApiError(400, "All fields are required"));
-  }
+  try {
+    if (
+      [name, email, password, role].some(
+        (field) => !field || field.trim() === ""
+      )
+    ) {
+      return res.status(400).json(new ApiError(400, "All fields are required"));
+    }
 
-  const existingEmployee = await Employee.findOne({ email });
-  if (existingEmployee) {
-    return res
-      .status(400)
-      .json(new ApiError(400, "Employee already exists", existingEmployee));
-  }
+    const existingEmployee = await Employee.findOne({ email });
+    if (existingEmployee) {
+      return res
+        .status(400)
+        .json(new ApiError(400, "Employee already exists", existingEmployee));
+    }
 
-  let employeeId = await employeeIdCreate();
-  let hashedPassword = await bcrypt.hash(password, 10);
+    let employeeId = await employeeIdCreate();
+    let hashedPassword = await bcrypt.hash(password, 10);
 
-  const newEmployee = await Employee.create({
-    employeeId,
-    name,
-    email,
-    password: hashedPassword,
-    role,
-    department,
-    salary: {
-      ctc,
-      basic,
-      hra,
-      allowances,
-      tax,
-      pf,
-      otherDeductions,
-      netSalary,
-    },
-    currency,
-    paymentFrequency,
-    joiningDate,
-  });
+    const newEmployee = await Employee.create({
+      employeeId,
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      department,
+      salary: {
+        ctc,
+        basic,
+        hra,
+        allowances,
+        tax,
+        pf,
+        otherDeductions,
+        netSalary,
+      },
+      currency,
+      paymentFrequency,
+      joiningDate,
+    });
 
-  if (!newEmployee) {
-    return res.status(500).json(new ApiError(500, "Employee creation failed"));
-  }
+    if (!newEmployee) {
+      return res
+        .status(500)
+        .json(new ApiError(500, "Employee creation failed"));
+    }
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_ADDRESS,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_ADDRESS,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
 
-  const userMailOptions = {
-    from: process.env.EMAIL_ADDRESS,
-    to: email,
-    subject: "Your Employee Account Has Been Created!",
-    text: `Dear ${name},
+    const userMailOptions = {
+      from: process.env.EMAIL_ADDRESS,
+      to: email,
+      subject: "Your Employee Account Has Been Created!",
+      text: `Dear ${name},
 
       Congratulations! Your employee account has been successfully created.
 
@@ -116,16 +120,17 @@ export const createEmployee = async (req, res) => {
       Email: shaileshkale87730@gmail.com  
       Phone: +91 9923110630
       `,
-  };
+    };
 
-  await transporter.sendMail(userMailOptions);
+    await transporter.sendMail(userMailOptions);
 
-  return res
-    .status(201)
-    .json(new ApiResponse(201, newEmployee, "Employee created successfully"));
-  // } catch (error) {
-  //   return res.status(500).json(new ApiError(500, error.message));
-  // }
+    return res
+      .status(201)
+      .json(new ApiResponse(201, newEmployee, "Employee created successfully"));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(new ApiError(500, error.message));
+  }
 };
 
 export const EmployeeAllInfo = async (req, res, io) => {
@@ -169,8 +174,22 @@ export const EmployeeAllInfo = async (req, res, io) => {
 
 export const EmployeeOneInfo = async (req, res, io) => {
   const socketId = req.query.socketId; // Get from frontend
+  const { id } = req.params;
+
+  // Validate ObjectId
+  if (!mongoose.isValidObjectId(id)) {
+    return res.status(400).json({
+      status: 400,
+      message: "Invalid user ID format",
+      success: false,
+    });
+  }
+
   try {
     const data = await Employee.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(id) },
+      },
       {
         $unwind: {
           path: "$Department",

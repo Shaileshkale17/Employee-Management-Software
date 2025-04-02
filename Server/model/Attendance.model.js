@@ -11,10 +11,16 @@ const AttendanceSchema = new mongoose.Schema(
     date: { type: Date, required: true },
     checkIn: { type: Date },
     checkOut: { type: Date },
+    checkHoldIn: { type: Date },
+    checkHoldOut: { type: Date },
     status: {
       type: String,
       enum: ["Present", "Absent", "Leave"],
       required: true,
+    },
+    online: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
