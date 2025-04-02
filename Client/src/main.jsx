@@ -7,7 +7,8 @@ import Login from "./pages/Login";
 import OTP from "./pages/OTP";
 import ForgotPassword from "./pages/ForgotPassword";
 import Overview from "./pages/Employee Dashboard/overview";
-
+import { Provider } from "react-redux";
+import store from "./redux/store";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -34,6 +35,8 @@ const routers = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={routers} />
+    <Provider store={store}>
+      <RouterProvider router={routers} />
+    </Provider>
   </StrictMode>
 );

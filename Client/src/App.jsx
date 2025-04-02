@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-
-import InputBox from "./components/InputBox";
 import Navber from "./components/Navber";
 import Footer from "./components/Footer";
 import { Outlet, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const NavberRouter = useNavigate();
-
+  const { user } = useSelector((state) => state.auth);
+  console.log("user", user);
   useEffect(() => {
-    localStorage.setItem("token", "CZSBFGLKJSHFLKJSHDFJDSBQVQYJKo");
+    localStorage.setItem("token", "");
     if (token === "") {
       NavberRouter("/");
     }
