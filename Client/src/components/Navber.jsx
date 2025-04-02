@@ -8,25 +8,25 @@ const Navber = () => {
     useState(0);
   const [Notificationsnumber, setNotificationsnumber] = useState(0);
   return (
-    <div className=" border border-solid border-gray-500 shadow-lg bg-gray-400">
-      <div className="mx-10 flex flex-row justify-between items-center ">
+    <div className=" border border-solid border-[#3354F4] shadow-lg bg-white">
+      <div className="mx-0 md:mx-2  flex flex-row justify-between items-center ">
         <div>
           <img src={logo} alt="logo" className="w-[4.5rem] h-[4.5rem]" />
         </div>
         <div>
           <ul className="flex flex-row items-center gap-4">
-            <li className="rounded-full bg-gray-300 p-2 relative">
+            <li className="rounded-full bg-[#CFD7FD] p-2  relative">
               <img src={solar_calendar} alt="solar calendar" />
               {solar_calendar_Notifications === 0 || (
-                <span className="absolute top-5 right-0 bg-[#ff000076] text-center w-6 h-6 rounded-full text-gray-400 ">
+                <span className="absolute top-5 right-0 bg-[#ff000076] text-center w-6 h-6 rounded-full text-white ">
                   {solar_calendar_Notifications}
                 </span>
               )}
             </li>
-            <li className="  rounded-full bg-gray-300 p-2 relative">
+            <li className="  rounded-full bg-[#CFD7FD] p-2 relative">
               <img src={Notifications} alt="Notification" />
               {Notificationsnumber === 0 || (
-                <span className="absolute top-5 right-0 bg-[#ff000076] text-center w-6 h-6 rounded-full text-gray-400 ">
+                <span className="absolute top-5 right-0 bg-[#ff000076] text-center w-6 h-6 rounded-full text-white ">
                   {Notificationsnumber}
                 </span>
               )}
