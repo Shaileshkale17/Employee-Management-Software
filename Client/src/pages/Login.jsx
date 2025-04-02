@@ -5,12 +5,27 @@ import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import Heading from "../components/Heading";
 import bgImage from "../assets/pexels-olly-3771790.jpg";
+import axios, { Axios } from "axios";
+import { toast } from "react-toastify";
+
 const Login = () => {
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
   const Navrouter = useNavigate();
-  const fromSubmit = (e) => {
+  const fromSubmit = async (e) => {
     e.preventDefault();
+
+    if (!Email && Password) {
+      return toast.error("pls enter your email and password");
+    }
+
+    try {
+      const res = await axios.post(`${import.meta.process}/emp/emp-login`);
+    } catch (error) {
+      console.log(error);
+      return toast.error(error.message);
+    }
+
     console.log(`fromSubmit email ${Email} Password ${Password}`);
     setEmail("");
     setPassword("");
