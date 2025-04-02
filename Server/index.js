@@ -23,8 +23,8 @@ app.use((req, res, next) => {
 });
 app.locals.io = io;
 
-app.use("/api/", Employeerouter);
-app.use("/api/", Departmentrouter);
+app.use("/api/emp/", Employeerouter);
+app.use("/api/dep/", Departmentrouter);
 
 ConnectDB()
   .then(() => {
