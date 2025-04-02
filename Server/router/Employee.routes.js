@@ -4,13 +4,14 @@ import {
   EmployeeInfoDeleted,
   EmployeeInfoUpdate,
   EmployeeOneInfo,
+  LoginEmployee,
   createEmployee,
 } from "../Controller/Employee.js";
 
 const router = express.Router();
 
 router.post("/emp-login", (req, res) =>
-  createEmployee(req, res, req.app.locals.io)
+  LoginEmployee(req, res, req.app.locals.io)
 );
 router.post("/emp-post", (req, res) =>
   createEmployee(req, res, req.app.locals.io)

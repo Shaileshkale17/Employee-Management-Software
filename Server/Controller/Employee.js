@@ -5,6 +5,8 @@ import nodemailer from "nodemailer";
 import ApiResponse from "../utils/ApiResponse.js";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+
 const employeeIdCreate = async () => {
   const lastEmployee = await Employee.findOne().sort({ _id: -1 });
 
@@ -135,8 +137,54 @@ export const createEmployee = async (req, res) => {
 
 export const LoginEmployee = async (req, res) => {
   const { email, password } = req.body;
-  if (!(email && password)) {
-    return res.status(400).json(new ApiError(400, "All fields are required"));
+  try {
+    if (!(email && password)) {
+      return res.status(400).json(new ApiError(400, "All fields are required"));
+    }
+
+    const user = await Employee.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        status: 401,
+        message: "Invalid email or password",
+        success: false,
+      });
+    }
+
+    const token = await jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET
+    );
+
+    return res.status(200).json({
+      status: 200,
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        FullName: user.name,
+        email: user.email,
+        workLocation: user.workLocation,
+        employeeId: user.employeeId,
+        role: user.role,
+      },
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(new ApiError(500, error.message));
   }
 };
 
