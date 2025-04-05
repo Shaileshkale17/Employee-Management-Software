@@ -5,12 +5,14 @@ import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import Heading from "../components/Heading";
 import bgImage from "../assets/pexels-olly-3771790.jpg";
-import axios, { Axios } from "axios";
+import axios from "axios";
 import { toast } from "react-toastify";
-
+import { useDispatch } from "react-redux";
+import { login } from "../redux/slices/authSlice";
 const Login = () => {
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const Navrouter = useNavigate();
   const fromSubmit = async (e) => {
     e.preventDefault();
@@ -20,16 +22,29 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post(`${import.meta.process}/emp/emp-login`);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/emp/emp-login`,
+        {
+          email: Email,
+          password: Password,
+        }
+      );
+
+      const info = {
+        token: res.data.token,
+        user: res.data.user,
+      };
+      // console.log(info);
+      toast.success("Login successful");
+      dispatch(login(info));
+      Navrouter("/overview");
     } catch (error) {
       console.log(error);
-      return toast.error(error.message);
+      return toast.error(error.response.data.message);
     }
 
-    console.log(`fromSubmit email ${Email} Password ${Password}`);
     setEmail("");
     setPassword("");
-    Navrouter("/otp");
   };
   return (
     <div className="flex flex-row  ">

@@ -9,6 +9,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Overview from "./pages/Employee Dashboard/overview";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import Text from "./pages/text";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -29,6 +30,7 @@ const routers = createBrowserRouter([
         path: "/overview",
         element: <Overview />,
       },
+      // { path: "/", element: <Text /> },
     ],
   },
 ]);

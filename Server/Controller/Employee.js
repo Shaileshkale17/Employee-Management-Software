@@ -164,6 +164,7 @@ export const LoginEmployee = async (req, res) => {
       {
         id: user._id,
         role: user.role,
+        employeeId: user.employeeId,
       },
       process.env.JWT_SECRET
     );
@@ -194,7 +195,7 @@ export const EmployeeAllInfo = async (req, res, io) => {
       {
         $unwind: {
           path: "$Department",
-          preserveNullAndEmptyArrays: true, // Include users without events
+          preserveNullAndEmptyArrays: true, // Include users without Department
         },
       },
       {
@@ -218,7 +219,7 @@ export const EmployeeAllInfo = async (req, res, io) => {
       count: data.length,
       data,
     });
-    console.log("data in fo", data);
+
     return res
       .status(200)
       .json(new ApiResponse(200, data, "All Employee fetched successfully"));
@@ -248,7 +249,7 @@ export const EmployeeOneInfo = async (req, res, io) => {
       {
         $unwind: {
           path: "$Department",
-          preserveNullAndEmptyArrays: true, // Include users without events
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
