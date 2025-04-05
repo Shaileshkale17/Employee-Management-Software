@@ -6,10 +6,18 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login";
 import OTP from "./pages/OTP";
 import ForgotPassword from "./pages/ForgotPassword";
-import Overview from "./pages/Employee Dashboard/overview";
+import Overview from "./pages/Employee Dashboard/Overview";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import Text from "./pages/text";
+import ProtectedRoute from "./Middlewares/routes.Middlewares";
+import Task from "./pages/Employee Dashboard/Task";
+import Message from "./pages/Employee Dashboard/Message";
+import Meeting from "./pages/Employee Dashboard/Meeting";
+import Attendance_Info from "./pages/Employee Dashboard/Attendance_Info";
+import Report from "./pages/Employee Dashboard/Attendance_Info";
+import Event from "./pages/Employee Dashboard/Event";
+
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -28,9 +36,62 @@ const routers = createBrowserRouter([
       },
       {
         path: "/overview",
-        element: <Overview />,
+        element: (
+          <ProtectedRoute role="">
+            <Overview />
+          </ProtectedRoute>
+        ),
       },
-      // { path: "/", element: <Text /> },
+      {
+        path: "/task",
+        element: (
+          <ProtectedRoute role="">
+            <Task />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/message",
+        element: (
+          <ProtectedRoute role="">
+            <Message />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/meeting",
+        element: (
+          <ProtectedRoute role="">
+            <Meeting />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/attendance",
+        element: (
+          <ProtectedRoute role="">
+            <Attendance_Info />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/report",
+        element: (
+          <ProtectedRoute role="">
+            <Report />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/event",
+        element: (
+          <ProtectedRoute role="">
+            <Event />
+          </ProtectedRoute>
+        ),
+      },
+
+      { path: "/unauthorized", element: "unauthorized" },
     ],
   },
 ]);
