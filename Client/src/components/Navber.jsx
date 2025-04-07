@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import logo from "../assets/logo_SVG.png";
+// import logo from "../assets/logo_SVG.png";
+import logo from "../assets/ChatGPT Image Apr 7, 2025, 12_02_12 PM (1).svg";
 import solar_calendar from "../assets/solar_calendar-broken.svg";
 import Notifications from "../assets/Notifications.svg";
 import profile from "../assets/user.jpeg";
