@@ -10,7 +10,7 @@ const Navber = () => {
   const [Notificationsnumber, setNotificationsnumber] = useState(0);
   return (
     <div className=" border border-solid border-[#3354F4] shadow-lg bg-white">
-      <div className="mx-0 md:mx-2  flex flex-row justify-between items-center ">
+      <div className="mx-0 md:mx-2  flex flex-row justify-between items-center lg:px-5 ">
         <div>
           <img src={logo} alt="logo" className="w-[4.5rem] h-[4.5rem]" />
         </div>
