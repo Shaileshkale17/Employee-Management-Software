@@ -15,7 +15,7 @@ import Task from "./pages/Employee Dashboard/Task";
 import Message from "./pages/Employee Dashboard/Message";
 import Meeting from "./pages/Employee Dashboard/Meeting";
 import Attendance_Info from "./pages/Employee Dashboard/Attendance_Info";
-import Report from "./pages/Employee Dashboard/Attendance_Info";
+import Report from "./pages/Employee Dashboard/Report";
 import Event from "./pages/Employee Dashboard/Event";
 
 const routers = createBrowserRouter([
@@ -67,14 +67,6 @@ const routers = createBrowserRouter([
         ),
       },
       {
-        path: "/attendance",
-        element: (
-          <ProtectedRoute role="">
-            <Attendance_Info />
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: "/report",
         element: (
           <ProtectedRoute role="">
@@ -82,6 +74,15 @@ const routers = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "/attendance",
+        element: (
+          <ProtectedRoute role="">
+            <Attendance_Info />
+          </ProtectedRoute>
+        ),
+      },
+
       {
         path: "/event",
         element: (
