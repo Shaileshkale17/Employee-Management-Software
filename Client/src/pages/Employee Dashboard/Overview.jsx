@@ -225,16 +225,16 @@ const Overview = () => {
   return (
     <div className="flex flex-row w-full">
       <SideNavbar />
-      <main className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5 bg-white">
-        <div className="flex justify-center items-center rounded-lg shadow-md p-4">
+      <main className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5 bg-white  ">
+        <div className="hidden lg:flex justify-center items-center rounded-lg shadow-md p-4">
           <LineChart data={data} options={options} />
         </div>
-        <div className="flex justify-center items-center rounded-lg shadow-md p-4">
+        <div className="hidden lg:flex justify-center items-center rounded-lg shadow-md p-4">
           <LineChart data={employees_data} options={employees_options} />
         </div>
 
         <Card>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {featureCards.map((item, idx) => (
               <Title_Card
                 key={idx}

@@ -13,14 +13,14 @@ const SideNavbar = () => {
   ];
 
   return (
-    <div className="w-[20%] h-full bg-gray-100 p-4">
+    <div className="w-[30%] md:w-[20%] h-full bg-gray-100 p-1 md:p-4">
       <ul className="flex flex-col gap-4">
         {navbarArr.map((item, index) => (
           <li key={index}>
             <NavLink
               to={item.path}
               className={({ isActive }) =>
-                `block px-4 py-2 rounded-md text-start transition-all ${
+                `block md:px-4 py-2 rounded-md text-start transition-all ${
                   isActive
                     ? "bg-gray-700 text-white"
                     : "text-gray-800 hover:text-white hover:bg-gray-400"
