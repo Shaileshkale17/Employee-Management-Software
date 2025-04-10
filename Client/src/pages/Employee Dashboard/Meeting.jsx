@@ -20,7 +20,7 @@ const Meeting = () => {
     if (hours >= 12) {
       AMPM = "PM";
     }
-    return `${todayDate}/${month}/${year}${" "}${hours}:${minutes}:${Seconds} ${" "} ${AMPM} `;
+    return `${todayDate}/${month}/${year}${" "}${hours}:${minutes}:${Seconds} ${" "}  `;
   };
   setInterval(() => {
     setDateValue(DateTime());
