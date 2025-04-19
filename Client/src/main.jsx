@@ -17,6 +17,7 @@ import Meeting from "./pages/Employee Dashboard/Meeting";
 import Attendance_Info from "./pages/Employee Dashboard/Attendance_Info";
 import Report from "./pages/Employee Dashboard/Report";
 import Event from "./pages/Employee Dashboard/Event";
+import EmployeeRegistration from "./pages/Employee Dashboard/EmployeeRegistration";
 
 const routers = createBrowserRouter([
   {
@@ -90,6 +91,11 @@ const routers = createBrowserRouter([
             <Event />
           </ProtectedRoute>
         ),
+      },
+
+      {
+        path: "/EmployeeRegistration",
+        element: <EmployeeRegistration />,
       },
 
       { path: "/unauthorized", element: "unauthorized" },
