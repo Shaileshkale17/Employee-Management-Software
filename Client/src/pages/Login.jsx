@@ -34,7 +34,7 @@ const Login = () => {
         token: res.data.token,
         user: res.data.user,
       };
-
+      // console.log(info);
       toast.success("Login successful");
       dispatch(login(info));
       Navrouter("/overview");

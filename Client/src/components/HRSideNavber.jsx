@@ -11,7 +11,7 @@ const HRSideNavber = () => {
     { name: "Report", path: "/report" },
     { name: "Event", path: "/event" },
     { name: "Search Employees", path: "/search" },
-    { name: "HR", path: "/search" },
+    { name: "add", path: "/add" },
   ];
 
   return (

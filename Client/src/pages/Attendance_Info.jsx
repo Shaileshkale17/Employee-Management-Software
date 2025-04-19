@@ -1,6 +1,6 @@
 import React from "react";
-import SideNavbar from "../../components/SideNavber";
-import HRSideNavber from "../../components/HRSideNavber";
+import SideNavbar from "../components/SideNavber";
+import HRSideNavber from "../components/HRSideNavber";
 import { useSelector } from "react-redux";
 
 const Attendance_Info = () => {

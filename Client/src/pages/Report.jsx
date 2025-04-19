@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import SideNavbar from "../../components/SideNavber";
+import SideNavbar from "../components/SideNavber";
 import { NavLink } from "react-router-dom";
-import arrowRight from "../../assets/material-symbols-light_arrow-back-rounded-1.svg";
-import arrowLeft from "../../assets/material-symbols-light_arrow-back-rounded.svg";
-import InfoBoxCard from "../../components/InfoBoxCard";
-import InfoBoxCardDow from "../../components/download-icon.svg";
+import arrowRight from "../assets/material-symbols-light_arrow-back-rounded-1.svg";
+import arrowLeft from "../assets/material-symbols-light_arrow-back-rounded.svg";
+import InfoBoxCard from "../components/InfoBoxCard";
+import InfoBoxCardDow from "../components/download-icon.svg";
 import { useSelector } from "react-redux";
 
 const Report = () => {

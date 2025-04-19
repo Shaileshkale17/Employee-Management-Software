@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import SideNavbar from "../../components/SideNavber";
-import arrowRight from "../../assets/material-symbols-light_arrow-back-rounded-1.svg";
-import arrowLeft from "../../assets/material-symbols-light_arrow-back-rounded.svg";
-import ChatArea from "../../components/ChatArea";
+import SideNavbar from "../components/SideNavber";
+import arrowRight from "../assets/material-symbols-light_arrow-back-rounded-1.svg";
+import arrowLeft from "../assets/material-symbols-light_arrow-back-rounded.svg";
+import ChatArea from "../components/ChatArea";
 import { useSelector } from "react-redux";
 
 const Message = () => {

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import SideNavbar from "../../components/SideNavber";
+import SideNavbar from "../components/SideNavber";
 import { NavLink } from "react-router-dom";
-import arrowRight from "../../assets/material-symbols-light_arrow-back-rounded-1.svg";
-import arrowLeft from "../../assets/material-symbols-light_arrow-back-rounded.svg";
-import InfoBoxCard from "../../components/InfoBoxCard";
+import arrowRight from "../assets/material-symbols-light_arrow-back-rounded-1.svg";
+import arrowLeft from "../assets/material-symbols-light_arrow-back-rounded.svg";
+import InfoBoxCard from "../components/InfoBoxCard";
+import EventCard from "../components/EventCard";
 import { useSelector } from "react-redux";
 
-const Task = () => {
+const Event = () => {
   const [ClickShow, setClickShow] = useState(true);
   const [selectedTaskTitle, setSelectedTaskTitle] = useState("");
   const { user } = useSelector((state) => state.auth);
@@ -214,11 +215,11 @@ const Task = () => {
           )}
         </div>
         <div className="w-full p-4 overflow-y-auto">
-          <InfoBoxCard tasks={filteredTasks} />
+          <EventCard tasks={filteredTasks} />
         </div>
       </div>
     </div>
   );
 };
 
-export default Task;
+export default Event;

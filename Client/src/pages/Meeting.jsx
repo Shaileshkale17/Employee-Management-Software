@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import SideNavbar from "../../components/SideNavber";
-import MeetingCard from "../../components/MeetingCard";
+import SideNavbar from "../components/SideNavber";
+import MeetingCard from "../components/MeetingCard";
 import { useSelector } from "react-redux";
 
 const Meeting = () => {
