@@ -3,14 +3,14 @@ import { NavLink } from "react-router-dom";
 
 const SideNavbar = () => {
   const navbarArr = [
-    { name: "Overview", path: "/emp/overview" },
-    { name: "Task", path: "/emp/task" },
-    { name: "Message", path: "/emp/message" },
-    { name: "Meeting", path: "/emp/meeting" },
-    { name: "Attendance Info", path: "/emp/attendance" },
-    { name: "Report", path: "/emp/report" },
-    { name: "Event", path: "/emp/event" },
-    { name: "Search Employees", path: "/emp/search" },
+    { name: "Overview", path: "/overview" },
+    { name: "Task", path: "/task" },
+    { name: "Message", path: "/message" },
+    { name: "Meeting", path: "/meeting" },
+    { name: "Attendance Info", path: "/attendance" },
+    { name: "Report", path: "/report" },
+    { name: "Event", path: "/event" },
+    { name: "Search Employees", path: "/search" },
   ];
 
   return (

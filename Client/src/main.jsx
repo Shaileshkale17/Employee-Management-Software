@@ -37,7 +37,7 @@ const routers = createBrowserRouter([
         element: <ForgotPassword />,
       },
       {
-        path: "/emp/overview",
+        path: "/overview",
         element: (
           <ProtectedRoute role="">
             <Overview />
@@ -45,7 +45,7 @@ const routers = createBrowserRouter([
         ),
       },
       {
-        path: "/emp/task",
+        path: "/task",
         element: (
           <ProtectedRoute role="">
             <Task />
@@ -53,7 +53,7 @@ const routers = createBrowserRouter([
         ),
       },
       {
-        path: "/emp/message",
+        path: "/message",
         element: (
           <ProtectedRoute role="">
             <Message />
@@ -61,7 +61,7 @@ const routers = createBrowserRouter([
         ),
       },
       {
-        path: "/emp/meeting",
+        path: "/meeting",
         element: (
           <ProtectedRoute role="">
             <Meeting />
@@ -69,7 +69,7 @@ const routers = createBrowserRouter([
         ),
       },
       {
-        path: "/emp/report",
+        path: "/report",
         element: (
           <ProtectedRoute role="">
             <Report />
@@ -77,7 +77,7 @@ const routers = createBrowserRouter([
         ),
       },
       {
-        path: "/emp/attendance",
+        path: "/attendance",
         element: (
           <ProtectedRoute role="">
             <Attendance_Info />
@@ -86,7 +86,7 @@ const routers = createBrowserRouter([
       },
 
       {
-        path: "/emp/event",
+        path: "/event",
         element: (
           <ProtectedRoute role="">
             <Event />
@@ -94,7 +94,7 @@ const routers = createBrowserRouter([
         ),
       },
       {
-        path: "/emp/search",
+        path: "/search",
         element: (
           <ProtectedRoute role="">
             <SearchBarInAll />
