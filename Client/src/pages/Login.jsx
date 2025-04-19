@@ -34,10 +34,9 @@ const Login = () => {
         token: res.data.token,
         user: res.data.user,
       };
-      // console.log(info);
       toast.success("Login successful");
       dispatch(login(info));
-      Navrouter("/overview");
+      Navrouter("/emp/overview");
     } catch (error) {
       console.log(error);
       return toast.error(error.response.data.message);
