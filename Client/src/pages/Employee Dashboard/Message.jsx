@@ -3,10 +3,24 @@ import SideNavbar from "../../components/SideNavber";
 import arrowRight from "../../assets/material-symbols-light_arrow-back-rounded-1.svg";
 import arrowLeft from "../../assets/material-symbols-light_arrow-back-rounded.svg";
 import ChatArea from "../../components/ChatArea";
+import { useSelector } from "react-redux";
 
 const Message = () => {
   const [ClickShow, setClickShow] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
+  const { user } = useSelector((state) => state.auth);
+  console.log(user.user.role);
+
+  const SideNav = (role) => {
+    switch (role) {
+      case "developer":
+        return <SideNavbar />;
+      case "HR Manager":
+        return <HRSideNavber />;
+      default:
+        return null;
+    }
+  };
 
   const users = [
     { name: "Shailesh Kale", role: "Frontend Developer", online: true },
@@ -23,7 +37,7 @@ const Message = () => {
 
   return (
     <div className="flex w-full">
-      <SideNavbar />
+      {SideNav(user.user.role)}
       <div className="w-full flex h-screen">
         {/* Sidebar */}
         <div

@@ -13,8 +13,23 @@ import report from "../../assets/material-symbols-light_check-rounded.svg";
 import EventList from "../../components/EventList";
 import NotificationsList from "../../components/NotificationsList";
 import ClickInAndClickOut from "../../components/clickInAndClickOut";
+import { useSelector } from "react-redux";
 
 const Overview = () => {
+  const { user } = useSelector((state) => state.auth);
+  console.log(user.user.role);
+
+  const SideNav = (role) => {
+    switch (role) {
+      case "developer":
+        return <SideNavbar />;
+      case "HR Manager":
+        return <HRSideNavber />;
+      default:
+        return null;
+    }
+  };
+
   const featureCards = [
     {
       icon: Meet,
@@ -224,7 +239,7 @@ const Overview = () => {
 
   return (
     <div className="flex flex-row w-full">
-      <SideNavbar />
+      {SideNav(user.user.role)}
       <main className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5 bg-white  ">
         <div className="hidden lg:flex justify-center items-center rounded-lg shadow-md p-4">
           <LineChart data={data} options={options} />

@@ -19,12 +19,12 @@ import Report from "./pages/Employee Dashboard/Report";
 import Event from "./pages/Employee Dashboard/Event";
 import EmployeeRegistration from "./pages/Employee Dashboard/EmployeeRegistration";
 import SearchBarInAll from "./components/scarchBerInAll";
+import { Unauthorized } from "./components/unauthorized";
 
 const routers = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    errorElement: "error element not found ",
     HydrateFallback: true,
     children: [
       { path: "/", element: <Login /> },
@@ -101,13 +101,13 @@ const routers = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-
       {
         path: "/EmployeeRegistration",
         element: <EmployeeRegistration />,
       },
 
-      { path: "/unauthorized", element: "unauthorized" },
+      { path: "/unauthorized", element: <Unauthorized /> },
+      { path: "/*", element: "Error Page" },
     ],
   },
 ]);

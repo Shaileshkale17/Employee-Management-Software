@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from "react";
 import SideNavbar from "../../components/SideNavber";
 import MeetingCard from "../../components/MeetingCard";
+import { useSelector } from "react-redux";
 
 const Meeting = () => {
   const [selectedTaskTitle, setSelectedTaskTitle] = useState(null);
   const [Meet_Link, setMeet_Link] = useState("");
   const [DateValue, setDateValue] = useState("");
+  const { user } = useSelector((state) => state.auth);
+  console.log(user.user.role);
+
+  const SideNav = (role) => {
+    switch (role) {
+      case "developer":
+        return <SideNavbar />;
+      case "HR Manager":
+        return <HRSideNavber />;
+      default:
+        return null;
+    }
+  };
 
   const DateTime = () => {
     let newDate = new Date();
@@ -71,7 +85,7 @@ const Meeting = () => {
 
   return (
     <div className="flex flex-row w-full">
-      <SideNavbar />
+      {SideNav(user.user.role)}
       <div className="w-full min-h-[83.8vh] flex justify-center items-center bg-gray-200 p-4">
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-6xl justify-center items-center">
           <div className="flex min-w-[60%] flex-col gap-4 justify-center h-full ">

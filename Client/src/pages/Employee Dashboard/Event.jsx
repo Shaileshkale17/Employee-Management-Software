@@ -5,10 +5,24 @@ import arrowRight from "../../assets/material-symbols-light_arrow-back-rounded-1
 import arrowLeft from "../../assets/material-symbols-light_arrow-back-rounded.svg";
 import InfoBoxCard from "../../components/InfoBoxCard";
 import EventCard from "../../components/EventCard";
+import { useSelector } from "react-redux";
 
 const Event = () => {
   const [ClickShow, setClickShow] = useState(true);
   const [selectedTaskTitle, setSelectedTaskTitle] = useState("");
+  const { user } = useSelector((state) => state.auth);
+  console.log(user.user.role);
+
+  const SideNav = (role) => {
+    switch (role) {
+      case "developer":
+        return <SideNavbar />;
+      case "HR Manager":
+        return <HRSideNavber />;
+      default:
+        return null;
+    }
+  };
 
   const taskinfo = [
     {
@@ -161,7 +175,7 @@ const Event = () => {
 
   return (
     <div className="flex flex-row w-full">
-      <SideNavbar />
+      {SideNav(user.user.role)}
       <div className="w-full flex h-screen">
         <div
           className={`relative ${
