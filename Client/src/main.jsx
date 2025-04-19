@@ -18,6 +18,7 @@ import Attendance_Info from "./pages/Employee Dashboard/Attendance_Info";
 import Report from "./pages/Employee Dashboard/Report";
 import Event from "./pages/Employee Dashboard/Event";
 import EmployeeRegistration from "./pages/Employee Dashboard/EmployeeRegistration";
+import SearchBarInAll from "./components/scarchBerInAll";
 
 const routers = createBrowserRouter([
   {
@@ -89,6 +90,14 @@ const routers = createBrowserRouter([
         element: (
           <ProtectedRoute role="">
             <Event />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/search",
+        element: (
+          <ProtectedRoute role="">
+            <SearchBarInAll />
           </ProtectedRoute>
         ),
       },

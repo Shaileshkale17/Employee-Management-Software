@@ -10,6 +10,7 @@ const SideNavbar = () => {
     { name: "Attendance Info", path: "/attendance" },
     { name: "Report", path: "/report" },
     { name: "Event", path: "/event" },
+    { name: "Search Employees", path: "/search" },
   ];
 
   return (
