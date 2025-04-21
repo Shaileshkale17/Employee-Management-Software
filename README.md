@@ -1,5 +1,17 @@
 # Employee Management Software
+## Demo Credentials
 
+Use the following credentials to test the system:
+
+- **HR Login**  
+  Email: `hr@example.com`  
+  Password: `hr@1234`
+
+- **Employee Login**  
+  Email: `employee@example.com`  
+  Password: `employee@1234`
+
+---
 ## Overview
 
 Employee Management Software is a comprehensive solution designed to manage employees, attendance, shifts, leave requests, notifications, reports, and other core HR functionalities. The system ensures efficient management, real-time updates, and scalable architecture using modern web technologies.
