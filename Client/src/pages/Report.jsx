@@ -6,7 +6,7 @@ import arrowLeft from "../assets/material-symbols-light_arrow-back-rounded.svg";
 import InfoBoxCard from "../components/InfoBoxCard";
 import InfoBoxCardDow from "../components/download-icon.svg";
 import { useSelector } from "react-redux";
-
+import HRSideNavber from "../components/HRSideNavber";
 const Report = () => {
   const [ClickShow, setClickShow] = useState(true);
   const [selectedTaskTitle, setSelectedTaskTitle] = useState("");

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import SideNavbar from "../components/SideNavber";
 import MeetingCard from "../components/MeetingCard";
 import { useSelector } from "react-redux";
-
+import HRSideNavber from "../components/HRSideNavber";
 const Meeting = () => {
   const [selectedTaskTitle, setSelectedTaskTitle] = useState(null);
   const [Meet_Link, setMeet_Link] = useState("");
@@ -86,7 +86,9 @@ const Meeting = () => {
   return (
     <div className="flex flex-row w-full">
       {SideNav(user.user.role)}
-      <div className="w-full min-h-[83.8vh] flex justify-center items-center bg-gray-200 p-4">
+      <div
+        className="w-full 
+      -h-[83.8vh] flex justify-center items-center bg-gray-200 p-4">
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-6xl justify-center items-center">
           <div className="flex min-w-[60%] flex-col gap-4 justify-center h-full ">
             <h1 className="text-xl font-semibold text-center md:mb-16">

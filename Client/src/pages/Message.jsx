@@ -4,7 +4,7 @@ import arrowRight from "../assets/material-symbols-light_arrow-back-rounded-1.sv
 import arrowLeft from "../assets/material-symbols-light_arrow-back-rounded.svg";
 import ChatArea from "../components/ChatArea";
 import { useSelector } from "react-redux";
-
+import HRSideNavber from "../components/HRSideNavber";
 const Message = () => {
   const [ClickShow, setClickShow] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);

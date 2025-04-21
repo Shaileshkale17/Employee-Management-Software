@@ -2,9 +2,23 @@ import React, { useState } from "react";
 import SideNavbar from "./SideNavber"; // fix this if the filename was wrong
 import Searchicon from "../assets/iconamoon_search-thin.svg";
 import EmployeeProfile from "./EmployeeProfile";
+import { useSelector } from "react-redux";
+import HRSideNavber from "./HRSideNavber";
 const SearchBarInAll = () => {
   const [Search, setSearch] = useState("");
+  const { user } = useSelector((state) => state.auth);
+  console.log(user.user);
 
+  const SideNav = (role) => {
+    switch (role) {
+      case "developer":
+        return <SideNavbar />;
+      case "HR Manager":
+        return <HRSideNavber />;
+      default:
+        return null;
+    }
+  };
   const arr = [
     {
       id: 1,
@@ -65,7 +79,7 @@ const SearchBarInAll = () => {
 
   return (
     <div className="flex flex-row w-full">
-      <SideNavbar />
+      {SideNav(user.user.role)}
       <div className="w-full min-h-screen flex flex-col justify-center items-center bg-gray-200">
         <div className="h-10 mt-6 flex bg-white p-2 rounded-md ">
           <img src={Searchicon} alt="" />
@@ -79,7 +93,7 @@ const SearchBarInAll = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="h-full my-5 grid col-span-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 xl:grid-cols-4">
+        <div className="h-full mt-5 grid col-span-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 xl:grid-cols-5 ">
           {arr
             .filter(
               (item) =>
