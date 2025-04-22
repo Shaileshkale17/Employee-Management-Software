@@ -86,7 +86,7 @@ export const createEmployee = async (req, res) => {
         .status(500)
         .json(new ApiError(500, "Employee creation failed"));
     }
-    /*
+
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -125,7 +125,7 @@ export const createEmployee = async (req, res) => {
     };
 
     await transporter.sendMail(userMailOptions);
-*/
+
     return res
       .status(201)
       .json(new ApiResponse(201, newEmployee, "Employee created successfully"));
