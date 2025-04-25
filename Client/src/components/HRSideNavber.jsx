@@ -111,7 +111,7 @@ const HRSideNavber = () => {
   ];
 
   return (
-    <div className="w-[30%] md:w-[20%] h-screen bg-gray-100 p-1 md:p-4 overflow-scroll ">
+    <div className="w-[30%] md:w-[20%] h-screen bg-gray-100 p-1 md:p-4 overflow-y-scroll ">
       <ul className="flex flex-col gap-4">
         {navbarArr.map((item, index) => (
           <li key={index}>
