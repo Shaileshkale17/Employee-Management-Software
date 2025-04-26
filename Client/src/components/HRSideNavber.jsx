@@ -27,7 +27,6 @@ const HRSideNavber = () => {
           path: "/interview-scheduling-coordination",
         },
         { name: "Conducting Interviews", path: "/conducting-interviews" },
-        { name: "Conducting Interviews", path: "/conducting-interviews" },
       ],
     },
     {

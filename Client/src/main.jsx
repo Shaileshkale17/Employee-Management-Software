@@ -19,10 +19,11 @@ import Report from "./pages/Report";
 import Event from "./pages/Event";
 import EmployeeRegistration from "./pages/EmployeeRegistration";
 import SearchBarInAll from "./components/scarchBerInAll";
-import { Unauthorized } from "./components/unauthorized";
-import Job_Postings from "./components/Job_Postings";
-import InterviewSchedulingCoordination from "./components/InterviewSchedulingCoordination";
-import ResumeScreening from "./components/ResumeScreening";
+import Unauthorized from "./components/unauthorized";
+import Job_Postings from "./pages/Job_Postings";
+import InterviewSchedulingCoordination from "./pages/InterviewSchedulingCoordination";
+import ResumeScreening from "./pages/ResumeScreening";
+import ConductingInterviews from "./pages/ConductingInterviews";
 
 const routers = createBrowserRouter([
   {
@@ -129,6 +130,22 @@ const routers = createBrowserRouter([
         element: (
           <ProtectedRoute role="">
             <InterviewSchedulingCoordination />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/JobPostings",
+        element: (
+          <ProtectedRoute role="">
+            <InterviewSchedulingCoordination />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/conducting-interviews",
+        element: (
+          <ProtectedRoute role="">
+            <ConductingInterviews />
           </ProtectedRoute>
         ),
       },

@@ -3,7 +3,7 @@ import SideNavbar from "../components/SideNavber";
 import HRSideNavber from "../components/HRSideNavber";
 import { useSelector } from "react-redux";
 
-const Job_Postings = () => {
+const ResumeScreening = () => {
   const { user } = useSelector((state) => state.auth);
   console.log(user.user.role);
 
@@ -22,10 +22,10 @@ const Job_Postings = () => {
     <div className="flex flex-row w-full">
       {SideNav(user.user.role)}
       <div className="w-full h-screen flex justify-center items-center bg-gray-200">
-        Attendance_Info
+        Resume Screening
       </div>
     </div>
   );
 };
 
-export default Job_Postings;
+export default ResumeScreening;
