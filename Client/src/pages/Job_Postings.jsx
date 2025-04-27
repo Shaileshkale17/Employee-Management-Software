@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SideNavbar from "../components/SideNavber";
 import HRSideNavber from "../components/HRSideNavber";
 import { useSelector } from "react-redux";
-
+import { Link } from "react-router-dom";
 import Searchicon from "../assets/iconamoon_search-thin.svg";
 import JobPostCart from "../components/Job_post_cart";
 const Job_Postings = () => {
@@ -160,9 +160,11 @@ const Job_Postings = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <button className="border border-white py-2 px-4 rounded bg-white hover:bg-transparent hover:border-gray-600 hover:text-gray-600">
-            Post Job
-          </button>
+          <Link to="/Job-post-form">
+            <button className="bg-[#3354F4] border border-solid border-[#3354F4] hover:bg-white hover:text-[#3354F4] px-4 py-2 rounded-md text-white font-montserrat font-medium text-md leading-relaxed tracking-tightest">
+              Post Job
+            </button>
+          </Link>
         </div>
         <div className="h-full mt-5 grid col-span-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 xl:grid-cols-4 mb-5 ">
           {JobPostings.filter(

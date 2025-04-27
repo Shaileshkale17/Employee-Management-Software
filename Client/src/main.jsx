@@ -24,6 +24,7 @@ import Job_Postings from "./pages/Job_Postings";
 import InterviewSchedulingCoordination from "./pages/InterviewSchedulingCoordination";
 import ResumeScreening from "./pages/ResumeScreening";
 import ConductingInterviews from "./pages/ConductingInterviews";
+import Job_post_form from "./pages/Job_post_form";
 
 const routers = createBrowserRouter([
   {
@@ -146,6 +147,14 @@ const routers = createBrowserRouter([
         element: (
           <ProtectedRoute role="">
             <ConductingInterviews />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/Job-post-form",
+        element: (
+          <ProtectedRoute role="">
+            <Job_post_form />
           </ProtectedRoute>
         ),
       },
