@@ -71,10 +71,13 @@ const Job_post_form = () => {
   return (
     <div className="flex flex-row w-full">
       {sideNavComponent}
-      <div className="w-full min-h-screen flex justify-center items-center bg-gray-200">
+      <div className="w-full min-h-screen gap-5   bg-gray-200">
+        <div className="md:mt-2">
+          <h1 className="text-start font-normal text-2xl">Job Post Form</h1>
+        </div>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-3 items-center">
+          className="flex flex-col gap-3 justify-center items-center md:mt-14">
           <div className="flex flex-wrap gap-4">
             <InputBox
               label="Job Title"

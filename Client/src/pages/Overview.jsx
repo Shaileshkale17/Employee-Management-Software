@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SideNavbar from "../components/SideNavber";
 import LineChart from "../components/LineChart";
 import Card from "../components/Card";
 import Title_Card from "../components/Title_Card";
-
 import Meet from "../assets/guidance_meeting-room.svg";
 import clear from "../assets/ic_baseline-clear.svg";
 import light_check from "../assets/material-symbols-light_check-rounded.svg";

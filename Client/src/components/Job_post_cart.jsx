@@ -10,10 +10,8 @@ const JobPostCart = ({
   numberOfApply,
   experience,
 }) => {
-  //   console.log("skills", Array.isArray(skills));
-
   return (
-    <div className="bg-white relative shadow-md rounded-xl p-4 border border-gray-200 hover:shadow-lg transition duration-300 h-full cursor-pointer">
+    <div className="bg-white relative shadow-md rounded-xl p-4 border border-gray-200 hover:shadow-lg transition duration-300 h-72">
       <div className="flex flex-col justify-between h-full">
         <div>
           {/* Title and Location */}

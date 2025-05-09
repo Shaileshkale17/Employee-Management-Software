@@ -12,8 +12,10 @@ const EmployeeProfile = ({
   return (
     <div
       key={index}
-      className="bg-white relative shadow-md rounded-xl p-4 border border-gray-200 hover:shadow-lg transition duration-300 h-[21.5rem]">
-      <img src={image} alt="" className="w-full" />
+      className={`bg-white relative shadow-md rounded-xl p-4 border ${
+        status == "Active" ? "border-green-500" : "border-red-500"
+      } hover:shadow-lg border-2 transition duration-300 h-[19rem]`}>
+      <img src={image} alt="" className="w-70 h-70" />
 
       <div className="">
         <div className="flex justify-between items-center">

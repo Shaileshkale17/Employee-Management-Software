@@ -57,7 +57,7 @@ const EmployeeSchema = new mongoose.Schema(
       default: "14",
     },
     joiningDate: { type: Date, default: Date.now },
-    status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+    status: { type: String, enum: ["Active", "Inactive"], default: "Inactive" },
     workLocation: {
       type: String,
       enum: ["on-site", "hybrid", "Remote", "Office"],

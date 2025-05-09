@@ -9,7 +9,6 @@ import "react-toastify/dist/ReactToastify.css";
 function App() {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state?.auth);
-
   useEffect(() => {
     if (!user?.token) {
       navigate("/");

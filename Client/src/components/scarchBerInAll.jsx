@@ -1,13 +1,54 @@
-import React, { useState } from "react";
-import SideNavbar from "./SideNavber"; // fix this if the filename was wrong
+import React, { useEffect, useState } from "react";
+import SideNavbar from "./SideNavber";
+import logo from "../assets/ChatGPT Image Apr 7, 2025, 12_02_12 PM (1).svg";
 import Searchicon from "../assets/iconamoon_search-thin.svg";
 import EmployeeProfile from "./EmployeeProfile";
 import { useSelector } from "react-redux";
 import HRSideNavber from "./HRSideNavber";
+import { io } from "socket.io-client";
+import axios from "axios";
 const SearchBarInAll = () => {
   const [Search, setSearch] = useState("");
+  const [Data, setData] = useState([]);
   const { user } = useSelector((state) => state.auth);
-  console.log(user.user);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let mydata = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/emp/emp-get`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
+
+        setData(mydata.data.data);
+      } catch (error) {
+        console.error("Error fetching initial employee data:", error);
+      }
+    };
+
+    fetchData();
+
+    const socket = io(
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:8080"
+    );
+
+    socket.on("connect", () => {
+      console.log("Socket ID:", socket.id);
+    });
+
+    socket.emit("All_Employee_Info");
+
+    socket.on("All_Employee_Info_Response", (response) => {
+      setData(response.data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const SideNav = (role) => {
     switch (role) {
@@ -19,63 +60,6 @@ const SearchBarInAll = () => {
         return null;
     }
   };
-  const arr = [
-    {
-      id: 1,
-      name: "Aarav Sharma",
-      email: "aarav.sharma@example.com",
-      phone: "+91-9876543210",
-      department: "Engineering",
-      role: "Frontend Developer",
-      joiningDate: "2023-06-15",
-      status: "Active",
-      image: "https://randomuser.me/api/portraits/men/75.jpg",
-    },
-    {
-      id: 2,
-      name: "Isha Kapoor",
-      email: "isha.kapoor@example.com",
-      phone: "+91-9123456780",
-      department: "Human Resources",
-      role: "HR Manager",
-      joiningDate: "2022-04-01",
-      status: "Active",
-      image: "https://randomuser.me/api/portraits/women/65.jpg",
-    },
-    {
-      id: 3,
-      name: "Rohan Mehta",
-      email: "rohan.mehta@example.com",
-      phone: "+91-9988776655",
-      department: "Sales",
-      role: "Sales Executive",
-      joiningDate: "2021-11-20",
-      status: "Inactive",
-      image: "https://randomuser.me/api/portraits/men/45.jpg",
-    },
-    {
-      id: 4,
-      name: "Neha Verma",
-      email: "neha.verma@example.com",
-      phone: "+91-9090909090",
-      department: "Marketing",
-      role: "Content Strategist",
-      joiningDate: "2023-01-10",
-      status: "Active",
-      image: "https://randomuser.me/api/portraits/women/47.jpg",
-    },
-    {
-      id: 5,
-      name: "Kunal Joshi",
-      email: "kunal.joshi@example.com",
-      phone: "+91-9876501234",
-      department: "Engineering",
-      role: "Backend Developer",
-      joiningDate: "2022-09-05",
-      status: "Active",
-      image: "https://randomuser.me/api/portraits/men/38.jpg",
-    },
-  ];
 
   return (
     <div className="flex flex-row w-full">
@@ -93,34 +77,40 @@ const SearchBarInAll = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="h-full mt-5 grid col-span-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 xl:grid-cols-5 ">
-          {arr
-            .filter(
-              (item) =>
-                item.name
-                  .toLocaleLowerCase()
-                  .includes(Search.toLocaleLowerCase()) ||
-                item.email
-                  .toLocaleLowerCase()
-                  .includes(Search.toLocaleLowerCase()) ||
-                item.phone
-                  .toLocaleLowerCase()
-                  .includes(Search.toLocaleLowerCase()) ||
-                item.role
-                  .toLocaleLowerCase()
-                  .includes(Search.toLocaleLowerCase())
-            )
-            .map((item, index) => (
-              <EmployeeProfile
-                index={index}
-                image={item.image}
-                email={item.email}
-                name={item.name}
-                phone={item.phone}
-                role={item.role}
-                status={item.status}
-              />
-            ))}
+        <div className="h-full mx-5 mt-3 mb-2 grid col-span-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 xl:grid-cols-5 ">
+          {Data.filter(
+            (item) =>
+              item?.name
+                ?.toLocaleLowerCase()
+                ?.includes(Search?.toLocaleLowerCase()) ||
+              item?.email
+                ?.toLocaleLowerCase()
+                ?.includes(Search?.toLocaleLowerCase()) ||
+              item?.phone
+                ?.toLocaleLowerCase()
+                ?.includes(Search?.toLocaleLowerCase()) ||
+              item?.role
+                ?.toLocaleLowerCase()
+                ?.includes(Search?.toLocaleLowerCase())
+          ).map((item, index) => (
+            <EmployeeProfile
+              index={index}
+              image={item.image || logo}
+              email={
+                item.email.length >= 17
+                  ? item.email.slice(0, 17) + "..."
+                  : item.email
+              }
+              name={
+                item.name.length >= 13
+                  ? item.name.slice(0, 13) + "..."
+                  : item.name
+              }
+              phone={item.phone}
+              role={item.role}
+              status={item.status}
+            />
+          ))}
         </div>
       </div>
     </div>
