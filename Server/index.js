@@ -6,6 +6,7 @@ import http from "http";
 import { Server } from "socket.io";
 import Employeerouter from "./router/Employee.routes.js";
 import Departmentrouter from "./router/Department.routes.js";
+import Eventouter from "./router/Event.routes.js";
 import { Employee } from "./model/Employee.model.js";
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.locals.io = io;
 
 app.use("/api/emp/", Employeerouter);
 app.use("/api/dep/", Departmentrouter);
+app.use("/api/event/", Eventouter);
 
 // 404 handler
 app.use((req, res) => {
