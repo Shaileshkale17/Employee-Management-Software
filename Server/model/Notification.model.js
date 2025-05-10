@@ -8,11 +8,6 @@ const NotificationSchema = new mongoose.Schema(
       required: true,
     },
     message: { type: String, required: true },
-    type: {
-      type: String,
-      enum: ["Shift", "Attendance", "Leave", "General"],
-      required: true,
-    },
     status: { type: String, enum: ["Read", "Unread"], default: "Unread" },
   },
   { timestamps: true }

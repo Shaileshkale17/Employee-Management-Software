@@ -7,6 +7,7 @@ import profileIcon from "../assets/logo_SVG.png";
 import logoutIcon from "../assets/logoutIcon.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
+import io from "socket.io-client";
 
 const Navbar = () => {
   const [solarCalendarNotifications, setSolarCalendarNotifications] =
@@ -18,10 +19,16 @@ const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const profileRef = useRef(null);
+  const socketRef = useRef(null);
 
-  const { employeeId, FullName, role, email, img } = user?.user || {};
+  const { employeeId, FullName, role, email, img, _id } = user?.user || {};
 
+  // Setup socket and online/offline event listeners
   useEffect(() => {
+    socketRef.current = io(
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:8080"
+    );
+
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
@@ -29,11 +36,39 @@ const Navbar = () => {
     window.addEventListener("offline", handleOffline);
 
     return () => {
+      socketRef.current?.disconnect();
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
+  // Update status on online/offline change
+  useEffect(() => {
+    if (!socketRef.current || !user?.user?.id) return;
+
+    const status = isOnline && user?.token ? "Active" : "Inactive";
+
+    socketRef.current.emit("All_update_Status_Info", {
+      id: user.user.id,
+      isOnline: status,
+    });
+
+    socketRef.current.on("status_Response", (res) => {
+      console.log("Status update response:", res);
+    });
+  }, [isOnline, user?.token]);
+
+  // Emit Inactive if user is not logged in
+  useEffect(() => {
+    if (socketRef.current && !user?.token && user?.user?.id) {
+      socketRef.current.emit("All_update_Status_Info", {
+        id: user.user.id,
+        isOnline: "Inactive",
+      });
+    }
+  }, [user?.token]);
+
+  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -118,7 +153,15 @@ const Navbar = () => {
               </div>
               <p
                 className="mt-3 flex flex-row text-center items-center text-red-500 cursor-pointer"
-                onClick={() => dispatch(logout())}>
+                onClick={() => {
+                  if (socketRef.current && user?.user?.id) {
+                    socketRef.current.emit("All_update_Status_Info", {
+                      id: user.user.id,
+                      isOnline: "Inactive",
+                    });
+                  }
+                  dispatch(logout());
+                }}>
                 <img className="w-7 h-7" src={logoutIcon} alt="Logout Icon" />
                 Sign out
               </p>

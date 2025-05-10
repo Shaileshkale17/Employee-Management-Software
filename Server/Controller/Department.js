@@ -3,6 +3,7 @@ import { Department } from "../model/Department.mode.js";
 import { Employee } from "../model/Employee.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import { Notification } from "../model/Notification.model.js";
 
 export const createDepartment = async (req, res, io) => {
   const { name, description, employeeId } = req.body;
@@ -32,14 +33,21 @@ export const createDepartment = async (req, res, io) => {
     description,
     head: headInfo?._id,
   });
+
   if (!data) {
     return res
       .status(500)
       .json(new ApiError(500, "Department creation failed"));
   }
+
+  const NotificationData = await Notification.create({
+    employeeId: headInfo._id,
+    message: `new Department creating successfull ${data.name}`,
+  });
+
   // Emit event to notify clients (if using WebSockets)
   if (io) {
-    io.emit("departmentCreated", data);
+    io.emit("departmentCreated", NotificationData);
   }
 
   return res

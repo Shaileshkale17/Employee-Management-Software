@@ -96,6 +96,72 @@ ConnectDB()
         }
       });
 
+      // Listen for custom event "All_Department_Info" from this client
+      socket.on("All_Department_Info", async () => {
+        try {
+          const data = await Employee.aggregate([
+            {
+              $unwind: {
+                path: "$Department",
+                preserveNullAndEmptyArrays: true, // Include users without Department
+              },
+            },
+            {
+              $lookup: {
+                from: "departments",
+                localField: "department",
+                foreignField: "_id",
+                as: "DepartmentDetails",
+              },
+            },
+            {
+              $unwind: {
+                path: "$DepartmentDetails",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+          ]);
+
+          // Send response back to client who requested it
+          socket.emit("All_Department_Info_Response", {
+            message: "All Department have been retrieved",
+            count: data.length,
+            data,
+          });
+        } catch (error) {
+          console.error("Error fetching employee info:", error);
+          socket.emit("All_Department_Info_Response", {
+            message: "Error retrieving employee data",
+            error: error.message,
+          });
+        }
+      });
+      // Listen for custom event "All_update_STatus_Info" from this client
+      socket.on("All_update_Status_Info", async ({ id, isOnline }) => {
+        console.log("All_update_STatus_Info", { id });
+
+        try {
+          const data = await Employee.findByIdAndUpdate(
+            id,
+            {
+              status: isOnline,
+            },
+            { new: true }
+          );
+          // Send response back to client who requested it
+          socket.emit("status_Response", {
+            message: "Employee status updated successfully",
+            data,
+          });
+        } catch (error) {
+          console.error("Error updating employee status:", error);
+          socket.emit("status_Response", {
+            message: "Error updating employee status",
+            error: error.message,
+          });
+        }
+      });
+
       socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);
       });
