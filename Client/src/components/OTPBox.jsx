@@ -1,10 +1,8 @@
 const OTPBox = ({ index, otp, setOtp }) => {
   const handleChange = (e) => {
     const value = e.target.value;
-    if (!/^\d*$/.test(value)) return; // Ensure only numbers are entered
-
-    setOtp(value, index); // Directly call the passed function
-
+    if (!/^\d*$/.test(value)) return;
+    setOtp(value, index);
     if (value && index < otp.length - 1) {
       document.getElementById(`otp-${index + 1}`).focus();
     }
@@ -24,7 +22,9 @@ const OTPBox = ({ index, otp, setOtp }) => {
       value={otp[index]}
       onChange={handleChange}
       onKeyDown={handleBackspace}
-      className="w-12 h-12 text-center text-lg border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="w-12 h-14 text-center text-lg font-semibold border-2 border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all duration-200"
+      autoFocus={index === 0}
+      aria-label={`OTP digit ${index + 1}`}
     />
   );
 };

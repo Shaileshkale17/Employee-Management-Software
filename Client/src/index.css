@@ -4,17 +4,60 @@
 @tailwind utilities;
 
 * {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.montserrat-bold {
-    font-family: "Raleway", sans-serif;
-    font-weight: 700;
+html {
+  scroll-behavior: smooth;
 }
 
-.montserrat-light {
-    font-family: "Raleway", sans-serif;
-    font-weight: 300;
+body {
+  font-family: "Raleway", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F1F2F6;
+}
+
+@layer base {
+  :root {
+    --color-brand: #3354F4;
+    --color-brand-light: #4B6BFF;
+    --color-surface: #F1F2F6;
+  }
+}
+
+@layer components {
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-pulse rounded;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:ring-offset-0;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #c5c8e0 transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #c5c8e0;
+    border-radius: 9999px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
 }

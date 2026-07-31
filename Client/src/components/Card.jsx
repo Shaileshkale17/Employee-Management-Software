@@ -1,7 +1,5 @@
-import React from "react";
-
-const Card = ({ children }) => (
-  <div className="text-center flex justify-center items-center rounded-lg shadow-md p-4">
+const Card = ({ children, className, padding = true }) => (
+  <div className={`bg-white rounded-xl shadow-card border border-gray-100 ${padding ? "p-5" : ""} ${className || ""}`}>
     {children}
   </div>
 );

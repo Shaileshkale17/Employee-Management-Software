@@ -6,15 +6,17 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login";
 import OTP from "./pages/OTP";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Overview from "./pages/Overview";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import Text from "./pages/text";
-import ProtectedRoute from "./Middlewares/routes.Middlewares";
-import Task from "./pages/Task";
+import ProtectedRoute, {
+  ADMIN_ROLES,
+} from "./Middlewares/routes.Middlewares";import Task from "./pages/Task";
 import Message from "./pages/Message";
 import Meeting from "./pages/Meeting";
 import Attendance_Info from "./pages/Attendance_Info";
+import Leaves from "./pages/Leaves";
 import Report from "./pages/Report";
 import Event from "./pages/Event";
 import EmployeeRegistration from "./pages/EmployeeRegistration";
@@ -25,6 +27,22 @@ import InterviewSchedulingCoordination from "./pages/InterviewSchedulingCoordina
 import ResumeScreening from "./pages/ResumeScreening";
 import ConductingInterviews from "./pages/ConductingInterviews";
 import Job_post_form from "./pages/Job_post_form";
+import NewEmployeeOrientation from "./pages/NewEmployeeOrientation";
+import DocumentVerification from "./pages/DocumentVerification";
+import SystemAccessSetup from "./pages/SystemAccessSetup";
+import WelcomeKits from "./pages/WelcomeKits";
+import CompanyRegistration from "./pages/CompanyRegistration";
+import VerifyCompanyEmail from "./pages/VerifyCompanyEmail";
+import Careers from "./pages/Careers";
+import CareerJobDetail from "./pages/CareerJobDetail";
+import CareerApply from "./pages/CareerApply";
+import ApplicationSuccess from "./pages/ApplicationSuccess";
+import ATS from "./pages/ATS";
+import CandidateDetail from "./pages/CandidateDetail";
+import CandidateEdit from "./pages/CandidateEdit";
+import Interviews from "./pages/Interviews";
+import Notifications from "./pages/Notifications";
+import CompanySettings from "./pages/CompanySettings";
 
 const routers = createBrowserRouter([
   {
@@ -42,9 +60,67 @@ const routers = createBrowserRouter([
         element: <ForgotPassword />,
       },
       {
+        path: "/reset-password",
+        element: <ResetPassword />,
+      },
+      { path: "/register-company", element: <CompanyRegistration /> },
+      { path: "/verify-company-email", element: <VerifyCompanyEmail /> },
+      { path: "/careers/:slug", element: <Careers /> },
+      { path: "/careers/:slug/:jobId", element: <CareerJobDetail /> },
+      { path: "/careers/:slug/:jobId/apply", element: <CareerApply /> },
+      { path: "/careers/:slug/:jobId/success", element: <ApplicationSuccess /> },
+      {
+        path: "/ats",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <ATS />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/candidates/:id",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <CandidateDetail />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/candidates/:id/edit",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <CandidateEdit />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/interviews",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <Interviews />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/notifications",
+        element: (
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/company-settings",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <CompanySettings />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "/overview",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute>
             <Overview />
           </ProtectedRoute>
         ),
@@ -52,7 +128,7 @@ const routers = createBrowserRouter([
       {
         path: "/task",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute>
             <Task />
           </ProtectedRoute>
         ),
@@ -60,7 +136,7 @@ const routers = createBrowserRouter([
       {
         path: "/message",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute>
             <Message />
           </ProtectedRoute>
         ),
@@ -68,7 +144,7 @@ const routers = createBrowserRouter([
       {
         path: "/meeting",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute>
             <Meeting />
           </ProtectedRoute>
         ),
@@ -76,7 +152,7 @@ const routers = createBrowserRouter([
       {
         path: "/report",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute role={ADMIN_ROLES}>
             <Report />
           </ProtectedRoute>
         ),
@@ -84,8 +160,16 @@ const routers = createBrowserRouter([
       {
         path: "/attendance",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute>
             <Attendance_Info />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/leaves",
+        element: (
+          <ProtectedRoute>
+            <Leaves />
           </ProtectedRoute>
         ),
       },
@@ -93,7 +177,7 @@ const routers = createBrowserRouter([
       {
         path: "/event",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute>
             <Event />
           </ProtectedRoute>
         ),
@@ -101,19 +185,23 @@ const routers = createBrowserRouter([
       {
         path: "/search",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute>
             <SearchBarInAll />
           </ProtectedRoute>
         ),
       },
       {
         path: "/EmployeeRegistration",
-        element: <EmployeeRegistration />,
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <EmployeeRegistration />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/job-postings",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute role={ADMIN_ROLES}>
             <Job_Postings />
           </ProtectedRoute>
         ),
@@ -121,7 +209,7 @@ const routers = createBrowserRouter([
       {
         path: "/resume-screening",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute role={ADMIN_ROLES}>
             <ResumeScreening />
           </ProtectedRoute>
         ),
@@ -129,7 +217,7 @@ const routers = createBrowserRouter([
       {
         path: "/interview-scheduling-coordination",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute role={ADMIN_ROLES}>
             <InterviewSchedulingCoordination />
           </ProtectedRoute>
         ),
@@ -137,15 +225,15 @@ const routers = createBrowserRouter([
       {
         path: "/JobPostings",
         element: (
-          <ProtectedRoute role="">
-            <InterviewSchedulingCoordination />
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <Job_Postings />
           </ProtectedRoute>
         ),
       },
       {
         path: "/conducting-interviews",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute role={ADMIN_ROLES}>
             <ConductingInterviews />
           </ProtectedRoute>
         ),
@@ -153,8 +241,48 @@ const routers = createBrowserRouter([
       {
         path: "/Job-post-form",
         element: (
-          <ProtectedRoute role="">
+          <ProtectedRoute role={ADMIN_ROLES}>
             <Job_post_form />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/Job-post-form/:id",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <Job_post_form />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/new-employee-orientation",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <NewEmployeeOrientation />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/document-verification",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <DocumentVerification />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/system-access-setup",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <SystemAccessSetup />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/welcome-kits",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <WelcomeKits />
           </ProtectedRoute>
         ),
       },
@@ -169,5 +297,5 @@ createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <RouterProvider router={routers} />
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );

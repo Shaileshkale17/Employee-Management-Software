@@ -1,6 +1,13 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
+
+export const ADMIN_ROLES = [
+  "Super Admin",
+  "Company Admin",
+  "HR",
+  "HR Manager",
+  "Recruiter",
+];
 
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useSelector((state) => state.auth);
@@ -14,10 +21,13 @@ const ProtectedRoute = ({ children, role }) => {
     return <Navigate to="/overview" replace />;
   }
 
-  //   const userRole = user?.user?.role || user?.data?.role;
-  //   if (role && userRole !== role) {
-  //     return <Navigate to="/unauthorized" replace />;
-  //   }
+  const allowed =
+    !role ||
+    (Array.isArray(role) ? role : [role]).includes(user?.user?.role || user?.role);
+
+  if (!allowed) {
+    return <Navigate to="/unauthorized" replace />;
+  }
 
   return children;
 };

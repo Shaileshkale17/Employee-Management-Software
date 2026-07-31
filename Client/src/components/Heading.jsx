@@ -1,9 +1,7 @@
-import React from "react";
-
-const Heading = ({ Haeding }) => {
+const Heading = ({ heading, className }) => {
   return (
-    <h1 className="font-montserrat tracking-tightest  leading-relaxed text-6xl">
-      {Haeding}
+    <h1 className={`text-2xl font-bold text-gray-900 tracking-tight ${className || ""}`}>
+      {heading}
     </h1>
   );
 };

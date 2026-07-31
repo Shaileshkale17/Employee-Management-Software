@@ -6,22 +6,29 @@ const EmployeeSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, index: true },
     password: { type: String, required: true },
     role: { type: String, required: true },
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      index: true,
+    },
+    designation: { type: String, default: "" },
+    skills: [{ type: String }],
+    profileImg: { type: String, default: "" },
     department: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Department",
-      required: true,
     },
     salary: {
-      ctc: { type: Number, required: true }, //* Cost to Company (Annual)
-      basic: { type: Number, required: true },
-      hra: { type: Number, required: true }, //* House Rent Allowance
+      ctc: { type: Number },
+      basic: { type: Number },
+      hra: { type: Number },
       allowances: { type: Number, default: 0 },
       deductions: {
         tax: { type: Number, default: 0 },
-        pf: { type: Number, default: 0 }, //* Provident Fund
+        pf: { type: Number, default: 0 },
         otherDeductions: { type: Number, default: 0 },
       },
-      netSalary: { type: Number }, //* Computed: (Basic + HRA + Allowances - Deductions)
+      netSalary: { type: Number },
       currency: { type: String, default: "INR" },
       paymentFrequency: {
         type: String,
@@ -52,6 +59,10 @@ const EmployeeSchema = new mongoose.Schema(
       type: String,
       default: "14",
     },
+    Paid: {
+      type: String,
+      default: "14",
+    },
     Unpaid: {
       type: String,
       default: "14",
@@ -63,10 +74,28 @@ const EmployeeSchema = new mongoose.Schema(
       enum: ["on-site", "hybrid", "Remote", "Office"],
       default: "Office",
     },
-
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, default: "" },
     employeeId: { type: String, required: true },
+    phone: { type: String, default: "" },
+    address: { type: String, default: "" },
+    otp: { type: String, default: null },
+    otpExpiresAt: { type: Date, default: null },
+    mfaEnabled: { type: Boolean, default: false },
+    lastLoginAt: { type: Date, default: null },
+    passwordChangedAt: { type: Date, default: null },
+    online: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+EmployeeSchema.methods.toSafeObject = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  delete obj.otp;
+  delete obj.otpExpiresAt;
+  delete obj.emailVerificationToken;
+  return obj;
+};
 
 export const Employee = mongoose.model("Employee", EmployeeSchema);

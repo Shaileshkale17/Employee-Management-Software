@@ -1,33 +1,22 @@
-import React from "react";
-
-const EmployeeProfile = ({
-  index,
-  image,
-  name,
-  role,
-  email,
-  phone,
-  status,
-}) => {
+const EmployeeProfile = ({ index, image, name, role, email, phone, status }) => {
   return (
     <div
       key={index}
-      className={`bg-white relative shadow-md rounded-xl p-4 border ${
-        status == "Active" ? "border-green-500" : "border-red-500"
-      } hover:shadow-lg border-2 transition duration-300 h-[19rem]`}>
-      <img src={image} alt="" className="w-70 h-70" />
-
-      <div className="">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800 ">{name}</h2>
-          <p className="text-sm text-gray-500">{status}</p>
-        </div>
-        <p className=" font-semibold text-gray-800 mb-1">{role}</p>
-        <div>
-          <p className="text-gray-600 mb-1">{email}</p>
-          <p className="text-gray-600 mb-2">{phone}</p>
-        </div>
+      className={`bg-white rounded-xl border-2 p-4 transition-all duration-200 hover:shadow-card-hover ${
+        status === "Active" ? "border-green-200 hover:border-green-300" : "border-red-200 hover:border-red-300"
+      }`}>
+      <img src={image} alt={name} className="w-full h-36 object-cover rounded-lg mb-3 bg-gray-50" />
+      <div className="flex items-start justify-between mb-1">
+        <h2 className="text-sm font-semibold text-gray-900 truncate">{name}</h2>
+        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${
+          status === "Active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+        }`}>
+          {status}
+        </span>
       </div>
+      <p className="text-xs font-medium text-gray-500 mb-1">{role}</p>
+      <p className="text-xs text-gray-400 truncate">{email}</p>
+      <p className="text-xs text-gray-400">{phone}</p>
     </div>
   );
 };

@@ -1,136 +1,211 @@
-import React, { useEffect, useState } from "react";
-import SideNavbar from "../components/SideNavber";
-import MeetingCard from "../components/MeetingCard";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import SideNavbar from "../components/SideNavber";
 import HRSideNavber from "../components/HRSideNavber";
+import { api } from "../utils/api";
+import Button from "../components/Button";
+import Card from "../components/Card";
+import EmptyState from "../components/EmptyState";
+import Heading from "../components/Heading";
+import InputBox from "../components/InputBox";
+import TextArea from "../components/TextArea";
+
+const HR_ROLES = ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"];
+
 const Meeting = () => {
-  const [selectedTaskTitle, setSelectedTaskTitle] = useState(null);
-  const [Meet_Link, setMeet_Link] = useState("");
-  const [DateValue, setDateValue] = useState("");
   const { user } = useSelector((state) => state.auth);
-  console.log(user.user.role);
+  const role = user?.user?.role;
+  const isHR = HR_ROLES.includes(role);
 
-  const SideNav = (role) => {
-    switch (role) {
-      case "developer":
-        return <SideNavbar />;
-      case "HR Manager":
-        return <HRSideNavber />;
-      default:
-        return null;
+  const SideNav = (r) => (HR_ROLES.includes(r) ? <HRSideNavber /> : <SideNavbar />);
+
+  const [meetings, setMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ title: "", description: "", start: "", end: "", link: "" });
+
+  const fetchMeetings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/calendar/upcoming");
+      setMeetings(res.data.data || []);
+    } catch {
+      toast.error("Failed to load meetings");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMeetings();
+  }, [fetchMeetings]);
+
+  const setField = (key) => (value) => setForm((p) => ({ ...p, [key]: value }));
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    if (!form.title.trim() || !form.start || !form.end) {
+      toast.error("Please fill in title, start and end");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await api.post("/calendar/create", {
+        title: form.title,
+        description: form.description,
+        start: new Date(form.start).toISOString(),
+        end: new Date(form.end).toISOString(),
+        type: "meeting",
+        link: form.link,
+        attendees: [],
+      });
+      toast.success("Meeting created");
+      setForm({ title: "", description: "", start: "", end: "", link: "" });
+      setShowForm(false);
+      fetchMeetings();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to create meeting");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const DateTime = () => {
-    let newDate = new Date();
-
-    let hours = newDate.getHours();
-    let minutes = newDate.getMinutes();
-    let Seconds = newDate.getSeconds();
-    let todayDate = newDate.getDate();
-    let month = newDate.getMonth() + 1;
-    let year = newDate.getFullYear();
-    let AMPM = "AM";
-    if (hours >= 12) {
-      AMPM = "PM";
+  const handleJoin = (meeting) => {
+    if (meeting.link) {
+      window.open(meeting.link, "_blank", "noopener,noreferrer");
+    } else {
+      toast("No meeting link available");
     }
-    return `${todayDate}/${month}/${year}${" "}${hours}:${minutes}:${Seconds} ${" "}  `;
   };
-  setInterval(() => {
-    setDateValue(DateTime());
-  }, 1000);
-  const TypeofMeet = [
-    "Create meeting for Later",
-    "Start an instant meeting",
-    "Schedule your meeting",
-  ];
 
-  const meetings = [
-    {
-      taskTitle: "Salary Report",
-      title: "Track Employee Work Hours",
-      desc: "Allows employees to clock in at the start and clock out at the end of the workday.",
-      datetime: "2025-04-08T09:00:00Z",
-      read: false,
-    },
-    {
-      taskTitle: "Monthly Review",
-      title: "Team Performance Review",
-      desc: "Monthly meeting to evaluate team performance and plan improvements.",
-      datetime: "2025-04-10T14:00:00Z",
-      read: false,
-    },
-    {
-      taskTitle: "Client Meeting",
-      title: "Project Update with Client",
-      desc: "Discuss the progress of the current project and gather client feedback.",
-      datetime: "2025-04-12T11:30:00Z",
-      read: false,
-    },
-    {
-      taskTitle: "Product Demo",
-      title: "Demo New Features",
-      desc: "Showcase the newly implemented features to internal stakeholders.",
-      datetime: "2025-04-15T10:00:00Z",
-      read: false,
-    },
-    {
-      taskTitle: "Code Review",
-      title: "Review Latest Merge Requests",
-      desc: "Weekly session to go through the team's recent code submissions.",
-      datetime: "2025-04-17T16:00:00Z",
-      read: false,
-    },
-  ];
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/calendar/delete/${id}`);
+      toast.success("Meeting deleted");
+      fetchMeetings();
+    } catch {
+      toast.error("Failed to delete meeting");
+    }
+  };
 
   return (
-    <div className="flex flex-row w-full">
-      {SideNav(user.user.role)}
-      <div
-        className="w-full 
-      min-h-[83.8vh] flex justify-center items-center bg-gray-200 p-4">
-        <div className="flex flex-col md:flex-row gap-6 w-full max-w-6xl justify-center items-center">
-          <div className="flex min-w-[60%] flex-col gap-4 justify-center h-full ">
-            <h1 className="text-xl font-semibold text-center md:mb-16">
-              {DateValue}
-            </h1>
-            <div className="flex flex-row  gap-5 flex-wrap">
-              <select className="px-4 py-2 rounded-md shadow-md bg-white w-56">
-                {TypeofMeet.map((item, i) => (
-                  <option key={i} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <div>
-                <input
-                  type="text"
-                  name="Meet_Link"
-                  id="Meet_Link"
-                  value={Meet_Link}
-                  onChange={(e) => setMeet_Link(e.target.value)}
-                  className="px-4 py-2 rounded-md shadow-md bg-white w-80 outline-none"
-                  placeholder="Enter your code or Link"
+    <div className="flex">
+      {SideNav(role)}
+      <div className="flex-1 min-h-[calc(100vh-4rem)] bg-surface-100 p-6 overflow-y-auto">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <Heading heading="Meetings" />
+            {isHR && (
+              <Button
+                variant="secondary"
+                label={showForm ? "Cancel" : "Create Meeting"}
+                onClick={() => setShowForm((s) => !s)}
+              />
+            )}
+          </div>
+
+          {isHR && showForm && (
+            <Card>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Create Meeting</h2>
+              <form onSubmit={handleCreate} className="space-y-4">
+                <InputBox
+                  label="Title"
+                  id="meetingTitle"
+                  name="title"
+                  placeholder="Meeting title"
+                  setInput={setField("title")}
+                  getInput={form.title}
                 />
-                <button
-                  disabled={Meet_Link.trim() === ""}
-                  className={`px-4 py-2 ml-2 bg-blue-500 text-white rounded-md shadow-md ${
-                    Meet_Link.trim() === ""
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }`}>
-                  Join
-                </button>
-              </div>
+                <TextArea
+                  label="Description"
+                  id="meetingDescription"
+                  name="description"
+                  placeholder="Meeting description"
+                  value={form.description}
+                  onChange={(e) => setField("description")(e.target.value)}
+                  rows={3}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InputBox
+                    label="Start"
+                    id="meetingStart"
+                    name="start"
+                    type="datetime-local"
+                    setInput={setField("start")}
+                    getInput={form.start}
+                  />
+                  <InputBox
+                    label="End"
+                    id="meetingEnd"
+                    name="end"
+                    type="datetime-local"
+                    setInput={setField("end")}
+                    getInput={form.end}
+                  />
+                </div>
+                <InputBox
+                  label="Link"
+                  id="meetingLink"
+                  name="link"
+                  placeholder="https://meet.example.com/abc"
+                  setInput={setField("link")}
+                  getInput={form.link}
+                />
+                <div className="flex justify-end">
+                  <Button type="submit" label="Create Meeting" loading={submitting} disabled={submitting} />
+                </div>
+              </form>
+            </Card>
+          )}
+
+          {loading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-card p-5">
+                  <div className="skeleton h-5 w-1/3 mb-3" />
+                  <div className="skeleton h-4 w-full mb-2" />
+                  <div className="skeleton h-4 w-2/3" />
+                </div>
+              ))}
             </div>
-          </div>
-          <div className="min-w-[40%] p-4 bg-white rounded-lg shadow-md max-h-[75vh] overflow-y-auto">
-            <MeetingCard
-              tasks={meetings}
-              selectedTaskTitle={selectedTaskTitle}
-              setSelectedTaskTitle={setSelectedTaskTitle}
-            />
-          </div>
+          ) : meetings.length === 0 ? (
+            <Card>
+              <EmptyState
+                title="No upcoming meetings"
+                description="Meetings you create or are invited to will appear here."
+              />
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {meetings.map((meeting) => (
+                <Card key={meeting._id}>
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900">{meeting.title}</h3>
+                      {meeting.description && (
+                        <p className="text-sm text-gray-500 mt-1">{meeting.description}</p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-2">
+                        {new Date(meeting.start).toLocaleString()}
+                        {meeting.end ? ` — ${new Date(meeting.end).toLocaleString()}` : ""}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {(meeting.attendees || []).length} attendee(s)
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button size="sm" label="Join" onClick={() => handleJoin(meeting)} />
+                      {isHR && (
+                        <Button size="sm" variant="danger" label="Delete" onClick={() => handleDelete(meeting._id)} />
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
