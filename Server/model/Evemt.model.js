@@ -1,6 +1,11 @@
 import mongoose, { mongo } from "mongoose";
 const EventSchema = mongoose.Schema(
   {
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      index: true,
+    },
     taskTitle: {
       type: String,
       required: true,

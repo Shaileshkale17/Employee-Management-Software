@@ -1,11 +1,34 @@
-import React from "react";
+import { LoaderCircle } from "lucide-react";
 
-const Button = ({ label, type }) => {
+const Button = ({ label, type, loading, disabled, onClick, className, variant = "primary", size = "md" }) => {
+  const variants = {
+    primary: "btn-primary",
+    secondary: "btn-secondary",
+    ghost: "btn-ghost",
+    danger: "btn-danger",
+  };
+
+  const sizes = {
+    sm: "btn-sm",
+    md: "btn-md",
+    lg: "btn-lg",
+  };
+
   return (
     <button
       type={type}
-      className="bg-[#3354F4] border border-solid border-[#3354F4] px-4 py-2 rounded-md text-white font-montserrat font-bold text-lg leading-relaxed tracking-tightest">
-      {label}
+      onClick={onClick}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={`${variants[variant] || variants.primary} ${sizes[size] || sizes.md} ${className || ""}`}>
+      {loading ? (
+        <span className="inline-flex items-center justify-center gap-2">
+          <LoaderCircle className="h-4 w-4 animate-spin" />
+          <span>Processing...</span>
+        </span>
+      ) : (
+        <>{label}</>
+      )}
     </button>
   );
 };

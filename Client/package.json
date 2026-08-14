@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:load": "node ../Server/scripts/frontendLoadTest.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
@@ -15,6 +16,7 @@
     "chart.js": "^4.4.8",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^1.31.0",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.3.1",
