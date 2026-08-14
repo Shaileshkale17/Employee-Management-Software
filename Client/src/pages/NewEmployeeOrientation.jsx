@@ -3,9 +3,14 @@ import SideNavbar from "../components/SideNavber";
 import HRSideNavber from "../components/HRSideNavber";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import Heading from "../components/Heading";
+import StatCard from "../components/StatCard";
+import EmptyState from "../components/EmptyState";
+import { SkeletonList } from "../components/Skeleton";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { api } from "../utils/api";
+import { Calendar, CircleCheck, CircleX } from "lucide-react";
 
 const statusStyles = {
   Scheduled: "bg-brand-50 text-brand-700",
@@ -25,16 +30,10 @@ const NewEmployeeOrientation = () => {
   });
   const [employees, setEmployees] = useState([]);
 
-  const SideNav = (role) => {
-    switch (role) {
-      case "developer":
-        return <SideNavbar />;
-      case "HR Manager":
-        return <HRSideNavber />;
-      default:
-        return null;
-    }
-  };
+  const SideNav = (role) =>
+    ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"].includes(role)
+      ? <HRSideNavber />
+      : <SideNavbar />;
 
   const fetchRecords = async () => {
     try {
@@ -90,40 +89,80 @@ const NewEmployeeOrientation = () => {
     }
   };
 
+  const initials = (name = "") =>
+    name
+      .split(" ")
+      .map((w) => w[0])
+      .filter(Boolean)
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
+  const scheduledCount = records.filter(
+    (r) => r.orientationStatus === "Scheduled",
+  ).length;
+  const completedCount = records.filter(
+    (r) => r.orientationStatus === "Completed",
+  ).length;
+  const cancelledCount = records.filter(
+    (r) => r.orientationStatus === "Cancelled",
+  ).length;
+
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-surface-100">
       {SideNav(user?.user?.role)}
-      <div className="flex-1 min-h-screen p-6 bg-surface-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                New Employee Orientation
-              </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
-                Schedule and manage orientation sessions
-              </p>
-            </div>
+      <main className="flex-1 min-h-screen p-4 lg:p-8 bg-mesh-light">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 animate-fade-in-down">
+            <Heading
+              heading="New Employee Orientation"
+              subtitle="Schedule and manage orientation sessions"
+            />
             <Button
               label="+ Schedule Orientation"
               onClick={() => setShowForm(!showForm)}
             />
           </div>
 
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 animate-fade-in-up">
+            <StatCard
+              label="Scheduled"
+              value={scheduledCount}
+              color="brand"
+              icon={<Calendar className="h-5 w-5" />}
+            />
+            <StatCard
+              label="Completed"
+              value={completedCount}
+              color="green"
+              icon={<CircleCheck className="h-5 w-5" />}
+            />
+            <StatCard
+              label="Cancelled"
+              value={cancelledCount}
+              color="red"
+              icon={<CircleX className="h-5 w-5" />}
+            />
+          </div>
+
           {showForm && (
-            <Card className="mb-6 animate-fade-in-down">
+            <Card className="animate-fade-in-down">
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">
+                    <label
+                      htmlFor="orientation-employee"
+                      className="text-[13px] font-semibold text-ink-800"
+                    >
                       Employee
                     </label>
                     <select
+                      id="orientation-employee"
                       value={form.employee}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, employee: e.target.value }))
                       }
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                      className="input-base cursor-pointer"
                       required
                     >
                       <option value="">Select employee</option>
@@ -135,10 +174,14 @@ const NewEmployeeOrientation = () => {
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">
+                    <label
+                      htmlFor="orientation-date"
+                      className="text-[13px] font-semibold text-ink-800"
+                    >
                       Orientation Date
                     </label>
                     <input
+                      id="orientation-date"
                       type="date"
                       value={form.orientationDate}
                       onChange={(e) =>
@@ -147,22 +190,26 @@ const NewEmployeeOrientation = () => {
                           orientationDate: e.target.value,
                         }))
                       }
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                      className="input-base"
                       required
                     />
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">
+                  <label
+                    htmlFor="orientation-notes"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
                     Notes
                   </label>
                   <textarea
+                    id="orientation-notes"
                     value={form.notes}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, notes: e.target.value }))
                     }
                     rows={2}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 resize-none"
+                    className="input-base resize-none"
                     placeholder="Optional notes"
                   />
                 </div>
@@ -179,55 +226,52 @@ const NewEmployeeOrientation = () => {
           )}
 
           {loading ? (
-            <div className="space-y-3">
-              {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl p-5 border border-gray-100"
-                >
-                  <div className="skeleton h-5 w-1/3 mb-3" />
-                  <div className="skeleton h-4 w-1/2 mb-2" />
-                  <div className="skeleton h-4 w-2/3" />
-                </div>
-              ))}
-            </div>
+            <SkeletonList rows={4} />
           ) : records.length === 0 ? (
-            <div className="text-center py-20 text-gray-400 text-sm bg-white rounded-xl border border-gray-100">
-              No orientation sessions scheduled yet
-            </div>
+            <Card padding={false}>
+              <EmptyState
+                title="No orientation sessions scheduled yet"
+                description="Schedule your first orientation session to get new hires up to speed with your team."
+              />
+            </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {records.map((record) => (
-                <Card key={record._id}>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-semibold text-gray-900">
-                          {record.employee?.name || "Unknown"}
-                        </h3>
-                        <span
-                          className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[record.orientationStatus] || statusStyles.Scheduled}`}
-                        >
-                          {record.orientationStatus}
-                        </span>
+                <Card key={record._id} hover>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5 min-w-0">
+                      <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 text-sm font-semibold ring-1 ring-brand-500/10">
+                        {initials(record.employee?.name)}
                       </div>
-                      <p className="text-xs text-gray-500">
-                        {record.employee?.email} &middot;{" "}
-                        {record.employee?.role}
-                      </p>
-                      {record.orientationDate && (
-                        <p className="text-xs text-gray-400 mt-1">
-                          Date:{" "}
-                          {new Date(
-                            record.orientationDate,
-                          ).toLocaleDateString()}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-sm font-semibold text-ink-900">
+                            {record.employee?.name || "Unknown"}
+                          </h3>
+                          <span
+                            className={`chip ${statusStyles[record.orientationStatus] || statusStyles.Scheduled}`}
+                          >
+                            {record.orientationStatus}
+                          </span>
+                        </div>
+                        <p className="text-xs text-ink-500 mt-0.5">
+                          {record.employee?.email} &middot;{" "}
+                          {record.employee?.role}
                         </p>
-                      )}
-                      {record.notes && (
-                        <p className="text-xs text-gray-500 mt-1 italic">
-                          {record.notes}
-                        </p>
-                      )}
+                        {record.orientationDate && (
+                          <p className="text-xs text-ink-400 mt-1">
+                            Date:{" "}
+                            {new Date(
+                              record.orientationDate,
+                            ).toLocaleDateString()}
+                          </p>
+                        )}
+                        {record.notes && (
+                          <p className="text-xs text-ink-500 mt-1 italic">
+                            {record.notes}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <div className="flex gap-1.5 flex-shrink-0">
                       {record.orientationStatus === "Scheduled" && (
@@ -257,7 +301,7 @@ const NewEmployeeOrientation = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

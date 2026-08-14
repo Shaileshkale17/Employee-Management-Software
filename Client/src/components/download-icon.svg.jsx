@@ -1,4 +1,4 @@
-import Download from "../assets/material-symbols-light_download.svg";
+import { Download, Zap } from "lucide-react";
 import { toast } from "react-toastify";
 
 const InfoBoxCardDow = ({ tasks }) => {
@@ -11,24 +11,29 @@ const InfoBoxCardDow = ({ tasks }) => {
       {tasks.map((item, index) => (
         <div
           key={index}
-          className="bg-white rounded-xl border border-gray-100 shadow-card p-5 transition-all duration-200 hover:shadow-card-hover">
+          className="group rounded-2xl border border-ink-200/70 bg-white p-4 shadow-card transition-all duration-300 ease-smooth hover:-translate-y-0.5 hover:shadow-card-hover">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h2 className="text-sm font-semibold text-gray-900">{item.title}</h2>
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 ring-1 ring-brand-500/10">
+                <Zap className="h-[18px] w-[18px]" />
+              </div>
+              <h2 className="text-sm font-semibold text-ink-900 leading-snug">{item.title}</h2>
+            </div>
             {item.taskTitle && (
-              <span className="text-[10px] font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full flex-shrink-0">
+              <span className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-500/15 flex-shrink-0">
                 {item.taskTitle}
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-600 mb-3">{item.desc}</p>
+          <p className="text-[13px] text-ink-600 my-2.5 leading-relaxed">{item.desc}</p>
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-ink-400">
               {new Date(item.datetime).toLocaleString()}
             </p>
             <button
               onClick={() => handleDownload(item.taskTitle)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all">
-              <img className="w-4 h-4" src={Download} alt="" />
+              className="btn-secondary btn-sm">
+              <Download className="w-4 h-4" />
               Download
             </button>
           </div>

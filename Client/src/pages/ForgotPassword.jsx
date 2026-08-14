@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Heading from "../components/Heading";
 import { toast } from "react-toastify";
 import { api } from "../utils/api";
+import { Lock } from "lucide-react";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -42,17 +43,31 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-surface-100 via-surface-50 to-surface-200">
-      <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
+    <div className="relative flex min-h-screen bg-surface-100 overflow-hidden">
+      <div
+        className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-[120px]"
+        aria-hidden="true"
+      />
+      <div className="relative flex-1 flex items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-[440px] animate-fade-in-up">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-            <div className="text-center mb-6">
+          <div className="relative card-surface p-8 shadow-popover">
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-200 to-transparent"
+              aria-hidden="true"
+            />
+            <div className="text-center mb-7">
+              <div className="relative mx-auto mb-5 w-16 h-16">
+                <div className="absolute inset-0 rounded-2xl bg-brand-500/20 blur-lg" aria-hidden="true" />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow-sm">
+                  <Lock className="h-7 w-7" />
+                </div>
+              </div>
               <Heading heading="Forgot Password" className="text-2xl" />
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-ink-500 text-sm mt-1.5">
                 Enter your account email and we&apos;ll send you a verification code
               </p>
             </div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
               <InputBox
                 label="Email"
                 id="email"
@@ -68,7 +83,7 @@ const ForgotPassword = () => {
                 }}
               />
               <Button type="submit" label="Send Reset Code" loading={loading} disabled={loading} />
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-ink-500">
                 Remember your password?{" "}
                 <Link to="/" className="text-brand-600 hover:text-brand-700 hover:underline font-medium">
                   Sign In
@@ -78,12 +93,12 @@ const ForgotPassword = () => {
           </div>
         </div>
       </div>
-      <div className="w-[55%] min-h-screen hidden lg:flex items-center justify-center bg-gradient-to-br from-surface-900 via-[#131A2E] to-[#0B0F1C] p-12 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-brand-500/20 rounded-full blur-[120px]" />
+      <div className="relative w-[55%] min-h-screen hidden lg:flex items-center justify-center overflow-hidden bg-surface-900 p-12">
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-brand-500/20 rounded-full blur-[120px] animate-float-slow" aria-hidden="true" />
         <img
           src={HoreImage}
           alt="Reset password illustration"
-          className="relative z-10 max-w-md object-contain opacity-80"
+          className="relative z-10 max-w-md object-contain opacity-80 animate-float"
         />
       </div>
     </div>

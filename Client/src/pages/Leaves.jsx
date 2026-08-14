@@ -11,13 +11,14 @@ import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
 import TextArea from "../components/TextArea";
 import EmptyState from "../components/EmptyState";
+import { CalendarX, CreditCard, Sun, Thermometer, Users } from "lucide-react";
 
 const HR_ROLES = ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"];
 
 const statusStyles = {
-  Pending: "bg-amber-50 text-amber-700",
-  Approved: "bg-emerald-50 text-emerald-700",
-  Rejected: "bg-red-50 text-red-700",
+  Pending: "bg-amber-50 text-amber-700 ring-amber-500/20",
+  Approved: "bg-emerald-50 text-emerald-700 ring-emerald-500/20",
+  Rejected: "bg-red-50 text-red-700 ring-red-500/20",
 };
 
 const leaveOptions = [
@@ -31,42 +32,26 @@ const balanceMeta = [
   {
     key: "Sick",
     label: "Sick Leave",
-    icon: <path d="M14 4v10.54a4 4 0 11-4 0V4a2 2 0 014 0z" />,
+    icon: <Thermometer className="w-5 h-5" />,
     color: "bg-brand-50 text-brand-600",
   },
   {
     key: "Casual",
     label: "Casual Leave",
-    icon: (
-      <>
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-      </>
-    ),
+    icon: <Sun className="w-5 h-5" />,
     color: "bg-amber-50 text-amber-600",
   },
   {
     key: "Paid",
     label: "Paid Leave",
-    icon: (
-      <>
-        <rect x="2" y="6" width="20" height="12" rx="2" />
-        <circle cx="12" cy="12" r="2" />
-        <path d="M6 12h.01M18 12h.01" />
-      </>
-    ),
+    icon: <CreditCard className="w-5 h-5" />,
     color: "bg-emerald-50 text-emerald-600",
   },
   {
     key: "Unpaid",
     label: "Unpaid Leave",
-    icon: (
-      <>
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <path d="M16 2v4M8 2v4M3 10h18M9.75 15l4.5 4.5M14.25 15l-4.5 4.5" />
-      </>
-    ),
-    color: "bg-gray-100 text-gray-600",
+    icon: <CalendarX className="w-5 h-5" />,
+    color: "bg-ink-100 text-ink-600",
   },
 ];
 
@@ -192,7 +177,7 @@ const Leaves = () => {
   };
 
   const renderChip = (status) => (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusStyles[status] || statusStyles.Pending}`}>
+    <span className={`chip ring-1 ${statusStyles[status] || statusStyles.Pending}`}>
       {status || "Pending"}
     </span>
   );
@@ -200,57 +185,57 @@ const Leaves = () => {
   const renderSkeleton = () => (
     <div className="space-y-2">
       {[...Array(3)].map((_, i) => (
-        <div key={i} className="h-10 rounded-lg bg-gray-100 animate-pulse" />
+        <div key={i} className="skeleton h-10 rounded-xl" />
       ))}
     </div>
   );
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-surface-100">
       {SideNav(role)}
-      <div className="flex-1 min-h-[calc(100vh-4rem)] bg-surface-100 p-6 overflow-y-auto">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div>
-            <Heading heading="Leave Management" />
-            <p className="text-sm text-gray-500 mt-1">Track your leave balance, apply for leave and review requests.</p>
+      <main className="flex-1 min-h-screen p-4 lg:p-8 bg-mesh-light">
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="animate-fade-in-down">
+            <Heading heading="Leave Management" subtitle="Track your leave balance, apply for leave and review requests." />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 animate-fade-in-up">
             {balanceMeta.map((item) => {
               const bal = balances[item.key] || {};
               const remaining = bal.remaining ?? 0;
               const used = bal.used ?? 0;
               const total = bal.total ?? 0;
               return (
-                <div key={item.key} className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
+                <Card hover key={item.key}>
                   <div className="flex items-center justify-between mb-4">
                     <span className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.color}`}>
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        {item.icon}
-                      </svg>
+                      {item.icon}
                     </span>
-                    <span className="text-xs font-semibold text-gray-400">{item.label}</span>
+                    <span className="text-xs font-semibold text-ink-400">{item.label}</span>
                   </div>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-3xl font-bold text-ink-950 tabular-nums">
                     {remaining}
-                    <span className="text-sm font-medium text-gray-400 ml-2">remaining</span>
+                    <span className="text-sm font-medium text-ink-400 ml-2">remaining</span>
                   </p>
-                  <div className="flex items-center gap-2 mt-3 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 mt-3 text-xs text-ink-500">
                     <span>
-                      Used <strong className="text-gray-700">{used}</strong>
+                      Used <strong className="text-ink-800">{used}</strong>
                     </span>
-                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                    <span className="w-1 h-1 rounded-full bg-ink-300" />
                     <span>
-                      Total <strong className="text-gray-700">{total}</strong>
+                      Total <strong className="text-ink-800">{total}</strong>
                     </span>
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>
 
-          <Card>
-            <h2 className="text-base font-semibold text-gray-900 mb-4">Apply for Leave</h2>
+          <Card className="animate-fade-in-up">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-ink-950">Apply for Leave</h2>
+              <p className="text-xs text-ink-400 mt-0.5">Submit a new leave request</p>
+            </div>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <SelectBox label="Leave Type" id="leaveType" name="leaveType" setInput={set("leaveType")} getInput={form.leaveType} option={leaveOptions} />
               <InputBox label="Start Date" id="startDate" name="startDate" type="date" setInput={set("startDate")} getInput={form.startDate} />
@@ -264,36 +249,47 @@ const Leaves = () => {
             </form>
           </Card>
 
-          <Card>
-            <h2 className="text-base font-semibold text-gray-900 mb-4">My Leave Requests</h2>
+          <Card className="p-0 overflow-hidden animate-fade-in-up">
+            <div className="px-5 sm:px-6 py-4 border-b border-ink-200/60 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-ink-950">My Leave Requests</h2>
+                <p className="text-xs text-ink-400 mt-0.5">{myLeaves.length} request(s)</p>
+              </div>
+            </div>
             {myLoading ? (
-              renderSkeleton()
+              <div className="p-5 sm:p-6">
+                {renderSkeleton()}
+              </div>
             ) : myLeaves.length === 0 ? (
-              <EmptyState title="No leave requests yet" description="Your submitted leave requests will appear here." />
+              <EmptyState
+                icon={<CalendarX className="h-7 w-7" />}
+                title="No leave requests yet"
+                description="Your submitted leave requests will appear here."
+              />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-200">
-                      <th className="px-3 py-3">Leave Type</th>
-                      <th className="px-3 py-3">Start Date</th>
-                      <th className="px-3 py-3">End Date</th>
-                      <th className="px-3 py-3">Days</th>
-                      <th className="px-3 py-3">Reason</th>
-                      <th className="px-3 py-3">Status</th>
-                      <th className="px-3 py-3">Created</th>
+                    <tr className="border-b border-ink-200/60 bg-surface-100/70">
+                      <th className="table-th">Leave Type</th>
+                      <th className="table-th">Start Date</th>
+                      <th className="table-th">End Date</th>
+                      <th className="table-th">Days</th>
+                      <th className="table-th">Reason</th>
+                      <th className="table-th">Status</th>
+                      <th className="table-th">Created</th>
                     </tr>
                   </thead>
                   <tbody>
                     {myLeaves.map((leave) => (
-                      <tr key={leave._id} className="border-b border-gray-50 hover:bg-surface-50 transition-colors">
-                        <td className="px-3 py-3 font-medium text-gray-800 whitespace-nowrap">{leave.leaveType}</td>
-                        <td className="px-3 py-3 text-gray-600 whitespace-nowrap">{formatDate(leave.startDate)}</td>
-                        <td className="px-3 py-3 text-gray-600 whitespace-nowrap">{formatDate(leave.endDate)}</td>
-                        <td className="px-3 py-3 text-gray-600 whitespace-nowrap">{daysBetween(leave.startDate, leave.endDate)}</td>
-                        <td className="px-3 py-3 text-gray-600 max-w-[220px] truncate" title={leave.reason}>{leave.reason || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{renderChip(leave.status)}</td>
-                        <td className="px-3 py-3 text-gray-400 whitespace-nowrap">{formatDate(leave.createdAt)}</td>
+                      <tr key={leave._id} className="border-b border-ink-100 last:border-0 hover:bg-surface-50/60 transition-colors">
+                        <td className="table-td font-medium text-ink-800">{leave.leaveType}</td>
+                        <td className="table-td text-ink-600">{formatDate(leave.startDate)}</td>
+                        <td className="table-td text-ink-600">{formatDate(leave.endDate)}</td>
+                        <td className="table-td text-ink-600">{daysBetween(leave.startDate, leave.endDate)}</td>
+                        <td className="table-td text-ink-600 max-w-[220px] truncate" title={leave.reason}>{leave.reason || "—"}</td>
+                        <td className="table-td">{renderChip(leave.status)}</td>
+                        <td className="table-td text-ink-400">{formatDate(leave.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -303,43 +299,54 @@ const Leaves = () => {
           </Card>
 
           {isHR && (
-            <Card>
-              <h2 className="text-base font-semibold text-gray-900 mb-4">All Leave Requests</h2>
+            <Card className="p-0 overflow-hidden animate-fade-in-up">
+              <div className="px-5 sm:px-6 py-4 border-b border-ink-200/60 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink-950">All Leave Requests</h2>
+                  <p className="text-xs text-ink-400 mt-0.5">{allLeaves.length} request(s)</p>
+                </div>
+              </div>
               {allLoading ? (
-                renderSkeleton()
+                <div className="p-5 sm:p-6">
+                  {renderSkeleton()}
+                </div>
               ) : allLeaves.length === 0 ? (
-                <EmptyState title="No leave requests found" description="Leave requests submitted by employees will appear here." />
+                <EmptyState
+                icon={<Users className="h-7 w-7" />}
+                title="No leave requests found"
+                  description="Leave requests submitted by employees will appear here."
+                />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-200">
-                        <th className="px-3 py-3">Employee</th>
-                        <th className="px-3 py-3">Leave Type</th>
-                        <th className="px-3 py-3">Start Date</th>
-                        <th className="px-3 py-3">End Date</th>
-                        <th className="px-3 py-3">Days</th>
-                        <th className="px-3 py-3">Reason</th>
-                        <th className="px-3 py-3">Status</th>
-                        <th className="px-3 py-3">Actions</th>
+                      <tr className="border-b border-ink-200/60 bg-surface-100/70">
+                        <th className="table-th">Employee</th>
+                        <th className="table-th">Leave Type</th>
+                        <th className="table-th">Start Date</th>
+                        <th className="table-th">End Date</th>
+                        <th className="table-th">Days</th>
+                        <th className="table-th">Reason</th>
+                        <th className="table-th">Status</th>
+                        <th className="table-th">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {allLeaves.map((leave) => (
-                        <tr key={leave._id} className="border-b border-gray-50 hover:bg-surface-50 transition-colors">
-                          <td className="px-3 py-3">
+                        <tr key={leave._id} className="border-b border-ink-100 last:border-0 hover:bg-surface-50/60 transition-colors">
+                          <td className="table-td">
                             <div className="min-w-0">
-                              <p className="font-medium text-gray-800 truncate">{leave.employeeId?.name || "Unknown"}</p>
-                              <p className="text-xs text-gray-400">{leave.employeeId?.employeeId || leave.employeeId?.designation || ""}</p>
+                              <p className="font-medium text-ink-800 truncate">{leave.employeeId?.name || "Unknown"}</p>
+                              <p className="text-xs text-ink-400">{leave.employeeId?.employeeId || leave.employeeId?.designation || ""}</p>
                             </div>
                           </td>
-                          <td className="px-3 py-3 font-medium text-gray-800 whitespace-nowrap">{leave.leaveType}</td>
-                          <td className="px-3 py-3 text-gray-600 whitespace-nowrap">{formatDate(leave.startDate)}</td>
-                          <td className="px-3 py-3 text-gray-600 whitespace-nowrap">{formatDate(leave.endDate)}</td>
-                          <td className="px-3 py-3 text-gray-600 whitespace-nowrap">{daysBetween(leave.startDate, leave.endDate)}</td>
-                          <td className="px-3 py-3 text-gray-600 max-w-[220px] truncate" title={leave.reason}>{leave.reason || "—"}</td>
-                          <td className="px-3 py-3 whitespace-nowrap">{renderChip(leave.status)}</td>
-                          <td className="px-3 py-3 whitespace-nowrap">
+                          <td className="table-td font-medium text-ink-800">{leave.leaveType}</td>
+                          <td className="table-td text-ink-600">{formatDate(leave.startDate)}</td>
+                          <td className="table-td text-ink-600">{formatDate(leave.endDate)}</td>
+                          <td className="table-td text-ink-600">{daysBetween(leave.startDate, leave.endDate)}</td>
+                          <td className="table-td text-ink-600 max-w-[220px] truncate" title={leave.reason}>{leave.reason || "—"}</td>
+                          <td className="table-td">{renderChip(leave.status)}</td>
+                          <td className="table-td">
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
@@ -367,7 +374,7 @@ const Leaves = () => {
             </Card>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

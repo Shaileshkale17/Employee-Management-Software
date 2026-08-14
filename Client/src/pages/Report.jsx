@@ -9,6 +9,7 @@ import Card from "../components/Card";
 import Heading from "../components/Heading";
 import SelectBox from "../components/SelectBox";
 import EmptyState from "../components/EmptyState";
+import { ChartColumn } from "lucide-react";
 
 const HR_ROLES = ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"];
 
@@ -37,12 +38,12 @@ const formatDate = (date) => (date ? new Date(date).toLocaleDateString() : "-");
 
 const leaveStatusChip = (status) => {
   const map = {
-    Approved: "bg-green-100 text-green-600",
-    Pending: "bg-amber-100 text-amber-600",
-    Rejected: "bg-red-100 text-red-600",
-    Cancelled: "bg-gray-100 text-gray-600",
+    Approved: "bg-emerald-50 text-emerald-700 ring-emerald-500/20",
+    Pending: "bg-amber-50 text-amber-700 ring-amber-500/20",
+    Rejected: "bg-red-50 text-red-700 ring-red-500/20",
+    Cancelled: "bg-ink-100 text-ink-600 ring-ink-500/20",
   };
-  return map[status] || "bg-gray-100 text-gray-600";
+  return map[status] || "bg-ink-100 text-ink-600 ring-ink-500/20";
 };
 
 const leaveDays = (leave) => {
@@ -157,28 +158,28 @@ const Report = () => {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
-            <th className="px-5 py-3 font-semibold">Employee</th>
-            <th className="px-5 py-3 font-semibold">Employee ID</th>
-            <th className="px-5 py-3 font-semibold">Department</th>
-            <th className="px-5 py-3 font-semibold">Designation</th>
-            <th className="px-5 py-3 font-semibold">Present</th>
-            <th className="px-5 py-3 font-semibold">Absent</th>
-            <th className="px-5 py-3 font-semibold">Leave</th>
-            <th className="px-5 py-3 font-semibold">Total Hours</th>
+          <tr className="border-b border-ink-200/60 bg-surface-100/70">
+            <th className="table-th">Employee</th>
+            <th className="table-th">Employee ID</th>
+            <th className="table-th">Department</th>
+            <th className="table-th">Designation</th>
+            <th className="table-th">Present</th>
+            <th className="table-th">Absent</th>
+            <th className="table-th">Leave</th>
+            <th className="table-th">Total Hours</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50">
+        <tbody>
           {attendance.map((row, i) => (
-            <tr key={i} className="hover:bg-gray-50/50">
-              <td className="px-5 py-3 font-medium text-gray-900">{row.name || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{row.employeeId || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{row.department || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{row.designation || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{row.present ?? 0}</td>
-              <td className="px-5 py-3 text-gray-600">{row.absent ?? 0}</td>
-              <td className="px-5 py-3 text-gray-600">{row.leave ?? 0}</td>
-              <td className="px-5 py-3 text-gray-600">{row.totalHours ?? 0}</td>
+            <tr key={i} className="border-b border-ink-100 last:border-0 hover:bg-surface-50/60 transition-colors">
+              <td className="table-td font-medium text-ink-900">{row.name || "-"}</td>
+              <td className="table-td text-ink-600">{row.employeeId || "-"}</td>
+              <td className="table-td text-ink-600">{row.department || "-"}</td>
+              <td className="table-td text-ink-600">{row.designation || "-"}</td>
+              <td className="table-td text-ink-600 tabular-nums">{row.present ?? 0}</td>
+              <td className="table-td text-ink-600 tabular-nums">{row.absent ?? 0}</td>
+              <td className="table-td text-ink-600 tabular-nums">{row.leave ?? 0}</td>
+              <td className="table-td text-ink-600 tabular-nums">{row.totalHours ?? 0}</td>
             </tr>
           ))}
         </tbody>
@@ -190,34 +191,34 @@ const Report = () => {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
-            <th className="px-5 py-3 font-semibold">Employee</th>
-            <th className="px-5 py-3 font-semibold">Employee ID</th>
-            <th className="px-5 py-3 font-semibold">Department</th>
-            <th className="px-5 py-3 font-semibold">Type</th>
-            <th className="px-5 py-3 font-semibold">Start</th>
-            <th className="px-5 py-3 font-semibold">End</th>
-            <th className="px-5 py-3 font-semibold">Days</th>
-            <th className="px-5 py-3 font-semibold">Status</th>
-            <th className="px-5 py-3 font-semibold">Reason</th>
+          <tr className="border-b border-ink-200/60 bg-surface-100/70">
+            <th className="table-th">Employee</th>
+            <th className="table-th">Employee ID</th>
+            <th className="table-th">Department</th>
+            <th className="table-th">Type</th>
+            <th className="table-th">Start</th>
+            <th className="table-th">End</th>
+            <th className="table-th">Days</th>
+            <th className="table-th">Status</th>
+            <th className="table-th">Reason</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50">
+        <tbody>
           {leave.map((l, i) => (
-            <tr key={i} className="hover:bg-gray-50/50">
-              <td className="px-5 py-3 font-medium text-gray-900">{l.employeeId?.name || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{l.employeeId?.employeeId || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{l.employeeId?.department || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{l.leaveType || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{formatDate(l.startDate)}</td>
-              <td className="px-5 py-3 text-gray-600">{formatDate(l.endDate)}</td>
-              <td className="px-5 py-3 text-gray-600">{leaveDays(l)}</td>
-              <td className="px-5 py-3">
-                <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${leaveStatusChip(l.status)}`}>
+            <tr key={i} className="border-b border-ink-100 last:border-0 hover:bg-surface-50/60 transition-colors">
+              <td className="table-td font-medium text-ink-900">{l.employeeId?.name || "-"}</td>
+              <td className="table-td text-ink-600">{l.employeeId?.employeeId || "-"}</td>
+              <td className="table-td text-ink-600">{l.employeeId?.department || "-"}</td>
+              <td className="table-td text-ink-600">{l.leaveType || "-"}</td>
+              <td className="table-td text-ink-600">{formatDate(l.startDate)}</td>
+              <td className="table-td text-ink-600">{formatDate(l.endDate)}</td>
+              <td className="table-td text-ink-600 tabular-nums">{leaveDays(l)}</td>
+              <td className="table-td">
+                <span className={`chip ring-1 ${leaveStatusChip(l.status)}`}>
                   {l.status || "-"}
                 </span>
               </td>
-              <td className="px-5 py-3 text-gray-600 max-w-[260px] truncate">{l.reason || "-"}</td>
+              <td className="table-td text-ink-600 max-w-[260px] truncate">{l.reason || "-"}</td>
             </tr>
           ))}
         </tbody>
@@ -229,22 +230,22 @@ const Report = () => {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
-            <th className="px-5 py-3 font-semibold">Title</th>
-            <th className="px-5 py-3 font-semibold">Task Title</th>
-            <th className="px-5 py-3 font-semibold">Description</th>
-            <th className="px-5 py-3 font-semibold">Start</th>
-            <th className="px-5 py-3 font-semibold">End</th>
+          <tr className="border-b border-ink-200/60 bg-surface-100/70">
+            <th className="table-th">Title</th>
+            <th className="table-th">Task Title</th>
+            <th className="table-th">Description</th>
+            <th className="table-th">Start</th>
+            <th className="table-th">End</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50">
+        <tbody>
           {events.map((ev, i) => (
-            <tr key={i} className="hover:bg-gray-50/50">
-              <td className="px-5 py-3 font-medium text-gray-900">{ev.title || ev.taskTitle || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{ev.taskTitle || "-"}</td>
-              <td className="px-5 py-3 text-gray-600 max-w-[280px] truncate">{(ev.description ?? ev.desc) || "-"}</td>
-              <td className="px-5 py-3 text-gray-600">{formatDate(ev.start || ev.StartDate)}</td>
-              <td className="px-5 py-3 text-gray-600">{formatDate(ev.end || ev.EndDate)}</td>
+            <tr key={i} className="border-b border-ink-100 last:border-0 hover:bg-surface-50/60 transition-colors">
+              <td className="table-td font-medium text-ink-900">{ev.title || ev.taskTitle || "-"}</td>
+              <td className="table-td text-ink-600">{ev.taskTitle || "-"}</td>
+              <td className="table-td text-ink-600 max-w-[280px] truncate">{(ev.description ?? ev.desc) || "-"}</td>
+              <td className="table-td text-ink-600">{formatDate(ev.start || ev.StartDate)}</td>
+              <td className="table-td text-ink-600">{formatDate(ev.end || ev.EndDate)}</td>
             </tr>
           ))}
         </tbody>
@@ -255,7 +256,15 @@ const Report = () => {
   const renderContent = () => {
     if (loading) return renderSkeleton();
     if (!activeReport) {
-      return <EmptyState title="No report selected" description="Choose a report type above to view data." />;
+      return (
+        <EmptyState
+          icon={
+            <ChartColumn className="h-7 w-7" />
+          }
+          title="No report selected"
+          description="Choose a report type above to view data."
+        />
+      );
     }
     if (activeReport === "attendance") {
       return attendance.length === 0 ? (
@@ -279,16 +288,18 @@ const Report = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-surface-100">
       {isHR ? <HRSideNavber /> : <SideNavbar />}
-      <div className="flex-1 min-h-[calc(100vh-4rem)] bg-surface-100 p-6 overflow-y-auto">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <Heading heading="Reports" />
+      <main className="flex-1 min-h-screen p-4 lg:p-8 bg-mesh-light">
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="animate-fade-in-down">
+            <Heading heading="Reports" subtitle="Generate attendance, leave and event reports." />
+          </div>
 
-          <Card>
+          <Card className="animate-fade-in-up">
             <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Generate Reports</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Select a month and year to generate company reports</p>
+              <h2 className="text-lg font-semibold text-ink-950">Generate Reports</h2>
+              <p className="text-xs text-ink-400 mt-0.5">Select a month and year to generate company reports</p>
             </div>
             <div className="flex flex-wrap items-end gap-3">
               <div className="w-40">
@@ -319,14 +330,14 @@ const Report = () => {
             </div>
           </Card>
 
-          <Card className="p-0 overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900">{REPORT_TITLES[activeReport] || "Report Data"}</h2>
+          <Card className="p-0 overflow-hidden animate-fade-in-up">
+            <div className="px-5 sm:px-6 py-4 border-b border-ink-200/60">
+              <h2 className="text-lg font-semibold text-ink-950">{REPORT_TITLES[activeReport] || "Report Data"}</h2>
             </div>
             {renderContent()}
           </Card>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

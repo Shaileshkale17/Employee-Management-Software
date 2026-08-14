@@ -22,10 +22,11 @@ export const notify = async ({
       link,
     });
     if (io) {
-      io.emit("notification:new", {
+      io.to(`user:${String(recipient)}`).emit("notification:new", {
         recipient: String(recipient),
         notification: data,
       });
+      io.to(`user:${String(recipient)}`).emit("notification:count");
     }
     return data;
   } catch (error) {

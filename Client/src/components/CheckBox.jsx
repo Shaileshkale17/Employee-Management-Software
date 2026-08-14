@@ -1,13 +1,31 @@
-const CheckBox = ({ label, checked, onChange }) => {
+import { Check } from "lucide-react";
+
+const CheckBox = ({ label, checked, onChange, className }) => {
   return (
-    <label className="flex items-center gap-2.5 cursor-pointer group">
-      <input
-        type="checkbox"
-        className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500/30 focus:ring-offset-0 cursor-pointer transition-all"
-        checked={checked}
-        onChange={onChange}
-      />
-      <span className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">{label}</span>
+    <label className={`flex items-center gap-2.5 cursor-pointer group ${className || ""}`}>
+      <span className="relative inline-flex">
+        <input
+          type="checkbox"
+          className="peer sr-only"
+          checked={checked}
+          onChange={onChange}
+        />
+        <span
+          aria-hidden="true"
+          className="w-[18px] h-[18px] rounded-md border transition-all duration-200 ease-smooth
+            bg-white border-ink-300 group-hover:border-brand-400
+            peer-checked:bg-brand-600 peer-checked:border-brand-600
+            peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 peer-focus-visible:ring-offset-1
+            flex items-center justify-center">
+          <Check
+            className={`w-3 h-3 text-white transition-all duration-200 ${
+              checked ? "opacity-100 scale-100" : "opacity-0 scale-50"
+            }`}
+            strokeWidth={3.5}
+          />
+        </span>
+      </span>
+      <span className="text-sm text-ink-700 group-hover:text-ink-900 transition-colors">{label}</span>
     </label>
   );
 };

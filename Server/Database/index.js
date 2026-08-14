@@ -23,7 +23,9 @@ const migrateIndexes = async () => {
 
 const ConnectDB = async () => {
   try {
-    const connectURL = await mongoose.connect(process.env.URL);
+    const connectURL = await mongoose.connect(process.env.URL, {
+      maxPoolSize: Number(process.env.DB_POOL_SIZE) || 200,
+    });
     console.log("connect sccessfull", connectURL.connection.host);
     try {
       await migrateIndexes();

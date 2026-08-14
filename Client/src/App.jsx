@@ -15,6 +15,7 @@ const PUBLIC_PATHS = [
   "/otp",
   "/reset-password",
   "/unauthorized",
+  "/join",
 ];
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
   const location = useLocation();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state?.auth);
+  const { mode } = useSelector((state) => state?.theme);
 
   useEffect(() => {
     const handleAuthExpired = () => {
@@ -53,7 +55,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme={mode === "dark" ? "dark" : "light"}
       />
       <Outlet />
       {user?.token && <Footer />}

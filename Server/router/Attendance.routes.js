@@ -9,6 +9,7 @@ import {
   updateAttendance,
   getAttendanceSummary,
   getAttendanceCalendar,
+  getAttendanceTodaySummary,
   autoMarkAbsent,
 } from "../Controller/Attendance.js";
 import { authMiddleware, tenantMiddleware, authorize } from "../Middlewares/AuthMiddleware.js";
@@ -23,6 +24,7 @@ router.post("/break", (req, res) => toggleBreak(req, res));
 router.get("/today", (req, res) => getTodayAttendance(req, res));
 router.get("/my", (req, res) => getMyAttendance(req, res));
 router.get("/summary", (req, res) => getAttendanceSummary(req, res));
+router.get("/today-summary", (req, res) => getAttendanceTodaySummary(req, res));
 router.get("/calendar", (req, res) => getAttendanceCalendar(req, res));
 
 router.get("/", (req, res) => getAllAttendance(req, res));

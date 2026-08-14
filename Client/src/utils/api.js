@@ -22,8 +22,16 @@ export const getToken = () => {
   }
 };
 
+export const getGuestToken = () => {
+  try {
+    return sessionStorage.getItem("meetingGuestToken") || "";
+  } catch {
+    return "";
+  }
+};
+
 api.interceptors.request.use((config) => {
-  const token = getToken();
+  const token = getToken() || getGuestToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -42,6 +50,6 @@ api.interceptors.response.use(
 );
 
 export const authHeaders = () => {
-  const token = getToken();
+  const token = getToken() || getGuestToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 };

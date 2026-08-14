@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { Employee } from "../model/Employee.model.js";
 
 export const authMiddleware = async (req, res, next) => {
+  if (req.guest) return next();
   const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ status: 401, message: "Token not found" });
@@ -11,18 +12,22 @@ export const authMiddleware = async (req, res, next) => {
     req.user = verified;
     next();
   } catch (error) {
-    return res.status(401).json({ status: 401, message: "Invalid or expired token" });
+    return res
+      .status(401)
+      .json({ status: 401, message: "Invalid or expired token" });
   }
 };
 
 export const tenantMiddleware = async (req, res, next) => {
   try {
+    if (req.guest) return next();
     if (!req.user || !req.user.id) {
       return res.status(401).json({ status: 401, message: "Unauthorized" });
     }
     const employee = await Employee.findById(req.user.id).select(
-      "companyId role status name"
+      "companyId role status name",
     );
+
     if (!employee) {
       return res.status(404).json({ status: 404, message: "User not found" });
     }
@@ -31,8 +36,9 @@ export const tenantMiddleware = async (req, res, next) => {
         .status(403)
         .json({ status: 403, message: "Account is inactive" });
     }
+
     if (employee.role === "Super Admin") {
-      req.companyId = null;
+      req.companyId = employee.companyId;
       req.employee = employee;
       return next();
     }

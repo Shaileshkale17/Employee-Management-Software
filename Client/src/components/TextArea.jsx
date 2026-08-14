@@ -1,8 +1,10 @@
-const TextArea = ({ name, id, label, placeholder, value, onChange, rows = 5 }) => {
+import { CircleAlert } from "lucide-react";
+
+const TextArea = ({ name, id, label, placeholder, value, onChange, rows = 5, error, className }) => {
   return (
-    <div className="flex flex-col items-start gap-1.5 w-full">
+    <div className={`flex flex-col items-start gap-1.5 w-full ${className || ""}`}>
       {label && (
-        <label htmlFor={id} className="text-sm font-semibold text-gray-700">
+        <label htmlFor={id} className="text-[13px] font-semibold text-ink-800">
           {label}
         </label>
       )}
@@ -13,8 +15,18 @@ const TextArea = ({ name, id, label, placeholder, value, onChange, rows = 5 }) =
         onChange={onChange}
         value={value}
         rows={rows}
-        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none transition-all duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 placeholder:text-gray-400 resize-none"
+        className={`input-base resize-none leading-relaxed ${
+          error ? "!border-red-300 focus:!ring-red-500/10" : ""
+        }`}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-error` : undefined}
       />
+      {error && (
+        <p id={`${id}-error`} className="text-red-500 text-xs flex items-center gap-1 mt-0.5" role="alert">
+          <CircleAlert className="w-3.5 h-3.5 flex-shrink-0" />
+          {error}
+        </p>
+      )}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import { Leave } from "../model/LeaveSchema.model.js";
 import { Employee } from "../model/Employee.model.js";
-import { Notification } from "../model/Notification.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import { notify } from "../utils/notificationService.js";
 import { sendLeaveStatusEmail } from "../utils/mailService.js";
 import { isValidObjectId } from "../utils/validation.js";
 import { logActivity } from "../utils/activityLogger.js";
@@ -96,18 +96,17 @@ export const applyLeave = async (req, res) => {
         companyId: req.companyId,
         role: { $in: ["HR", "HR Manager", "Company Admin", "Super Admin"] },
       }).select("_id");
-      if (hr.length) {
-        await Notification.insertMany(
-          hr.map((h) => ({
-            companyId: req.companyId,
-            recipient: h._id,
-            recipientModel: "Employee",
-            title: "New Leave Request",
-            message: `${employee.name} requested ${requested} day(s) of ${leaveType} leave.`,
-            type: "info",
-            link: "/leaves",
-          }))
-        );
+      const unique = [...new Set(hr.map((h) => String(h._id)))];
+      for (const hrId of unique) {
+        await notify({
+          io: req.io,
+          recipient: hrId,
+          companyId: req.companyId,
+          title: "New Leave Request",
+          message: `${employee.name} requested ${requested} day(s) of ${leaveType} leave.`,
+          type: "leave",
+          link: "/leaves",
+        });
       }
     }
 
@@ -230,13 +229,13 @@ export const updateLeaveStatus = async (req, res) => {
       ).catch(() => {});
     }
 
-    await Notification.create({
-      companyId: req.companyId || leave.employeeId?.companyId,
+    await notify({
+      io: req.io,
       recipient: leave.employeeId._id,
-      recipientModel: "Employee",
+      companyId: req.companyId || leave.employeeId?.companyId,
       title: "Leave Request Updated",
       message: `Your ${leave.leaveType} leave request was ${status}.`,
-      type: "info",
+      type: "leave",
       link: "/leaves",
     });
 

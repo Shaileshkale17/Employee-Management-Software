@@ -5,6 +5,7 @@ import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
 import Button from "../components/Button";
 import { api } from "../utils/api";
+import { Building, Upload } from "lucide-react";
 
 const industryOptions = [
   { label: "Software / IT", value: "Software / IT" },
@@ -89,38 +90,31 @@ const CompanyRegistration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F1F2F6] via-[#F8F9FF] to-[#E8EAF6] py-10 px-4">
-      <div className="max-w-2xl mx-auto animate-fadeIn">
+    <div className="min-h-screen bg-mesh-light py-10 px-4">
+      <div className="max-w-2xl mx-auto animate-fade-in-up">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[#3354F4] to-[#1a3bb8] rounded-2xl shadow-lg shadow-[#3354F4]/20 mb-4">
-            <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 21h18" />
-              <path d="M5 21V7l7-4 7 4v14" />
-              <path d="M9 21v-4h6v4" />
-              <path d="M9 9h.01" />
-              <path d="M15 9h.01" />
-              <path d="M9 13h.01" />
-              <path d="M15 13h.01" />
-            </svg>
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-brand-500 to-brand-800 rounded-2xl shadow-glow mb-4">
+            <Building className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 font-montserrat tracking-tight">Register Your Company</h1>
-          <p className="text-gray-500 text-sm font-montserrat mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-ink-950 tracking-tight text-balance">Register Your Company</h1>
+          <p className="text-ink-500 text-sm mt-1.5">
             Create your workspace and start hiring. HR Admin account is created automatically.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl shadow-gray-200/70 border border-gray-100 p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="card-surface shadow-popover p-6 sm:p-8 space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Company Logo</label>
+            <label className="block text-[13px] font-semibold text-ink-800 mb-1.5">Company Logo</label>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-ink-300 bg-surface-50 flex items-center justify-center overflow-hidden transition-colors duration-200">
                 {logoPreview ? (
                   <img src={logoPreview} alt="logo" className="w-full h-full object-contain" />
                 ) : (
-                  <span className="text-gray-300 text-xs text-center px-1">Logo</span>
+                  <span className="text-ink-300 text-xs text-center px-1">Logo</span>
                 )}
               </div>
-              <label className="px-4 py-2 bg-brand-50 text-brand-700 text-sm font-medium rounded-lg cursor-pointer hover:bg-brand-100 transition-colors">
+              <label className="btn-secondary btn-sm cursor-pointer inline-flex items-center justify-center gap-2">
+                <Upload className="h-4 w-4" />
                 Upload Logo
                 <input type="file" accept="image/*" className="hidden" onChange={handleLogo} />
               </label>
@@ -140,8 +134,8 @@ const CompanyRegistration = () => {
           <InputBox label="Address" id="address" placeholder="Registered office address" name="address" setInput={set("address")} getInput={formData.address} />
           <InputBox label="GST (optional)" id="gst" placeholder="GST number" name="gst" setInput={set("gst")} getInput={formData.gst} />
 
-          <div className="border-t border-gray-100 pt-5">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">HR Admin Account</h3>
+          <div className="border-t border-ink-100 pt-5">
+            <h3 className="text-sm font-semibold text-ink-800 mb-4">HR Admin Account</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InputBox label="Contact Person" id="contactPerson" placeholder="Full name" name="contactPerson" setInput={set("contactPerson")} getInput={formData.contactPerson} error={errors.contactPerson} />
               <InputBox label="Phone Number" id="phone" placeholder="+91 ..." name="phone" setInput={set("phone")} getInput={formData.phone} error={errors.phone} />
@@ -154,9 +148,9 @@ const CompanyRegistration = () => {
 
           <Button type="submit" label="Create Workspace" loading={loading} disabled={loading} className="w-full" />
 
-          <p className="text-center font-montserrat text-sm text-gray-500">
+          <p className="text-center text-sm text-ink-500">
             Already registered?{" "}
-            <Link to="/" className="text-[#3354F4] hover:text-[#2a45d4] hover:underline font-medium transition-colors">
+            <Link to="/" className="text-brand-600 hover:text-brand-700 hover:underline font-medium transition-colors focus-ring rounded">
               Sign in
             </Link>
           </p>

@@ -13,6 +13,13 @@ const ALLOWED_MIME = {
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
     ".docx",
   "text/plain": ".txt",
+  "text/csv": ".csv",
+  "application/vnd.ms-excel": ".xls",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+  "image/png": ".png",
+  "image/jpeg": ".jpg",
+  "image/webp": ".webp",
+  "image/svg+xml": ".svg",
 };
 
 const storage = multer.diskStorage({
@@ -39,11 +46,14 @@ export const uploadResume = multer({
   fileFilter,
 }).single("resume");
 
+export const uploadAttachments = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024, files: 5 },
+  fileFilter,
+}).array("attachments", 5);
+
 export const uploadLogo = multer({
-  storage: {
-    ...storage,
-    destination: (req, file, cb) => cb(null, uploadDir),
-  },
+  storage,
   limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ["image/png", "image/jpeg", "image/svg+xml", "image/webp"];

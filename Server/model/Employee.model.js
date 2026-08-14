@@ -68,6 +68,7 @@ const EmployeeSchema = new mongoose.Schema(
       default: "14",
     },
     joiningDate: { type: Date, default: Date.now },
+    dateOfBirth: { type: Date, default: null },
     status: { type: String, enum: ["Active", "Inactive"], default: "Inactive" },
     workLocation: {
       type: String,
@@ -85,6 +86,12 @@ const EmployeeSchema = new mongoose.Schema(
     lastLoginAt: { type: Date, default: null },
     passwordChangedAt: { type: Date, default: null },
     online: { type: Boolean, default: false },
+    presence: {
+      type: String,
+      enum: ["online", "away", "busy", "offline", "idle"],
+      default: "offline",
+    },
+    lastActive: { type: Date, default: null },
   },
   { timestamps: true }
 );

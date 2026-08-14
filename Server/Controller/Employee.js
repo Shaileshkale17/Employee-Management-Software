@@ -1,7 +1,7 @@
 import { Employee } from "../model/Employee.model.js";
-import { Notification } from "../model/Notification.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import { notify } from "../utils/notificationService.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
@@ -134,9 +134,9 @@ export const createEmployee = async (req, res) => {
     });
 
     if (req.companyId && newEmployee._id) {
-      await Notification.create({
+      await notify({
+        io: req.io,
         recipient: newEmployee._id,
-        recipientModel: "Employee",
         companyId: req.companyId,
         title: "Welcome aboard",
         message: `Welcome ${newEmployee.name}! Your account has been created. Your Employee ID is ${employeeId}.`,
@@ -587,8 +587,11 @@ export const EmployeeInfoUpdate = async (req, res, io) => {
   }
 
   try {
-    const data = await Employee.findByIdAndUpdate(id, update, { new: true })
-      .select("-password -otp -otpExpiresAt -emailVerificationToken -salaryHistory");
+    const data = await Employee.findOneAndUpdate(
+      { _id: id, ...(req.companyId ? { companyId: req.companyId } : {}) },
+      update,
+      { new: true }
+    ).select("-password -otp -otpExpiresAt -emailVerificationToken -salaryHistory");
 
     if (!data) {
       return res.status(404).json(new ApiError(404, "Employee not found"));
@@ -625,7 +628,10 @@ export const EmployeeInfoDeleted = async (req, res, io) => {
   }
 
   try {
-    const data = await Employee.findByIdAndDelete(id);
+    const data = await Employee.findOneAndDelete({
+      _id: id,
+      ...(req.companyId ? { companyId: req.companyId } : {}),
+    });
 
     if (!data) {
       return res.status(404).json(new ApiError(404, "Employee not found"));
@@ -688,7 +694,7 @@ export const getEmployeeDirectory = async (req, res) => {
   try {
     const match = req.companyId ? { companyId: req.companyId, status: "Active" } : { status: "Active" };
     const data = await Employee.find(match)
-      .select("name email role designation profileImg employeeId department workLocation")
+      .select("name email role designation profileImg employeeId department workLocation online presence lastActive")
       .populate("department", "name")
       .sort({ name: 1 });
     return res.status(200).json(new ApiResponse(200, data, "Employee directory fetched"));

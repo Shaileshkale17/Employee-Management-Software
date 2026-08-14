@@ -11,6 +11,7 @@ import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
 import TextArea from "../components/TextArea";
 import EmptyState from "../components/EmptyState";
+import { SquareCheck } from "lucide-react";
 
 const HR_ROLES = ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"];
 
@@ -29,21 +30,21 @@ const PRIORITY_OPTIONS = [
 ];
 
 const STATS_CARDS = [
-  { key: "todo", label: "Todo", chip: "bg-gray-100 text-gray-600" },
-  { key: "inProgress", label: "In Progress", chip: "bg-blue-100 text-blue-600" },
-  { key: "inReview", label: "In Review", chip: "bg-amber-100 text-amber-600" },
-  { key: "done", label: "Done", chip: "bg-green-100 text-green-600" },
-  { key: "total", label: "Total", chip: "bg-brand-600 text-white" },
+  { key: "todo", label: "Todo", chip: "bg-ink-100 text-ink-600" },
+  { key: "inProgress", label: "In Progress", chip: "bg-purple-50 text-purple-600" },
+  { key: "inReview", label: "In Review", chip: "bg-amber-50 text-amber-600" },
+  { key: "done", label: "Done", chip: "bg-emerald-50 text-emerald-600" },
+  { key: "total", label: "Total", chip: "bg-brand-600 text-white shadow-glow-sm" },
 ];
 
 const priorityChip = (priority) => {
   const map = {
-    Low: "bg-gray-100 text-gray-600",
-    Medium: "bg-blue-100 text-blue-600",
-    High: "bg-orange-100 text-orange-600",
-    Urgent: "bg-red-100 text-red-600",
+    Low: "bg-ink-50 text-ink-600 ring-1 ring-ink-500/20",
+    Medium: "bg-purple-50 text-purple-600 ring-1 ring-purple-500/20",
+    High: "bg-orange-50 text-orange-600 ring-1 ring-orange-500/20",
+    Urgent: "bg-red-50 text-red-600 ring-1 ring-red-500/20",
   };
-  return map[priority] || "bg-gray-100 text-gray-600";
+  return map[priority] || "bg-ink-50 text-ink-600 ring-1 ring-ink-500/20";
 };
 
 const formatDate = (date) => (date ? new Date(date).toLocaleDateString() : "-");
@@ -166,18 +167,20 @@ const Task = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-surface-100">
       {isHR ? <HRSideNavber /> : <SideNavbar />}
-      <div className="flex-1 min-h-[calc(100vh-4rem)] bg-surface-100 p-6 overflow-y-auto">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <Heading heading="Tasks" />
+      <main className="flex-1 min-h-screen p-4 lg:p-8 bg-mesh-light">
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="animate-fade-in-down">
+            <Heading heading="Tasks" subtitle="Create, track and manage tasks across your team." />
+          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 animate-fade-in-up">
             {STATS_CARDS.map((stat) => (
-              <Card key={stat.key} className="flex items-center justify-between">
+              <Card key={stat.key} hover className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">{stats[stat.key] ?? 0}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{stat.label}</div>
+                  <div className="text-2xl font-bold text-ink-950 tabular-nums">{stats[stat.key] ?? 0}</div>
+                  <div className="text-xs text-ink-400 mt-0.5">{stat.label}</div>
                 </div>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${stat.chip}`}>
                   {stats[stat.key] ?? 0}
@@ -187,10 +190,10 @@ const Task = () => {
           </div>
 
           {isHR && (
-            <Card>
+            <Card className="animate-fade-in-up">
               <div className="mb-5">
-                <h2 className="text-lg font-semibold text-gray-900">Create Task</h2>
-                <p className="text-xs text-gray-400 mt-0.5">Assign a new task to an employee</p>
+                <h2 className="text-lg font-semibold text-ink-950">Create Task</h2>
+                <p className="text-xs text-ink-400 mt-0.5">Assign a new task to an employee</p>
               </div>
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -236,20 +239,22 @@ const Task = () => {
                   onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                   rows={3}
                 />
-                <Button type="submit" label="Create Task" loading={creating} />
+                <div className="flex justify-end">
+                  <Button type="submit" label="Create Task" loading={creating} />
+                </div>
               </form>
             </Card>
           )}
 
-          <Card className="p-0 overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <Card className="p-0 overflow-hidden animate-fade-in-up">
+            <div className="px-5 sm:px-6 py-4 border-b border-ink-200/60 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Task List</h2>
-                <p className="text-xs text-gray-400 mt-0.5">{tasks.length} tasks</p>
+                <h2 className="text-lg font-semibold text-ink-950">Task List</h2>
+                <p className="text-xs text-ink-400 mt-0.5">{tasks.length} tasks</p>
               </div>
             </div>
             {loading ? (
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-ink-100">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="flex items-center gap-6 p-5">
                     <div className="skeleton h-4 w-40" />
@@ -263,6 +268,7 @@ const Task = () => {
               </div>
             ) : tasks.length === 0 ? (
               <EmptyState
+                icon={<SquareCheck className="h-7 w-7" />}
                 title="No tasks found"
                 description={isHR ? "Create a task to get started." : "Tasks assigned to you will appear here."}
               />
@@ -270,34 +276,34 @@ const Task = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
-                      <th className="px-5 py-3 font-semibold">Task</th>
-                      <th className="px-5 py-3 font-semibold">Priority</th>
-                      <th className="px-5 py-3 font-semibold">Assignee</th>
-                      <th className="px-5 py-3 font-semibold">Due</th>
-                      <th className="px-5 py-3 font-semibold">Created</th>
-                      <th className="px-5 py-3 font-semibold">Status</th>
-                      {isHR && <th className="px-5 py-3 font-semibold text-right">Actions</th>}
+                    <tr className="border-b border-ink-200/60 bg-surface-100/70">
+                      <th className="table-th">Task</th>
+                      <th className="table-th">Priority</th>
+                      <th className="table-th">Assignee</th>
+                      <th className="table-th">Due</th>
+                      <th className="table-th">Created</th>
+                      <th className="table-th">Status</th>
+                      {isHR && <th className="table-th text-right">Actions</th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody>
                     {tasks.map((task) => (
-                      <tr key={task._id} className="hover:bg-gray-50/50">
-                        <td className="px-5 py-3">
-                          <div className="font-medium text-gray-900">{task.title}</div>
+                      <tr key={task._id} className="border-b border-ink-100 last:border-0 hover:bg-surface-50/60 transition-colors">
+                        <td className="table-td">
+                          <div className="font-medium text-ink-900">{task.title}</div>
                           {task.description && (
-                            <div className="text-xs text-gray-400 truncate max-w-[240px]">{task.description}</div>
+                            <div className="text-xs text-ink-400 truncate max-w-[240px]">{task.description}</div>
                           )}
                         </td>
-                        <td className="px-5 py-3">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${priorityChip(task.priority)}`}>
+                        <td className="table-td">
+                          <span className={`chip ${priorityChip(task.priority)}`}>
                             {task.priority || "Medium"}
                           </span>
                         </td>
-                        <td className="px-5 py-3 text-gray-600">{assigneeName(task)}</td>
-                        <td className="px-5 py-3 text-gray-600">{formatDate(task.dueDate)}</td>
-                        <td className="px-5 py-3 text-gray-400 text-xs">{formatDate(task.createdAt)}</td>
-                        <td className="px-5 py-3">
+                        <td className="table-td text-ink-600">{assigneeName(task)}</td>
+                        <td className="table-td text-ink-600">{formatDate(task.dueDate)}</td>
+                        <td className="table-td text-ink-400 text-xs">{formatDate(task.createdAt)}</td>
+                        <td className="table-td">
                           <div className={updatingId === task._id ? "w-44 opacity-50 pointer-events-none" : "w-44"}>
                             <SelectBox
                               name="status"
@@ -308,7 +314,7 @@ const Task = () => {
                           </div>
                         </td>
                         {isHR && (
-                          <td className="px-5 py-3 text-right">
+                          <td className="table-td text-right">
                             <Button
                               variant="danger"
                               size="sm"
@@ -326,7 +332,7 @@ const Task = () => {
             )}
           </Card>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

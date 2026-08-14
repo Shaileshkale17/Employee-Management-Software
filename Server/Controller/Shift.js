@@ -47,13 +47,14 @@ export const getShifts = async (req, res) => {
     const pageNum = Math.max(Number(page) || 1, 1);
     const limitNum = Math.min(Math.max(Number(limit) || 50, 1), 200);
     const filter = {};
-    if (req.companyId) {
-      const employees = await Employee.find({ companyId: req.companyId }).select("_id");
-      filter.employeeId = { $in: employees.map((e) => e._id) };
-    }
+    const employeeScope = { ...(req.companyId ? { companyId: req.companyId } : {}) };
     if (employeeId) {
       if (!isValidObjectId(employeeId)) return res.status(400).json(new ApiError(400, "Invalid employee ID"));
-      filter.employeeId = employeeId;
+      employeeScope._id = employeeId;
+    }
+    if (req.companyId || employeeId) {
+      const employees = await Employee.find(employeeScope).select("_id");
+      filter.employeeId = { $in: employees.map((e) => e._id) };
     }
     if (from || to) {
       filter.shiftStart = {};
@@ -96,6 +97,12 @@ export const updateShiftStatus = async (req, res) => {
     if (!["Scheduled", "Completed", "Cancelled"].includes(status)) {
       return res.status(400).json(new ApiError(400, "Invalid status"));
     }
+    const existing = await Shift.findById(id).select("employeeId");
+    if (!existing) return res.status(404).json(new ApiError(404, "Shift not found"));
+    if (req.companyId) {
+      const owner = await Employee.findOne({ _id: existing.employeeId, companyId: req.companyId }).select("_id");
+      if (!owner) return res.status(404).json(new ApiError(404, "Shift not found"));
+    }
     const data = await Shift.findByIdAndUpdate(id, { status }, { new: true });
     if (!data) return res.status(404).json(new ApiError(404, "Shift not found"));
     return res.status(200).json(new ApiResponse(200, data, "Shift updated"));
@@ -108,6 +115,12 @@ export const deleteShift = async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidObjectId(id)) return res.status(400).json(new ApiError(400, "Invalid shift ID"));
+    const existing = await Shift.findById(id).select("employeeId");
+    if (!existing) return res.status(404).json(new ApiError(404, "Shift not found"));
+    if (req.companyId) {
+      const owner = await Employee.findOne({ _id: existing.employeeId, companyId: req.companyId }).select("_id");
+      if (!owner) return res.status(404).json(new ApiError(404, "Shift not found"));
+    }
     const data = await Shift.findByIdAndDelete(id);
     if (!data) return res.status(404).json(new ApiError(404, "Shift not found"));
     return res.status(200).json(new ApiResponse(200, null, "Shift deleted"));

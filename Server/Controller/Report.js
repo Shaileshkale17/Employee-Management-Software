@@ -50,7 +50,11 @@ export const getEmployeeReport = async (req, res) => {
       const leave = mine.filter((r) => r.status === "Leave").length;
       const hours = mine.reduce((sum, r) => {
         if (r.checkIn && r.checkOut) {
-          sum += (new Date(r.checkOut) - new Date(r.checkIn)) / 3600000;
+          const breaksMs = (r.breaks || []).reduce((bSum, b) => {
+            if (b?.start && b?.end) bSum += new Date(b.end) - new Date(b.start);
+            return bSum;
+          }, 0);
+          sum += Math.max(0, (new Date(r.checkOut) - new Date(r.checkIn) - breaksMs)) / 3600000;
         }
         return sum;
       }, 0);
@@ -118,18 +122,40 @@ export const exportAttendanceCsv = async (req, res) => {
       .sort({ date: 1 });
 
     const rows = [
-      ["Date", "Employee ID", "Name", "Department", "Status", "Check In", "Check Out", "Break In", "Break Out"],
-      ...records.map((r) => [
-        r.date.toISOString().slice(0, 10),
-        r.employeeId?.employeeId || "",
-        r.employeeId?.name || "",
-        r.employeeId?.department || "",
-        r.status,
-        r.checkIn ? new Date(r.checkIn).toLocaleTimeString() : "",
-        r.checkOut ? new Date(r.checkOut).toLocaleTimeString() : "",
-        r.checkHoldIn ? new Date(r.checkHoldIn).toLocaleTimeString() : "",
-        r.checkHoldOut ? new Date(r.checkHoldOut).toLocaleTimeString() : "",
-      ]),
+      ["Date", "Employee ID", "Name", "Department", "Status", "Check In", "Check Out", "Break Time", "Hours", "Late", "Overtime"],
+      ...records.map((r) => {
+        const breaksMs = (r.breaks || []).reduce((sum, b) => {
+          if (b?.start && b?.end) sum += new Date(b.end) - new Date(b.start);
+          return sum;
+        }, 0);
+        const breakMins = Math.round(breaksMs / 60000);
+        const workMins = r.checkIn && r.checkOut
+          ? Math.max(0, Math.round((new Date(r.checkOut) - new Date(r.checkIn) - breaksMs) / 60000))
+          : 0;
+        const toMin = (d) => {
+          const t = new Date(d);
+          return t.getHours() * 60 + t.getMinutes();
+        };
+        const late = r.checkIn ? Math.max(0, toMin(r.checkIn) - 9 * 60) : 0;
+        const overtime = r.checkOut ? Math.max(0, toMin(r.checkOut) - 18 * 60) : 0;
+        const fmtMins = (min) => {
+          if (min <= 0) return "0";
+          return `${Math.floor(min / 60)}h ${min % 60}m`;
+        };
+        return [
+          r.date.toISOString().slice(0, 10),
+          r.employeeId?.employeeId || "",
+          r.employeeId?.name || "",
+          r.employeeId?.department || "",
+          r.status,
+          r.checkIn ? new Date(r.checkIn).toLocaleTimeString() : "",
+          r.checkOut ? new Date(r.checkOut).toLocaleTimeString() : "",
+          fmtMins(breakMins),
+          fmtMins(workMins),
+          fmtMins(late),
+          fmtMins(overtime),
+        ];
+      }),
     ];
 
     res.setHeader("Content-Type", "text/csv; charset=utf-8");

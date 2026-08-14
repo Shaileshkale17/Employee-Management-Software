@@ -9,8 +9,9 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { login, setPendingMfa } from "../redux/slices/authSlice";
 import { api } from "../utils/api";
+import { ShieldCheck, Timer } from "lucide-react";
 
-const OTP = () => {
+const OtpPage = () => {
   const [otp, setOtps] = useState(Array(6).fill(""));
   const [selectedCheckbox, setSelectedCheckbox] = useState(null);
   const [time, setTime] = useState(600);
@@ -119,13 +120,27 @@ const OTP = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-surface-100 via-surface-50 to-surface-200">
-      <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
+    <div className="relative flex min-h-screen bg-surface-100 overflow-hidden">
+      <div
+        className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-[120px]"
+        aria-hidden="true"
+      />
+      <div className="relative flex-1 flex items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-[440px] animate-fade-in-up">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-            <div className="text-center mb-6">
+          <div className="relative card-surface p-8 shadow-popover">
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-200 to-transparent"
+              aria-hidden="true"
+            />
+            <div className="text-center mb-7">
+              <div className="relative mx-auto mb-5 w-16 h-16">
+                <div className="absolute inset-0 rounded-2xl bg-brand-500/20 blur-lg" aria-hidden="true" />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow-sm">
+                  <ShieldCheck className="h-7 w-7" />
+                </div>
+              </div>
               <Heading heading="Verification" className="text-2xl" />
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-ink-500 text-sm mt-1.5">
                 {mode === "reset"
                   ? "Enter the 6-digit code sent to your email"
                   : "Enter the 6-digit code sent to your email"}
@@ -133,7 +148,9 @@ const OTP = () => {
             </div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-3">Enter Your OTP</p>
+                <p className="text-[13px] font-semibold text-ink-700 mb-3 text-center">
+                  Enter Your OTP
+                </p>
                 <div className="flex justify-center gap-2.5">
                   {otp.map((value, index) => (
                     <OTPBox
@@ -144,25 +161,29 @@ const OTP = () => {
                     />
                   ))}
                 </div>
-                <p className="text-right mt-3 text-sm">
+                <div className="mt-3.5 flex justify-center min-h-[24px]">
                   {time > 0 ? (
-                    <span className="text-red-400 font-medium">{formatTime(time)}</span>
+                    <span className="inline-flex items-center gap-1.5 text-sm text-ink-500">
+                      <Timer className="h-4 w-4 text-red-400" />
+                      <span className="font-semibold text-red-500 tabular-nums">{formatTime(time)}</span>
+                      <span>remaining</span>
+                    </span>
                   ) : (
                     <button
                       type="button"
-                      className="text-brand-600 hover:text-brand-700 font-medium cursor-pointer"
+                      className="text-brand-600 hover:text-brand-700 font-medium cursor-pointer transition-colors"
                       onClick={resendCode}
                     >
                       Resend OTP
                     </button>
                   )}
-                </p>
+                </div>
               </div>
 
               {mode === "mfa" && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Your location</p>
-                  <div className="flex gap-4">
+                  <p className="text-[13px] font-semibold text-ink-700 mb-2.5">Your location</p>
+                  <div className="flex flex-wrap gap-4">
                     <CheckBox
                       label="Office"
                       checked={selectedCheckbox === "Office"}
@@ -183,7 +204,7 @@ const OTP = () => {
               )}
 
               <Button type="submit" label="Verify OTP" loading={loading} disabled={loading} />
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-ink-500">
                 Back to{" "}
                 <Link
                   to="/"
@@ -202,16 +223,16 @@ const OTP = () => {
           </div>
         </div>
       </div>
-      <div className="w-[55%] min-h-screen hidden lg:flex items-center justify-center bg-gradient-to-br from-surface-900 via-[#131A2E] to-[#0B0F1C] p-12 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-brand-500/20 rounded-full blur-[120px]" />
+      <div className="relative w-[55%] min-h-screen hidden lg:flex items-center justify-center overflow-hidden bg-surface-900 p-12">
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-brand-500/20 rounded-full blur-[120px] animate-float-slow" aria-hidden="true" />
         <img
           src={HoreImage}
           alt="Verification illustration"
-          className="relative z-10 max-w-md object-contain opacity-80"
+          className="relative z-10 max-w-md object-contain opacity-80 animate-float"
         />
       </div>
     </div>
   );
 };
 
-export default OTP;
+export default OtpPage;

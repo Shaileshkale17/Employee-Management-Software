@@ -4,7 +4,9 @@ import { toast } from "react-toastify";
 import InputBox from "../components/InputBox";
 import TextArea from "../components/TextArea";
 import Button from "../components/Button";
+import Skeleton from "../components/Skeleton";
 import { api } from "../utils/api";
+import { Briefcase, MapPin, CircleCheck, Upload } from "lucide-react";
 
 const initialForm = {
   firstName: "",
@@ -70,22 +72,65 @@ const CareerApply = () => {
     }
   };
 
-  if (!job) return null;
+  if (!job) {
+    return (
+      <div className="min-h-screen bg-mesh-light py-10 px-4">
+        <div className="max-w-2xl mx-auto animate-fade-in">
+          <Skeleton className="h-4 w-32 mb-6" />
+          <div className="card-surface p-4 mb-6">
+            <Skeleton className="h-3 w-24 mb-2" />
+            <Skeleton className="h-5 w-2/3 mb-2" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+          <div className="card-surface p-6 sm:p-8 space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton className="h-11 w-full rounded-xl" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton className="h-11 w-full rounded-xl" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton className="h-11 w-full rounded-xl" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+            <Skeleton className="h-11 w-full rounded-xl" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton className="h-11 w-full rounded-xl" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+            <Skeleton className="h-36 w-full rounded-2xl" />
+            <Skeleton className="h-28 w-full rounded-xl" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F1F2F6] via-[#F8F9FF] to-[#E8EAF6] py-10 px-4">
-      <div className="max-w-2xl mx-auto animate-fadeIn">
-        <Link to={`/careers/${slug}/${jobId}`} className="text-sm text-gray-500 hover:text-brand-600 font-medium transition-colors mb-6 inline-block">
-          ← Back to job details
+    <div className="min-h-screen bg-mesh-light py-10 px-4">
+      <div className="max-w-2xl mx-auto animate-fade-in-up">
+        <Link to={`/careers/${slug}/${jobId}`} className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-brand-600 font-medium transition-colors focus-ring rounded-lg mb-6">
+          <span aria-hidden="true">←</span> Back to job details
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-4 mb-6">
-          <p className="text-xs text-gray-500 mb-1">Applying for</p>
-          <h1 className="text-lg font-semibold text-gray-900">{job.title}</h1>
-          <p className="text-xs text-gray-400 mt-1">📍 {job.location} · {job.employmentType}</p>
+        <div className="card-surface p-4 mb-6 flex items-start gap-3.5">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-500/10">
+            <Briefcase className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-ink-400 mb-1">Applying for</p>
+            <h1 className="text-lg font-semibold text-ink-950 truncate">{job.title}</h1>
+            <p className="text-xs text-ink-400 mt-1 flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {job.location} · {job.employmentType}
+            </p>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl shadow-gray-200/70 border border-gray-100 p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="card-surface shadow-popover p-6 sm:p-8 space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputBox label="First Name" id="firstName" placeholder="Jane" name="firstName" setInput={set("firstName")} getInput={formData.firstName} error={errors.firstName} />
             <InputBox label="Last Name" id="lastName" placeholder="Doe" name="lastName" setInput={set("lastName")} getInput={formData.lastName} error={errors.lastName} />
@@ -105,18 +150,19 @@ const CareerApply = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Resume (PDF, DOC, DOCX, TXT — max 5MB)</label>
-            <label className={`flex flex-col items-center justify-center gap-1 border-2 border-dashed rounded-xl py-6 cursor-pointer transition-colors ${resume ? "border-brand-400 bg-brand-50" : "border-gray-200 bg-gray-50 hover:border-brand-300 hover:bg-brand-50/50"}`}>
+            <label className="block text-[13px] font-semibold text-ink-800 mb-1.5">Resume (PDF, DOC, DOCX, TXT — max 5MB)</label>
+            <label className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-2xl py-8 px-6 cursor-pointer transition-all duration-200 ease-smooth focus-ring ${resume ? "border-brand-400 bg-brand-50" : "border-ink-300 bg-surface-50 hover:border-brand-400 hover:bg-brand-50/40"}`}>
               {resume ? (
-                <span className="text-sm font-medium text-brand-700">{resume.name}</span>
+                <>
+                  <CircleCheck className="w-7 h-7 text-brand-600" />
+                  <span className="text-sm font-medium text-brand-700">{resume.name}</span>
+                  <span className="text-[11px] text-ink-400">Click to replace</span>
+                </>
               ) : (
                 <>
-                  <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  <span className="text-xs text-gray-500">Click to upload resume</span>
+                  <Upload className="w-7 h-7 text-ink-400" />
+                  <span className="text-xs text-ink-500">Click to upload resume</span>
+                  <span className="text-[11px] text-ink-400">PDF, DOC, DOCX, TXT · Max 5MB</span>
                 </>
               )}
               <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => setResume(e.target.files?.[0] || null)} />

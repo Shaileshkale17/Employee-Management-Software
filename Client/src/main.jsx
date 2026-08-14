@@ -10,11 +10,13 @@ import ResetPassword from "./pages/ResetPassword";
 import Overview from "./pages/Overview";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import ProtectedRoute, {
-  ADMIN_ROLES,
-} from "./Middlewares/routes.Middlewares";import Task from "./pages/Task";
+import ProtectedRoute from "./Middlewares/routes.Middlewares";
+import { ADMIN_ROLES } from "./Middlewares/roles";
+import Task from "./pages/Task";
 import Message from "./pages/Message";
 import Meeting from "./pages/Meeting";
+import MeetingRoom from "./pages/MeetingRoom";
+import GuestJoin from "./pages/GuestJoin";
 import Attendance_Info from "./pages/Attendance_Info";
 import Leaves from "./pages/Leaves";
 import Report from "./pages/Report";
@@ -43,6 +45,20 @@ import CandidateEdit from "./pages/CandidateEdit";
 import Interviews from "./pages/Interviews";
 import Notifications from "./pages/Notifications";
 import CompanySettings from "./pages/CompanySettings";
+import Calendar from "./pages/Calendar";
+import MaintainingEmployeeFiles from "./pages/MaintainingEmployeeFiles";
+import KeepingRecordsUpdated from "./pages/KeepingRecordsUpdated";
+import HandlingConfidentialInformation from "./pages/HandlingConfidentialInformation";
+import ManagingSalariesBonuses from "./pages/ManagingSalariesBonuses";
+import CoordinatingWithFinance from "./pages/CoordinatingWithFinance";
+import AttendanceLeaveTracking from "./pages/AttendanceLeaveTracking";
+import HealthInsurance from "./pages/HealthInsurance";
+import ProvidentFundGratuity from "./pages/ProvidentFundGratuity";
+import OtherPerksReimbursements from "./pages/OtherPerksReimbursements";
+import AppraisalProcesses from "./pages/AppraisalProcesses";
+import GoalSetting from "./pages/GoalSetting";
+import FeedbackCollection from "./pages/FeedbackCollection";
+import PromotionsTerminations from "./pages/PromotionsTerminations";
 
 const routers = createBrowserRouter([
   {
@@ -146,6 +162,30 @@ const routers = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Meeting />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/meeting/:meetingId",
+        element: (
+          <ProtectedRoute>
+            <MeetingRoom />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/join/:meetingId",
+        element: <GuestJoin />,
+      },
+      {
+        path: "/join/:meetingId/room",
+        element: <MeetingRoom />,
+      },
+      {
+        path: "/calendar",
+        element: (
+          <ProtectedRoute>
+            <Calendar />
           </ProtectedRoute>
         ),
       },
@@ -283,6 +323,110 @@ const routers = createBrowserRouter([
         element: (
           <ProtectedRoute role={ADMIN_ROLES}>
             <WelcomeKits />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/Maintaining-employee-files",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <MaintainingEmployeeFiles />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/keeping-records-updated",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <KeepingRecordsUpdated />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/Handling-confidential-information",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <HandlingConfidentialInformation />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/managing-salaries-bonuses-and-incentives",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <ManagingSalariesBonuses />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/coordinating-with-finance",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <CoordinatingWithFinance />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/Attendance-leave-tracking",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <AttendanceLeaveTracking />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/health-insurance",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <HealthInsurance />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/provident-fund-gratuity",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <ProvidentFundGratuity />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/other-perks-reimbursements",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <OtherPerksReimbursements />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/appraisal-processes",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <AppraisalProcesses />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/goal-setting",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <GoalSetting />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/feedback-collection",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <FeedbackCollection />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/promotions-terminations",
+        element: (
+          <ProtectedRoute role={ADMIN_ROLES}>
+            <PromotionsTerminations />
           </ProtectedRoute>
         ),
       },

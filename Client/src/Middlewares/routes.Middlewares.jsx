@@ -1,14 +1,6 @@
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 
-export const ADMIN_ROLES = [
-  "Super Admin",
-  "Company Admin",
-  "HR",
-  "HR Manager",
-  "Recruiter",
-];
-
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();

@@ -55,6 +55,13 @@ export const getConversation = async (req, res) => {
       { read: true, readAt: new Date() }
     );
 
+    if (req.io) {
+      req.io.to(`user:${other}`).emit("chat:read", {
+        with: req.user.id,
+        readAt: new Date().toISOString(),
+      });
+    }
+
     return res.status(200).json(new ApiResponse(200, data, "Conversation fetched"));
   } catch (error) {
     return res.status(500).json(new ApiError(500, error.message));
@@ -121,6 +128,12 @@ export const markConversationRead = async (req, res) => {
       { sender: other, recipient: req.user.id, read: false },
       { read: true, readAt: new Date() }
     );
+    if (req.io) {
+      req.io.to(`user:${other}`).emit("chat:read", {
+        with: req.user.id,
+        readAt: new Date().toISOString(),
+      });
+    }
     return res.status(200).json(new ApiResponse(200, null, "Messages marked as read"));
   } catch (error) {
     return res.status(500).json(new ApiError(500, error.message));

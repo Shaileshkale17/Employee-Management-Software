@@ -9,6 +9,7 @@ import InputBox from "../components/InputBox";
 import TextArea from "../components/TextArea";
 import EmptyState from "../components/EmptyState";
 import { SkeletonList } from "../components/Skeleton";
+import { ArrowUpRight, X } from "lucide-react";
 
 const initialForm = {
   candidate: "",
@@ -23,10 +24,16 @@ const initialForm = {
   notes: "",
 };
 
+const selectChevron = {
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a94a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 14px center",
+};
+
 const Interviews = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.user?.role;
-  const canManage = ["Company Admin", "HR", "HR Manager", "Recruiter"].includes(
+  const canManage = ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"].includes(
     role,
   );
 
@@ -174,546 +181,597 @@ const Interviews = () => {
   const avatar = (c) => `${c?.firstName?.[0] || ""}${c?.lastName?.[0] || ""}`;
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-surface-100">
       {SideNav(role)}
-      <div className="flex-1 min-h-screen p-4 lg:p-6 bg-surface-100">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Interviews</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
-              Schedule and manage interviews
-            </p>
+      <main className="flex-1 min-h-screen p-4 lg:p-8 bg-mesh-light">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in-down">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-ink-950 sm:text-3xl">
+                Interviews
+              </h1>
+              <p className="mt-1 text-sm text-ink-500">
+                Schedule and manage interviews
+              </p>
+            </div>
+            {canManage && (
+              <Button
+                label="+ Schedule Interview"
+                onClick={() => setShowForm((v) => !v)}
+              />
+            )}
           </div>
-          {canManage && (
-            <Button
-              label="+ Schedule Interview"
-              onClick={() => setShowForm((v) => !v)}
-            />
-          )}
-        </div>
 
-        {showForm && canManage && (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl shadow-card border border-gray-100 p-6 mb-6 animate-fadeIn"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-gray-900">
-                Schedule new interview
-              </h2>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
+          {showForm && canManage && (
+            <form
+              onSubmit={handleSubmit}
+              className="card-surface mb-6 p-6 animate-fade-in-down"
+            >
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-ink-950">
+                    Schedule new interview
+                  </h2>
+                  <p className="mt-0.5 text-xs text-ink-400">
+                    Coordinate rounds, panel and meeting details
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  aria-label="Close form"
+                  className="focus-ring flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 transition-colors duration-200 hover:bg-surface-100 hover:text-ink-600"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700">
-                  Candidate
-                </label>
-                <select
-                  value={formData.candidate}
-                  onChange={(e) => set("candidate")(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  <option value="">Select candidate</option>
-                  {candidates.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.firstName} {c.lastName} {c.email ? `(${c.email})` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700">
-                  Job
-                </label>
-                <select
-                  value={formData.job}
-                  onChange={(e) => {
-                    set("job")(e.target.value);
-                    set("application")("");
-                  }}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  <option value="">Select job</option>
-                  {jobs.map((j) => (
-                    <option key={j._id} value={j._id}>
-                      {j.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700">
-                  Application (optional)
-                </label>
-                <select
-                  value={formData.application}
-                  onChange={(e) => set("application")(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  <option value="">— link to application —</option>
-                  {appsByJob.map((a) => (
-                    <option key={a._id} value={a._id}>
-                      {a.candidate?.firstName} {a.candidate?.lastName} (
-                      {a.status})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <InputBox
-                label="Date & time"
-                type="datetime-local"
-                id="interviewDate"
-                name="interviewDate"
-                setInput={set("interviewDate")}
-                getInput={formData.interviewDate}
-              />
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700">
-                  Duration (min)
-                </label>
-                <select
-                  value={formData.duration}
-                  onChange={(e) => set("duration")(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  {["30", "45", "60", "90", "120"].map((d) => (
-                    <option key={d} value={d}>
-                      {d} min
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700">
-                  Round
-                </label>
-                <select
-                  value={formData.round}
-                  onChange={(e) => set("round")(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  {["Round 1", "Round 2", "Round 3", "Final"].map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700">
-                  Mode
-                </label>
-                <select
-                  value={formData.mode}
-                  onChange={(e) => set("mode")(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  {[
-                    "Video Call",
-                    "In-person",
-                    "Phone",
-                    "Online",
-                    "Offline",
-                  ].map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700">
-                  Type
-                </label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => set("type")(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  {["Technical", "HR", "Managerial", "Final"].map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <InputBox
-                label="Meeting link"
-                id="meetingLink"
-                placeholder="https://meet.google.com/..."
-                name="meetingLink"
-                setInput={set("meetingLink")}
-                getInput={formData.meetingLink}
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="text-sm font-semibold text-gray-700 block mb-1.5">
-                Interview panel
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={searchEmployees}
-                  onFocus={() => setShowResults(true)}
-                  placeholder="Search employees to add to panel..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="candidate"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
+                    Candidate
+                  </label>
+                  <select
+                    id="candidate"
+                    value={formData.candidate}
+                    onChange={(e) => set("candidate")(e.target.value)}
+                    className="input-base appearance-none cursor-pointer pr-10"
+                    style={selectChevron}
+                  >
+                    <option value="">Select candidate</option>
+                    {candidates.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.firstName} {c.lastName} {c.email ? `(${c.email})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="job"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
+                    Job
+                  </label>
+                  <select
+                    id="job"
+                    value={formData.job}
+                    onChange={(e) => {
+                      set("job")(e.target.value);
+                      set("application")("");
+                    }}
+                    className="input-base appearance-none cursor-pointer pr-10"
+                    style={selectChevron}
+                  >
+                    <option value="">Select job</option>
+                    {jobs.map((j) => (
+                      <option key={j._id} value={j._id}>
+                        {j.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="application"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
+                    Application (optional)
+                  </label>
+                  <select
+                    id="application"
+                    value={formData.application}
+                    onChange={(e) => set("application")(e.target.value)}
+                    className="input-base appearance-none cursor-pointer pr-10"
+                    style={selectChevron}
+                  >
+                    <option value="">— link to application —</option>
+                    {appsByJob.map((a) => (
+                      <option key={a._id} value={a._id}>
+                        {a.candidate?.firstName} {a.candidate?.lastName} (
+                        {a.status})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <InputBox
+                  label="Date & time"
+                  type="datetime-local"
+                  id="interviewDate"
+                  name="interviewDate"
+                  setInput={set("interviewDate")}
+                  getInput={formData.interviewDate}
                 />
-                {showResults && (search || searching) && (
-                  <div className="absolute z-20 mt-1 w-full bg-white rounded-xl border border-gray-200 shadow-modal max-h-52 overflow-y-auto">
-                    {searching ? (
-                      <div className="p-3 text-xs text-gray-400">
-                        Searching...
-                      </div>
-                    ) : searchResults.length === 0 ? (
-                      <div className="p-3 text-xs text-gray-400">
-                        No employees found
-                      </div>
-                    ) : (
-                      searchResults.map((emp) => (
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="duration"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
+                    Duration (min)
+                  </label>
+                  <select
+                    id="duration"
+                    value={formData.duration}
+                    onChange={(e) => set("duration")(e.target.value)}
+                    className="input-base appearance-none cursor-pointer pr-10"
+                    style={selectChevron}
+                  >
+                    {["30", "45", "60", "90", "120"].map((d) => (
+                      <option key={d} value={d}>
+                        {d} min
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="round"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
+                    Round
+                  </label>
+                  <select
+                    id="round"
+                    value={formData.round}
+                    onChange={(e) => set("round")(e.target.value)}
+                    className="input-base appearance-none cursor-pointer pr-10"
+                    style={selectChevron}
+                  >
+                    {["Round 1", "Round 2", "Round 3", "Final"].map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="mode"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
+                    Mode
+                  </label>
+                  <select
+                    id="mode"
+                    value={formData.mode}
+                    onChange={(e) => set("mode")(e.target.value)}
+                    className="input-base appearance-none cursor-pointer pr-10"
+                    style={selectChevron}
+                  >
+                    {[
+                      "Video Call",
+                      "In-person",
+                      "Phone",
+                      "Online",
+                      "Offline",
+                    ].map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="type"
+                    className="text-[13px] font-semibold text-ink-800"
+                  >
+                    Type
+                  </label>
+                  <select
+                    id="type"
+                    value={formData.type}
+                    onChange={(e) => set("type")(e.target.value)}
+                    className="input-base appearance-none cursor-pointer pr-10"
+                    style={selectChevron}
+                  >
+                    {["Technical", "HR", "Managerial", "Final"].map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <InputBox
+                  label="Meeting link"
+                  id="meetingLink"
+                  placeholder="https://meet.google.com/..."
+                  name="meetingLink"
+                  setInput={set("meetingLink")}
+                  getInput={formData.meetingLink}
+                />
+              </div>
+
+              <div className="mt-4">
+                <label className="mb-1.5 block text-[13px] font-semibold text-ink-800">
+                  Interview panel
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={searchEmployees}
+                    onFocus={() => setShowResults(true)}
+                    placeholder="Search employees to add to panel..."
+                    className="input-base"
+                  />
+                  {showResults && (search || searching) && (
+                    <div className="absolute z-20 mt-1 max-h-52 w-full overflow-y-auto scrollbar-thin rounded-xl border border-ink-200/60 bg-white p-1 shadow-popover animate-fade-in">
+                      {searching ? (
+                        <div className="p-3 text-xs text-ink-400">
+                          Searching...
+                        </div>
+                      ) : searchResults.length === 0 ? (
+                        <div className="p-3 text-xs text-ink-400">
+                          No employees found
+                        </div>
+                      ) : (
+                        searchResults.map((emp) => (
+                          <button
+                            type="button"
+                            key={emp._id}
+                            onClick={() => togglePanel(emp)}
+                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-surface-100"
+                          >
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50 text-[10px] font-semibold text-brand-600">
+                              {emp.name?.[0]}
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-ink-800">
+                                {emp.name}
+                              </p>
+                              <p className="text-[10px] text-ink-400">
+                                {emp.designation || emp.role || ""}
+                              </p>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+                {panel.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {panel.map((emp) => (
+                      <span
+                        key={emp._id}
+                        className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-500/20"
+                      >
+                        {emp.name}
                         <button
                           type="button"
-                          key={emp._id}
                           onClick={() => togglePanel(emp)}
-                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-surface-100 transition-colors text-left"
+                          aria-label={`Remove ${emp.name} from panel`}
+                          className="text-brand-400 transition-colors duration-200 hover:text-brand-700"
                         >
-                          <div className="w-7 h-7 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 text-[10px] font-semibold">
-                            {emp.name?.[0]}
-                          </div>
-                          <div>
-                            <p className="text-xs font-medium text-gray-800">
-                              {emp.name}
-                            </p>
-                            <p className="text-[10px] text-gray-400">
-                              {emp.designation || emp.role || ""}
-                            </p>
-                          </div>
+                          ×
                         </button>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-              {panel.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {panel.map((emp) => (
-                    <span
-                      key={emp._id}
-                      className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs px-2.5 py-1 rounded-full"
-                    >
-                      {emp.name}
-                      <button
-                        type="button"
-                        onClick={() => togglePanel(emp)}
-                        className="text-brand-400 hover:text-brand-700"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4">
-              <TextArea
-                label="Notes"
-                id="notes"
-                placeholder="Preparation notes, topics to cover..."
-                name="notes"
-                value={formData.notes}
-                onChange={(e) => set("notes")(e.target.value)}
-                rows={3}
-              />
-            </div>
-
-            <div className="mt-5 flex justify-end">
-              <Button
-                type="submit"
-                label="Schedule Interview"
-                loading={submitting}
-                disabled={submitting}
-              />
-            </div>
-          </form>
-        )}
-
-        {loading ? (
-          <SkeletonList rows={4} />
-        ) : interviews.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-card border border-gray-100">
-            <EmptyState
-              title="No interviews yet"
-              description="Schedule your first interview to get started."
-            />
-          </div>
-        ) : (
-          <>
-            <section className="mb-8">
-              <h2 className="text-sm font-semibold text-gray-700 mb-3">
-                Upcoming
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {upcoming.length === 0 && (
-                  <p className="text-xs text-gray-400">
-                    No upcoming interviews
-                  </p>
-                )}
-                {upcoming.map((iv) => (
-                  <div
-                    key={iv._id}
-                    className="bg-white rounded-2xl shadow-card border border-gray-100 p-5"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] bg-brand-50 text-brand-700 px-2 py-1 rounded-full font-medium">
-                        {iv.status}
                       </span>
-                      <span className="text-[10px] text-gray-400">
-                        {new Date(iv.interviewDate).toLocaleDateString(
-                          undefined,
-                          { weekday: "short", month: "short", day: "numeric" },
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-semibold text-xs">
-                        {avatar(iv.candidate)}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-medium text-gray-900 truncate">
-                          {iv.candidate?.firstName} {iv.candidate?.lastName}
-                        </h3>
-                        <p className="text-[11px] text-gray-500 truncate">
-                          {iv.job?.title}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mt-4 text-[10px]">
-                      <span className="bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full">
-                        {iv.round} · {iv.type}
-                      </span>
-                      <span className="bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full">
-                        {iv.mode} · {iv.duration}m
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <p className="text-[10px] text-gray-400 mb-1.5">
-                        Panel ({iv.panel?.length || 0})
-                      </p>
-                      <div className="flex -space-x-2">
-                        {iv.panel?.map((p, i) => (
-                          <div
-                            key={i}
-                            title={p.name}
-                            className="w-7 h-7 rounded-full bg-surface-200 border-2 border-white flex items-center justify-center text-[9px] font-semibold text-gray-500"
-                          >
-                            {p.name?.[0]}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {iv.meetingLink && (
-                      <a
-                        href={iv.meetingLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 text-[11px] text-brand-600 hover:text-brand-700 mt-3 font-medium"
-                      >
-                        Join meeting
-                        <svg
-                          className="w-3 h-3"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M7 17L17 7M7 7h10v10" />
-                        </svg>
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-sm font-semibold text-gray-700 mb-3">
-                Past / Completed
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {past.length === 0 && (
-                  <p className="text-xs text-gray-400">No past interviews</p>
-                )}
-                {past.map((iv) => (
-                  <div
-                    key={iv._id}
-                    className="bg-white rounded-2xl shadow-card border border-gray-100 p-5 opacity-90"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span
-                        className={`text-[10px] px-2 py-1 rounded-full font-medium ${iv.status === "Cancelled" ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-600"}`}
-                      >
-                        {iv.status}
-                      </span>
-                      <span className="text-[10px] text-gray-400">
-                        {new Date(iv.interviewDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-surface-100 flex items-center justify-center text-gray-500 font-semibold text-xs">
-                        {avatar(iv.candidate)}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-medium text-gray-900 truncate">
-                          {iv.candidate?.firstName} {iv.candidate?.lastName}
-                        </h3>
-                        <p className="text-[11px] text-gray-500 truncate">
-                          {iv.job?.title}
-                        </p>
-                      </div>
-                    </div>
-                    {iv.result && (
-                      <span
-                        className={`inline-block text-[10px] mt-3 px-2 py-0.5 rounded-full font-medium ${iv.result === "Pass" ? "bg-green-50 text-green-600" : iv.result === "Fail" ? "bg-red-50 text-red-600" : "bg-yellow-50 text-yellow-600"}`}
-                      >
-                        {iv.result}
-                      </span>
-                    )}
-                    {canManage && iv.status !== "Cancelled" && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        label={iv.feedback ? "Edit feedback" : "Add feedback"}
-                        className="mt-4"
-                        onClick={() => {
-                          setFeedbackFor(iv);
-                          setFeedback({
-                            rating: iv.rating || 3,
-                            result: iv.result || "",
-                            status: "Completed",
-                            feedback: iv.feedback || "",
-                          });
-                        }}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          </>
-        )}
-
-        {feedbackFor && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-            onClick={() => setFeedbackFor(null)}
-          >
-            <form
-              onSubmit={handleFeedbackSubmit}
-              className="bg-white rounded-2xl shadow-modal w-full max-w-md mx-4 p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-sm font-semibold text-gray-900 mb-4">
-                Interview feedback
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 block mb-1.5">
-                    Rating
-                  </label>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() =>
-                          setFeedback((f) => ({ ...f, rating: r }))
-                        }
-                        className={`text-xl transition-colors ${r <= feedback.rating ? "text-amber-400" : "text-gray-200"}`}
-                      >
-                        ★
-                      </button>
                     ))}
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-gray-700">
-                      Result
-                    </label>
-                    <select
-                      value={feedback.result}
-                      onChange={(e) =>
-                        setFeedback((f) => ({ ...f, result: e.target.value }))
-                      }
-                      className="px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-brand-500"
-                    >
-                      <option value="">—</option>
-                      <option>Pass</option>
-                      <option>Fail</option>
-                      <option>Hold</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-gray-700">
-                      Status
-                    </label>
-                    <select
-                      value={feedback.status}
-                      onChange={(e) =>
-                        setFeedback((f) => ({ ...f, status: e.target.value }))
-                      }
-                      className="px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-brand-500"
-                    >
-                      <option>Completed</option>
-                      <option>Rescheduled</option>
-                      <option>Cancelled</option>
-                    </select>
-                  </div>
-                </div>
+                )}
+              </div>
+
+              <div className="mt-4">
                 <TextArea
-                  label="Feedback"
-                  id="feedback"
-                  placeholder="Detailed feedback..."
-                  name="feedback"
-                  value={feedback.feedback}
-                  onChange={(e) =>
-                    setFeedback((f) => ({ ...f, feedback: e.target.value }))
-                  }
-                  rows={4}
+                  label="Notes"
+                  id="notes"
+                  placeholder="Preparation notes, topics to cover..."
+                  name="notes"
+                  value={formData.notes}
+                  onChange={(e) => set("notes")(e.target.value)}
+                  rows={3}
                 />
               </div>
-              <div className="flex justify-end gap-2 mt-5">
+
+              <div className="mt-5 flex justify-end">
                 <Button
-                  variant="secondary"
-                  size="sm"
-                  label="Cancel"
-                  onClick={() => setFeedbackFor(null)}
+                  type="submit"
+                  label="Schedule Interview"
+                  loading={submitting}
+                  disabled={submitting}
                 />
-                <Button type="submit" size="sm" label="Save feedback" />
               </div>
             </form>
-          </div>
-        )}
-      </div>
+          )}
+
+          {loading ? (
+            <SkeletonList rows={4} />
+          ) : interviews.length === 0 ? (
+            <div className="card-surface animate-fade-in">
+              <EmptyState
+                title="No interviews yet"
+                description="Schedule your first interview to get started."
+              />
+            </div>
+          ) : (
+            <>
+              <section className="mb-8 animate-fade-in-up">
+                <div className="mb-3 flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-ink-800">
+                    Upcoming
+                  </h2>
+                  <span className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-500/20">
+                    {upcoming.length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {upcoming.length === 0 && (
+                    <p className="text-xs text-ink-400">
+                      No upcoming interviews
+                    </p>
+                  )}
+                  {upcoming.map((iv) => (
+                    <div
+                      key={iv._id}
+                      className="card-surface card-hover p-5"
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-500/20">
+                          {iv.status}
+                        </span>
+                        <span className="text-[10px] font-medium text-ink-400">
+                          {new Date(iv.interviewDate).toLocaleDateString(
+                            undefined,
+                            { weekday: "short", month: "short", day: "numeric" },
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-semibold text-white">
+                          {avatar(iv.candidate)}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="truncate text-sm font-medium text-ink-900">
+                            {iv.candidate?.firstName} {iv.candidate?.lastName}
+                          </h3>
+                          <p className="truncate text-[11px] text-ink-500">
+                            {iv.job?.title}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-1.5 text-[10px]">
+                        <span className="chip bg-surface-100 text-ink-600 ring-1 ring-ink-200/60">
+                          {iv.round} · {iv.type}
+                        </span>
+                        <span className="chip bg-surface-100 text-ink-600 ring-1 ring-ink-200/60">
+                          {iv.mode} · {iv.duration}m
+                        </span>
+                      </div>
+                      <div className="mt-3">
+                        <p className="mb-1.5 text-[10px] text-ink-400">
+                          Panel ({iv.panel?.length || 0})
+                        </p>
+                        <div className="flex -space-x-2">
+                          {iv.panel?.map((p, i) => (
+                            <div
+                              key={i}
+                              title={p.name}
+                              className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-surface-200 text-[9px] font-semibold text-ink-500"
+                            >
+                              {p.name?.[0]}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      {iv.meetingLink && (
+                        <a
+                          href={iv.meetingLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-brand-600 transition-colors duration-200 hover:text-brand-700"
+                        >
+                          Join meeting
+                          <ArrowUpRight className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="animate-fade-in-up">
+                <div className="mb-3 flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-ink-800">
+                    Past / Completed
+                  </h2>
+                  <span className="chip bg-surface-100 text-ink-600 ring-1 ring-ink-200/60">
+                    {past.length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {past.length === 0 && (
+                    <p className="text-xs text-ink-400">No past interviews</p>
+                  )}
+                  {past.map((iv) => (
+                    <div
+                      key={iv._id}
+                      className="card-surface p-5 opacity-90"
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <span
+                          className={`chip ring-1 ${iv.status === "Cancelled" ? "bg-red-50 text-red-600 ring-red-500/20" : "bg-ink-100 text-ink-600 ring-ink-500/15"}`}
+                        >
+                          {iv.status}
+                        </span>
+                        <span className="text-[10px] font-medium text-ink-400">
+                          {new Date(iv.interviewDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-surface-200 text-xs font-semibold text-ink-500">
+                          {avatar(iv.candidate)}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="truncate text-sm font-medium text-ink-900">
+                            {iv.candidate?.firstName} {iv.candidate?.lastName}
+                          </h3>
+                          <p className="truncate text-[11px] text-ink-500">
+                            {iv.job?.title}
+                          </p>
+                        </div>
+                      </div>
+                      {iv.result && (
+                        <span
+                          className={`chip mt-3 inline-flex ring-1 ${iv.result === "Pass" ? "bg-green-50 text-green-600 ring-green-500/20" : iv.result === "Fail" ? "bg-red-50 text-red-600 ring-red-500/20" : "bg-yellow-50 text-yellow-600 ring-yellow-500/20"}`}
+                        >
+                          {iv.result}
+                        </span>
+                      )}
+                      {canManage && iv.status !== "Cancelled" && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          label={iv.feedback ? "Edit feedback" : "Add feedback"}
+                          className="mt-4"
+                          onClick={() => {
+                            setFeedbackFor(iv);
+                            setFeedback({
+                              rating: iv.rating || 3,
+                              result: iv.result || "",
+                              status: "Completed",
+                              feedback: iv.feedback || "",
+                            });
+                          }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+
+          {feedbackFor && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/50 p-4 backdrop-blur-sm"
+              onClick={() => setFeedbackFor(null)}
+            >
+              <form
+                onSubmit={handleFeedbackSubmit}
+                className="card-surface w-full max-w-md p-6 shadow-modal animate-scale-in"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-base font-semibold text-ink-950">
+                    Interview feedback
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => setFeedbackFor(null)}
+                    aria-label="Close feedback"
+                    className="focus-ring flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 transition-colors duration-200 hover:bg-surface-100 hover:text-ink-600"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-ink-700">
+                      Rating
+                    </label>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() =>
+                            setFeedback((f) => ({ ...f, rating: r }))
+                          }
+                          aria-label={`Rate ${r} of 5`}
+                          className={`text-xl transition-all duration-200 active:scale-90 ${r <= feedback.rating ? "text-amber-400" : "text-ink-200 hover:text-amber-300"}`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-ink-700">
+                        Result
+                      </label>
+                      <select
+                        value={feedback.result}
+                        onChange={(e) =>
+                          setFeedback((f) => ({ ...f, result: e.target.value }))
+                        }
+                        className="input-base appearance-none cursor-pointer pr-10"
+                        style={selectChevron}
+                      >
+                        <option value="">—</option>
+                        <option>Pass</option>
+                        <option>Fail</option>
+                        <option>Hold</option>
+                      </select>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-ink-700">
+                        Status
+                      </label>
+                      <select
+                        value={feedback.status}
+                        onChange={(e) =>
+                          setFeedback((f) => ({ ...f, status: e.target.value }))
+                        }
+                        className="input-base appearance-none cursor-pointer pr-10"
+                        style={selectChevron}
+                      >
+                        <option>Completed</option>
+                        <option>Rescheduled</option>
+                        <option>Cancelled</option>
+                      </select>
+                    </div>
+                  </div>
+                  <TextArea
+                    label="Feedback"
+                    id="feedback"
+                    placeholder="Detailed feedback..."
+                    name="feedback"
+                    value={feedback.feedback}
+                    onChange={(e) =>
+                      setFeedback((f) => ({ ...f, feedback: e.target.value }))
+                    }
+                    rows={4}
+                  />
+                </div>
+                <div className="mt-5 flex justify-end gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    label="Cancel"
+                    onClick={() => setFeedbackFor(null)}
+                  />
+                  <Button type="submit" size="sm" label="Save feedback" />
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

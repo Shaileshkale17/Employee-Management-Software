@@ -27,6 +27,7 @@ const users = [
     role: "Super Admin",
     employeeId: "1000",
     salary: { ctc: 0, basic: 0, hra: 0 },
+    dateOfBirth: "1985-03-12",
   },
   {
     name: "HR Admin",
@@ -35,6 +36,7 @@ const users = [
     role: "Company Admin",
     employeeId: "EMP001",
     salary: { ctc: 600000, basic: 300000, hra: 120000 },
+    dateOfBirth: "1990-07-25",
   },
   {
     name: "HR Manager",
@@ -43,6 +45,7 @@ const users = [
     role: "HR",
     employeeId: "EMP002",
     salary: { ctc: 700000, basic: 350000, hra: 140000 },
+    dateOfBirth: "1992-01-15",
   },
   {
     name: "Recruiter User",
@@ -51,6 +54,7 @@ const users = [
     role: "Recruiter",
     employeeId: "EMP003",
     salary: { ctc: 500000, basic: 250000, hra: 100000 },
+    dateOfBirth: "1994-11-05",
   },
   {
     name: "Interviewer User",
@@ -59,6 +63,7 @@ const users = [
     role: "Interviewer",
     employeeId: "EMP004",
     salary: { ctc: 900000, basic: 450000, hra: 180000 },
+    dateOfBirth: "1988-09-20",
   },
   {
     name: "Employee User",
@@ -67,6 +72,7 @@ const users = [
     role: "developer",
     employeeId: "EMP005",
     salary: { ctc: 500000, basic: 250000, hra: 100000 },
+    dateOfBirth: "1996-05-30",
   },
 ];
 
@@ -135,6 +141,7 @@ async function seed() {
             : role === "Interviewer"
               ? ["React", "Node.js", "System Design"]
               : ["Recruiting", "Communication"];
+        if (u.dateOfBirth) existing.dateOfBirth = new Date(u.dateOfBirth);
         await existing.save();
         console.log(`Updated user: ${u.email} (${role})`);
         continue;
@@ -157,6 +164,7 @@ async function seed() {
               ? ["React", "Node.js", "System Design"]
               : ["Recruiting", "Communication"],
         joiningDate: new Date(),
+        dateOfBirth: u.dateOfBirth ? new Date(u.dateOfBirth) : null,
         status: "Active",
         workLocation: "Office",
         isEmailVerified: true,

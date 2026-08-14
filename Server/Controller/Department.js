@@ -3,7 +3,7 @@ import { Department } from "../model/Department.mode.js";
 import { Employee } from "../model/Employee.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { Notification } from "../model/Notification.model.js";
+import { notify } from "../utils/notificationService.js";
 import { logActivity } from "../utils/activityLogger.js";
 
 export const createDepartment = async (req, res) => {
@@ -42,12 +42,14 @@ export const createDepartment = async (req, res) => {
     });
 
     if (headInfo) {
-      await Notification.create({
+      await notify({
+        io: req.io,
         recipient: headInfo._id,
-        recipientModel: "Employee",
         title: "Department created",
         message: `You have been assigned as the head of the new department: ${data.name}`,
         companyId: req.companyId,
+        type: "system",
+        link: "/department",
       });
     }
 

@@ -22,7 +22,7 @@ const NotificationSchema = new mongoose.Schema(
     message: { type: String, required: true },
     type: {
       type: String,
-      enum: ["info", "interview", "application", "job", "system", "message"],
+      enum: ["info", "interview", "application", "job", "system", "message", "meeting", "leave", "attendance"],
       default: "info",
     },
     link: { type: String, default: "" },

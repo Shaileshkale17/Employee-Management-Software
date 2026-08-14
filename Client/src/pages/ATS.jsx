@@ -7,13 +7,13 @@ import HRSideNavber from "../components/HRSideNavber";
 import { api } from "../utils/api";
 import EmptyState from "../components/EmptyState";
 import { SkeletonList } from "../components/Skeleton";
-import Searchicon from "../assets/iconamoon_search-thin.svg";
+import { Search, X } from "lucide-react";
 
 const PIPELINE = [
   {
     key: "Applied",
     label: "New Applications",
-    color: "bg-blue-50 text-blue-700 border-blue-100",
+    color: "bg-purple-50 text-purple-700 border-purple-100",
   },
   {
     key: "Screening",
@@ -52,7 +52,13 @@ const sortOptions = [
   { label: "Oldest first", value: "createdAt" },
 ];
 
-const ATS = () => {
+const selectChevron = {
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a94a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 14px center",
+};
+
+const ApplicantTracking = () => {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
@@ -68,6 +74,7 @@ const ATS = () => {
     if (role === "developer" || role === "Employee" || role === "Interviewer")
       return <SideNavbar />;
     if (
+      role === "Super Admin" ||
       role === "Company Admin" ||
       role === "HR" ||
       role === "HR Manager" ||
@@ -146,171 +153,174 @@ const ATS = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-surface-100">
       {SideNav(user?.user?.role)}
-      <div className="flex-1 min-h-screen p-4 lg:p-6 bg-surface-100">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">
-              Applicant Tracking
-            </h1>
-            <p className="text-sm text-gray-400 mt-0.5">
-              Manage candidates through the hiring pipeline
-            </p>
+      <main className="flex-1 min-h-screen p-4 lg:p-8 bg-mesh-light">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <div className="flex flex-col gap-4 animate-fade-in-down lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-ink-950 sm:text-3xl">
+                Applicant Tracking
+              </h1>
+              <p className="mt-1 text-sm text-ink-500">
+                Manage candidates through the hiring pipeline
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search candidates..."
+                  aria-label="Search candidates"
+                  className="input-base pl-10 pr-4 sm:w-56"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <select
+                value={jobFilter}
+                onChange={(e) => setJobFilter(e.target.value)}
+                aria-label="Filter by job"
+                className="input-base appearance-none cursor-pointer pr-10 sm:w-auto"
+                style={selectChevron}
+              >
+                <option value="">All jobs</option>
+                {jobs.map((j) => (
+                  <option key={j._id} value={j._id}>
+                    {j.title}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                aria-label="Sort applications"
+                className="input-base appearance-none cursor-pointer pr-10 sm:w-auto"
+                style={selectChevron}
+              >
+                {sortOptions.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative">
-              <img
-                src={Searchicon}
-                alt=""
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4"
-              />
-              <input
-                type="text"
-                placeholder="Search candidates..."
-                className="pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 w-full sm:w-56"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+
+          {loading ? (
+            <SkeletonList rows={4} />
+          ) : applications.length === 0 ? (
+            <div className="card-surface animate-fade-in">
+              <EmptyState
+                title="No applications yet"
+                description="Applications from your career portal will appear here as soon as candidates apply."
               />
             </div>
-            <select
-              value={jobFilter}
-              onChange={(e) => setJobFilter(e.target.value)}
-              className="px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-            >
-              <option value="">All jobs</option>
-              {jobs.map((j) => (
-                <option key={j._id} value={j._id}>
-                  {j.title}
-                </option>
-              ))}
-            </select>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-            >
-              {sortOptions.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {loading ? (
-          <SkeletonList rows={4} />
-        ) : applications.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-card border border-gray-100">
-            <EmptyState
-              title="No applications yet"
-              description="Applications from your career portal will appear here as soon as candidates apply."
-            />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-            {PIPELINE.map((col) => {
-              const items = byStatus[col.key] || [];
-              return (
-                <div
-                  key={col.key}
-                  className="bg-surface-200/60 rounded-xl p-3 min-h-[200px]"
-                >
-                  <div className="flex items-center justify-between px-1 mb-3">
-                    <div
-                      className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border ${col.color}`}
-                    >
-                      <span className="text-xs font-semibold">{col.label}</span>
-                      <span className="text-[10px] font-bold">
-                        {items.length}
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 animate-fade-in-up">
+              {PIPELINE.map((col) => {
+                const items = byStatus[col.key] || [];
+                return (
+                  <div
+                    key={col.key}
+                    className="min-h-[200px] rounded-2xl border border-ink-200/60 bg-surface-100/60 p-3"
+                  >
+                    <div className="mb-3 flex items-center justify-between px-1">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 ${col.color}`}
+                      >
+                        <span className="text-xs font-semibold">
+                          {col.label}
+                        </span>
+                        <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-white/70 px-1 text-[10px] font-bold">
+                          {items.length}
+                        </span>
                       </span>
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    {items.length === 0 ? (
-                      <div className="text-center text-[11px] text-gray-400 py-4 border border-dashed border-gray-200 rounded-lg">
-                        No candidates
-                      </div>
-                    ) : (
-                      items.map((app) => (
-                        <button
-                          key={app._id}
-                          onClick={() => {
-                            setSelected(app);
-                            setNoteDraft("");
-                          }}
-                          className="w-full text-left bg-white rounded-xl border border-gray-100 shadow-card p-3.5 hover:shadow-card-hover transition-shadow"
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="w-9 h-9 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-semibold text-xs flex-shrink-0">
-                              {app.candidate?.firstName?.[0]}
-                              {app.candidate?.lastName?.[0]}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-sm font-medium text-gray-900 truncate">
-                                {app.candidate?.firstName}{" "}
-                                {app.candidate?.lastName}
-                              </h3>
-                              <p className="text-[11px] text-gray-500 truncate">
-                                {app.job?.title}
-                              </p>
-                              <div className="flex flex-wrap gap-1 mt-1.5">
-                                {app.candidate?.skills
-                                  ?.slice(0, 3)
-                                  .map((s, i) => (
-                                    <span
-                                      key={i}
-                                      className="bg-gray-50 text-gray-400 text-[9px] px-1.5 py-0.5 rounded"
-                                    >
-                                      {s}
-                                    </span>
-                                  ))}
+                    <div className="space-y-2">
+                      {items.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-ink-200 py-4 text-center text-[11px] text-ink-400">
+                          No candidates
+                        </div>
+                      ) : (
+                        items.map((app) => (
+                          <button
+                            key={app._id}
+                            onClick={() => {
+                              setSelected(app);
+                              setNoteDraft("");
+                            }}
+                            className="card-surface card-hover w-full p-4 text-left"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-semibold text-white">
+                                {app.candidate?.firstName?.[0]}
+                                {app.candidate?.lastName?.[0]}
                               </div>
-                              <p className="text-[10px] text-gray-300 mt-1.5">
-                                Applied{" "}
-                                {new Date(
-                                  app.appliedDate || app.createdAt,
-                                ).toLocaleDateString()}
-                              </p>
+                              <div className="min-w-0 flex-1">
+                                <h3 className="truncate text-sm font-medium text-ink-900">
+                                  {app.candidate?.firstName}{" "}
+                                  {app.candidate?.lastName}
+                                </h3>
+                                <p className="truncate text-[11px] text-ink-500">
+                                  {app.job?.title}
+                                </p>
+                                <div className="mt-1.5 flex flex-wrap gap-1">
+                                  {app.candidate?.skills
+                                    ?.slice(0, 3)
+                                    .map((s, i) => (
+                                      <span
+                                        key={i}
+                                        className="rounded-md bg-surface-100 px-2 py-0.5 text-[11px] font-medium text-ink-600 ring-1 ring-ink-200/60"
+                                      >
+                                        {s}
+                                      </span>
+                                    ))}
+                                </div>
+                                <p className="mt-1.5 text-[10px] text-ink-300">
+                                  Applied{" "}
+                                  {new Date(
+                                    app.appliedDate || app.createdAt,
+                                  ).toLocaleDateString()}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        </button>
-                      ))
-                    )}
+                          </button>
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
 
-        {selected && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-            onClick={() => setSelected(null)}
-          >
+          {selected && (
             <div
-              className="bg-white rounded-2xl shadow-modal w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/50 p-4 backdrop-blur-sm"
+              onClick={() => setSelected(null)}
             >
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-5">
+              <div
+                className="card-surface max-h-[90vh] w-full max-w-2xl overflow-y-auto scrollbar-thin p-6 shadow-modal animate-scale-in"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="mb-5 flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-semibold text-base">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-base font-semibold text-white">
                       {selected.candidate?.firstName?.[0]}
                       {selected.candidate?.lastName?.[0]}
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900">
+                      <h2 className="text-lg font-semibold text-ink-950">
                         {selected.candidate?.firstName}{" "}
                         {selected.candidate?.lastName}
                       </h2>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-ink-500">
                         {selected.candidate?.email}
                       </p>
                       {selected.candidate?.phone && (
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-ink-400">
                           {selected.candidate.phone}
                         </p>
                       )}
@@ -318,47 +328,38 @@ const ATS = () => {
                   </div>
                   <button
                     onClick={() => setSelected(null)}
-                    className="text-gray-400 hover:text-gray-600"
+                    aria-label="Close details"
+                    className="focus-ring flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-ink-400 transition-colors duration-200 hover:bg-surface-100 hover:text-ink-600"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
+                    <X className="h-5 w-5" />
                   </button>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 mb-5">
-                  <span className="text-xs bg-gray-50 text-gray-500 px-2.5 py-1 rounded-full">
+                <div className="mb-5 flex flex-wrap items-center gap-2">
+                  <span className="chip bg-surface-100 text-ink-600 ring-1 ring-ink-200/60">
                     {selected.job?.title}
                   </span>
                   {selected.candidate?.experience && (
-                    <span className="text-xs bg-gray-50 text-gray-500 px-2.5 py-1 rounded-full">
+                    <span className="chip bg-surface-100 text-ink-600 ring-1 ring-ink-200/60">
                       Exp: {selected.candidate.experience}
                     </span>
                   )}
                   {selected.candidate?.education && (
-                    <span className="text-xs bg-gray-50 text-gray-500 px-2.5 py-1 rounded-full">
+                    <span className="chip bg-surface-100 text-ink-600 ring-1 ring-ink-200/60">
                       {selected.candidate.education}
                     </span>
                   )}
-                  <span className="text-xs bg-brand-50 text-brand-700 px-2.5 py-1 rounded-full font-medium">
+                  <span className="chip bg-brand-50 font-semibold text-brand-700 ring-1 ring-brand-500/20">
                     {selected.status}
                   </span>
                 </div>
 
                 {selected.candidate?.skills?.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-5">
+                  <div className="mb-5 flex flex-wrap gap-1.5">
                     {selected.candidate.skills.map((s, i) => (
                       <span
                         key={i}
-                        className="bg-brand-50 text-brand-700 text-[11px] px-2 py-0.5 rounded-full"
+                        className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-500/20"
                       >
                         {s}
                       </span>
@@ -366,12 +367,12 @@ const ATS = () => {
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-1.5 mb-6">
+                <div className="mb-6 flex flex-wrap gap-1.5">
                   <button
                     onClick={() =>
                       navigate(`/candidates/${selected.candidate?._id}`)
                     }
-                    className="bg-brand-600 text-white px-3.5 py-2 rounded-lg text-xs font-medium hover:bg-brand-700 transition-colors"
+                    className="btn-primary btn-sm"
                   >
                     View Full Profile
                   </button>
@@ -380,7 +381,7 @@ const ATS = () => {
                       href={selected.candidate.resume}
                       target="_blank"
                       rel="noreferrer"
-                      className="bg-white text-gray-600 px-3.5 py-2 rounded-lg text-xs font-medium border border-gray-200 hover:bg-gray-50 transition-colors"
+                      className="btn-secondary btn-sm"
                     >
                       View Resume
                     </a>
@@ -388,7 +389,7 @@ const ATS = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-xs font-semibold text-gray-700 mb-2">
+                  <label className="mb-2 block text-xs font-semibold text-ink-700">
                     Move to stage
                   </label>
                   <div className="flex flex-wrap gap-1.5">
@@ -397,7 +398,7 @@ const ATS = () => {
                         <button
                           key={p.key}
                           onClick={() => handleStatusChange(selected, p.key)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium border transition-colors ${p.color} hover:opacity-80`}
+                          className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm ${p.color}`}
                         >
                           {p.label}
                         </button>
@@ -407,27 +408,25 @@ const ATS = () => {
                 </div>
 
                 <form onSubmit={handleAddNote} className="mb-6">
-                  <label className="block text-xs font-semibold text-gray-700 mb-2">
+                  <label htmlFor="ats-note" className="mb-2 block text-xs font-semibold text-ink-700">
                     Add note
                   </label>
                   <div className="flex gap-2">
                     <input
+                      id="ats-note"
                       value={noteDraft}
                       onChange={(e) => setNoteDraft(e.target.value)}
                       placeholder="Add an internal note..."
-                      className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                      className="input-base flex-1"
                     />
-                    <button
-                      type="submit"
-                      className="bg-brand-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-brand-700 transition-colors"
-                    >
+                    <button type="submit" className="btn-primary btn-md">
                       Add
                     </button>
                   </div>
                 </form>
 
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-700 mb-3">
+                  <h3 className="mb-3 text-xs font-semibold text-ink-700">
                     Candidate Timeline
                   </h3>
                   <div className="space-y-0">
@@ -436,24 +435,24 @@ const ATS = () => {
                         <div key={i} className="flex gap-3">
                           <div className="flex flex-col items-center">
                             <div
-                              className={`w-2.5 h-2.5 rounded-full mt-1 ${i === arr.length - 1 ? "bg-brand-500" : "bg-gray-300"}`}
+                              className={`mt-1 h-2.5 w-2.5 rounded-full ${i === arr.length - 1 ? "bg-brand-500" : "bg-ink-200"}`}
                             />
                             {i < arr.length - 1 && (
-                              <div className="w-px flex-1 bg-gray-200" />
+                              <div className="w-px flex-1 bg-ink-100" />
                             )}
                           </div>
                           <div className="pb-4">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-medium text-gray-800">
+                              <span className="text-xs font-medium text-ink-800">
                                 {t.status}
                               </span>
-                              <span className="text-[10px] text-gray-400">
+                              <span className="text-[10px] text-ink-400">
                                 {t.by?.name ? `${t.by.name} · ` : ""}
                                 {new Date(t.at).toLocaleString()}
                               </span>
                             </div>
                             {t.note && (
-                              <p className="text-xs text-gray-500 mt-0.5">
+                              <p className="mt-0.5 text-xs text-ink-500">
                                 {t.note}
                               </p>
                             )}
@@ -462,7 +461,7 @@ const ATS = () => {
                       ),
                     )}
                     {!selected.timeline?.length && (
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-ink-400">
                         No timeline entries yet
                       </p>
                     )}
@@ -470,11 +469,11 @@ const ATS = () => {
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 };
 
-export default ATS;
+export default ApplicantTracking;
