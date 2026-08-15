@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Video } from "lucide-react";
 import { getWeekDays, getHours, hourLabel, isToday, startOfDay, endOfDay } from "../../utils/dateUtils";
 import { TYPE_META } from "./calendarMeta";
 
@@ -43,6 +44,7 @@ const TimedEvent = ({ event, onClick }) => {
       style={{ top, height, borderColor: color, backgroundColor: `${color}14` }}
       title={event.title}>
       <p className="truncate text-[10px] font-semibold" style={{ color }}>
+        {event.meetingLink && <Video className="mr-1 inline h-3 w-3 align-[-1px]" strokeWidth={2.5} />}
         {event.title}
       </p>
       <p className="truncate text-[9px] text-ink-400">

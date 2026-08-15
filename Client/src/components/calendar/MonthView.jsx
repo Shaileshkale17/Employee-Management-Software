@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Video } from "lucide-react";
 import { getMonthGrid, isSameMonth, isToday, getOverlap, weekdayShort } from "../../utils/dateUtils";
 import { TYPE_META } from "./calendarMeta";
 
@@ -34,8 +35,11 @@ const EventChip = ({ event, onClick }) => {
       title={`${event.title}${time ? ` · ${time}` : ""}`}>
       <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ backgroundColor: event.category?.color || meta.dot }} />
       <span className="truncate">{event.title}</span>
+      {event.meetingLink && (
+        <Video className="h-3 w-3 flex-shrink-0 opacity-70" strokeWidth={2.5} />
+      )}
       {time && (
-        <span className="ml-auto flex-shrink-0 rounded bg-white/60 px-1 text-[9px] font-semibold leading-3 opacity-80">
+        <span className="ml-auto flex-shrink-0 rounded bg-white/60 px-1 text-[9px] font-semibold leading-3 opacity-80 dark:bg-white/10 dark:opacity-90">
           {time}
         </span>
       )}

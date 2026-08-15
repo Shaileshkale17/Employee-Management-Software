@@ -47,7 +47,7 @@ export const sendMessage = async (req, res) => {
 
     const files = (req.files || []).map((f) => ({
       name: f.originalname || f.filename,
-      url: `/uploads/${f.filename}`,
+      url: f.url,
       size: f.size || 0,
       type: f.mimetype || "",
     }));

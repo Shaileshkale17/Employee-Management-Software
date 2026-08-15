@@ -1,6 +1,6 @@
 import { LoaderCircle } from "lucide-react";
 
-const Button = ({ label, type, loading, disabled, onClick, className, variant = "primary", size = "md" }) => {
+const Button = ({ label, loadingLabel, type, loading, disabled, onClick, className, variant = "primary", size = "md" }) => {
   const variants = {
     primary: "btn-primary",
     secondary: "btn-secondary",
@@ -24,7 +24,7 @@ const Button = ({ label, type, loading, disabled, onClick, className, variant = 
       {loading ? (
         <span className="inline-flex items-center justify-center gap-2">
           <LoaderCircle className="h-4 w-4 animate-spin" />
-          <span>Processing...</span>
+          <span>{loadingLabel || "Processing..."}</span>
         </span>
       ) : (
         <>{label}</>

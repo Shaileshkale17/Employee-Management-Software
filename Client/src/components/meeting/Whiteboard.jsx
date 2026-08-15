@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 const COLORS = ["#1e293b", "#3354F4", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ffffff"];
@@ -6,6 +6,10 @@ const SIZES = [2, 4, 8];
 
 const Whiteboard = ({ socket, meetingId }) => {
   const isDark = useSelector((state) => state.theme?.mode === "dark");
+  const visibleStroke = useCallback(
+    (hex) => (isDark && hex === "#ffffff" ? "#e2e8f0" : hex),
+    [isDark]
+  );
   const defaultColor = isDark ? "#e2e8f0" : COLORS[0];
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
@@ -46,7 +50,7 @@ const Whiteboard = ({ socket, meetingId }) => {
     const onStroke = (data) => {
       const ctx = ctxRef.current;
       if (!ctx || !data) return;
-      ctx.strokeStyle = data.color;
+      ctx.strokeStyle = visibleStroke(data.color);
       ctx.lineWidth = data.size;
       ctx.beginPath();
       ctx.moveTo(data.prev.x, data.prev.y);
@@ -65,7 +69,7 @@ const Whiteboard = ({ socket, meetingId }) => {
       socket.off("meeting:whiteboard:stroke", onStroke);
       socket.off("meeting:whiteboard:clear", onClear);
     };
-  }, [socket]);
+  }, [socket, visibleStroke]);
 
   const getPos = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
@@ -149,10 +153,10 @@ const Whiteboard = ({ socket, meetingId }) => {
               key={c}
               onClick={() => {
                 setColor(c);
-                colorRef.current = c;
+                colorRef.current = visibleStroke(c);
               }}
               className={`h-6 w-6 rounded-full ring-2 transition-transform hover:scale-110 ${
-                color === c ? "ring-brand-500" : "ring-ink-200/60"
+                color === c ? "ring-brand-500" : c === "#ffffff" ? "ring-ink-300" : "ring-ink-200/60"
               }`}
               style={{ backgroundColor: c }}
               aria-label={`Color ${c}`}

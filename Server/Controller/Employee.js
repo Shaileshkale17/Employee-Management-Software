@@ -12,7 +12,8 @@ import {
   isValidObjectId,
   sanitizeString,
 } from "../utils/validation.js";
-import { sendOtpEmail } from "../utils/mailService.js";
+import { sendOtpEmail, sendWelcomeEmail, appBaseUrl } from "../utils/mailService.js";
+import { Company } from "../model/Company.model.js";
 import { logActivity } from "../utils/activityLogger.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -155,6 +156,30 @@ export const createEmployee = async (req, res) => {
       details: { email: newEmployee.email },
       ip: req.ip,
     });
+
+    // Welcome email after successful DB save. Fire-and-forget so an email
+    // provider failure never rolls back or blocks employee creation.
+    if (newEmployee.email) {
+      (async () => {
+        try {
+          let companyName = null;
+          if (newEmployee.companyId) {
+            const company = await Company.findById(newEmployee.companyId).select("name").lean();
+            companyName = company?.name || null;
+          }
+          await sendWelcomeEmail({
+            to: newEmployee.email,
+            name: newEmployee.name,
+            email: newEmployee.email,
+            employeeId,
+            companyName,
+            loginUrl: `${appBaseUrl()}/`,
+          });
+        } catch (emailErr) {
+          console.error("Welcome email failed:", emailErr.message);
+        }
+      })();
+    }
 
     return res
       .status(201)

@@ -18,6 +18,20 @@ const AttachmentSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const AttendeeSchema = new mongoose.Schema(
+  {
+    email: { type: String, required: true, lowercase: true, trim: true },
+    name: { type: String, default: "" },
+    required: { type: Boolean, default: true },
+    status: {
+      type: String,
+      enum: ["invited", "accepted", "declined", "cancelled"],
+      default: "invited",
+    },
+  },
+  { _id: false }
+);
+
 const RecurrenceSchema = new mongoose.Schema(
   {
     enabled: { type: Boolean, default: false },
@@ -106,7 +120,9 @@ const CalendarEventSchema = new mongoose.Schema(
       default: "Scheduled",
     },
     location: { type: String, default: "" },
+    isOnlineMeeting: { type: Boolean, default: false },
     meetingLink: { type: String, default: "" },
+    meetingId: { type: String, default: "" },
     meetingPlatform: {
       type: String,
       enum: [
@@ -120,6 +136,7 @@ const CalendarEventSchema = new mongoose.Schema(
       ],
       default: "",
     },
+    attendees: { type: [AttendeeSchema], default: [] },
     tags: [{ type: String }],
     attachments: { type: [AttachmentSchema], default: [] },
     notes: { type: String, default: "" },
@@ -181,6 +198,8 @@ const CalendarEventSchema = new mongoose.Schema(
 CalendarEventSchema.index({ company: 1, start: 1 });
 CalendarEventSchema.index({ organizer: 1, start: 1 });
 CalendarEventSchema.index({ participants: 1, start: 1 });
+CalendarEventSchema.index({ meetingId: 1 }, { sparse: true });
+CalendarEventSchema.index({ end: 1 });
 
 const CalendarEvent = mongoose.model("CalendarEvent", CalendarEventSchema);
 export default CalendarEvent;

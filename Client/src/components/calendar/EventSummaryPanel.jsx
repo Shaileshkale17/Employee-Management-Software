@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { Bell, Clock, FileText, MapPin, Pencil, Repeat, Tag, Trash2, TriangleAlert, Users, Video, X } from "lucide-react";
+import { Bell, Check, Clipboard, Clock, FileText, MapPin, Pencil, Repeat, Tag, Trash2, TriangleAlert, Users, Video, X } from "lucide-react";
 import Button from "../Button";
 import { TYPE_META, PRIORITY_META, STATUS_META, EVENT_STATUSES } from "./calendarMeta";
 import { platformLabel, openMeetingLink } from "../../utils/meetingPlatforms";
@@ -67,8 +67,10 @@ const ConfirmDelete = ({ onCancel, onDeleteOccurrence, onDeleteSeries, isRecurri
 
 const EventSummaryPanel = ({ event, onClose, onEdit, onDelete, onStatusChange, onDuplicate, onSnooze, currentUserId, canManage }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
   const [snoozeBusy, setSnoozeBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const organizerId = event?.organizer?._id || event?.organizer;
   const isOrganizer = String(organizerId) === String(currentUserId);
@@ -108,6 +110,31 @@ const EventSummaryPanel = ({ event, onClose, onEdit, onDelete, onStatusChange, o
     }
   };
 
+  const handleCopyLink = async () => {
+    if (!event.meetingLink) return;
+    try {
+      await navigator.clipboard.writeText(event.meetingLink);
+      setCopied(true);
+      toast.success("Meeting link copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
+
+  const handleCancel = async () => {
+    setConfirmCancel(false);
+    setStatusBusy(true);
+    try {
+      await onStatusChange("Cancelled");
+      toast.success("Event cancelled");
+    } catch {
+      toast.error("Failed to cancel event");
+    } finally {
+      setStatusBusy(false);
+    }
+  };
+
   if (!event) return null;
 
   return (
@@ -143,14 +170,23 @@ const EventSummaryPanel = ({ event, onClose, onEdit, onDelete, onStatusChange, o
 
         <div className="flex-1 overflow-y-auto scrollbar-thin space-y-5 px-5 py-5">
           {event.meetingLink && (
-            <button
-              type="button"
-              onClick={() => openMeetingLink(event.meetingLink)}
-              className="group flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-brand-600/25 transition-all hover:bg-brand-700 hover:shadow-md">
-              <Video className="h-4 w-4" />
-              Join meeting
-              <span className="ml-1 rounded-md bg-white/15 px-1.5 py-0.5 text-[11px]">{platformLabel(event.meetingPlatform)}</span>
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => openMeetingLink(event.meetingLink)}
+                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-brand-600/25 transition-all hover:bg-brand-700 hover:shadow-md">
+                <Video className="h-4 w-4" />
+                {event.meetingPlatform === "microsoft-teams" ? "Join Microsoft Teams meeting" : "Join meeting"}
+                <span className="ml-1 rounded-md bg-white/15 px-1.5 py-0.5 text-[11px]">{platformLabel(event.meetingPlatform)}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-surface-100 px-4 py-2.5 text-sm font-medium text-ink-600 ring-1 ring-ink-200/60 transition-colors hover:bg-surface-200/60">
+                {copied ? <Check className="h-4 w-4 text-green-600" /> : <Clipboard className="h-4 w-4" />}
+                {copied ? "Link copied" : "Copy meeting link"}
+              </button>
+            </div>
           )}
 
           <div className="space-y-4">
@@ -212,6 +248,20 @@ const EventSummaryPanel = ({ event, onClose, onEdit, onDelete, onStatusChange, o
                 <div className="flex flex-wrap gap-1.5">
                   {event.tags.map((t, i) => (
                     <span key={i} className="chip bg-ink-100 text-ink-600 ring-1 ring-ink-500/10">#{t}</span>
+                  ))}
+                </div>
+              </Row>
+            )}
+
+            {event.attendees?.length > 0 && (
+              <Row icon={<FieldIcon icon={ICONS.users} />} label={`Attendees (${event.attendees.length})`}>
+                <div className="flex flex-wrap gap-1.5">
+                  {event.attendees.map((a) => (
+                    <span
+                      key={a.email}
+                      className={`chip ${a.status === "cancelled" ? "bg-ink-100 text-ink-400 ring-1 ring-ink-200/60 line-through" : "bg-brand-50 text-brand-700 ring-1 ring-brand-500/15"}`}>
+                      {a.email}
+                    </span>
                   ))}
                 </div>
               </Row>
@@ -296,11 +346,39 @@ const EventSummaryPanel = ({ event, onClose, onEdit, onDelete, onStatusChange, o
             </select>
           </div>
 
+          {canEdit && event.status !== "Cancelled" && (
+            <Button
+              variant="danger"
+              label="Cancel event"
+              onClick={() => setConfirmCancel(true)}
+              className="w-full"
+            />
+          )}
+
           {canEdit && (
             <Button variant="danger" label="Delete" onClick={() => setConfirmDelete(true)} className="w-full" />
           )}
         </div>
       </div>
+
+      {confirmCancel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-ink-950/50 backdrop-blur-sm" onClick={() => setConfirmCancel(false)} aria-hidden="true" />
+          <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-modal animate-scale-in">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 mb-4">
+              <TriangleAlert className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-bold text-ink-950">Cancel event?</h3>
+            <p className="mt-1 text-sm text-ink-500">
+              Attendees will be notified by email and the online meeting will be closed.
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
+              <Button variant="danger" label="Yes, cancel event" onClick={handleCancel} />
+              <Button variant="ghost" label="Keep event" onClick={() => setConfirmCancel(false)} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {confirmDelete && (
         <ConfirmDelete

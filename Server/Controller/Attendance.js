@@ -5,6 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { notify } from "../utils/notificationService.js";
 import { isValidObjectId } from "../utils/validation.js";
 import { logActivity } from "../utils/activityLogger.js";
+import { sendAttendanceEmail, sendAdminNotificationEmail, escapeHtml } from "../utils/mailService.js";
 
 const startOfDay = (date = new Date()) => {
   const d = new Date(date);
@@ -132,6 +133,22 @@ export const clockIn = async (req, res) => {
         type: "attendance",
         link: "/attendance-info",
       });
+
+      (async () => {
+        try {
+          const emp = await Employee.findById(req.user.id).select("name email").lean();
+          if (emp?.email) {
+            await sendAttendanceEmail({
+              to: emp.email,
+              name: emp.name,
+              type: "late",
+              data: { lateMinutes: data.lateMinutes },
+            });
+          }
+        } catch (err) {
+          console.error("Late clock-in email failed:", err.message);
+        }
+      })();
     }
 
     return res.status(200).json(new ApiResponse(200, data, "Clocked in successfully"));
@@ -176,6 +193,28 @@ export const clockOut = async (req, res) => {
         link: "/attendance-info",
       });
     }
+
+    (async () => {
+      try {
+        const emp = await Employee.findById(req.user.id).select("name email").lean();
+        if (emp?.email) {
+          await sendAttendanceEmail({
+            to: emp.email,
+            name: emp.name,
+            type: "confirm",
+            data: {
+              date: today,
+              checkIn: existing.checkIn,
+              checkOut: existing.checkOut,
+              totalMinutes: existing.totalMinutes,
+              overtimeMinutes: existing.overtimeMinutes,
+            },
+          });
+        }
+      } catch (err) {
+        console.error("Attendance confirmation email failed:", err.message);
+      }
+    })();
 
     return res.status(200).json(new ApiResponse(200, existing, "Clocked out successfully"));
   } catch (error) {
@@ -584,6 +623,42 @@ export const markEmployeesAbsent = async ({ companyId } = {}) => {
         },
       }))
     );
+
+    // Notify absent employees and the admin (YOURSELF_EMAIL_ADDRESS) after the
+    // cutoff time. Fire-and-forget so email failures never break the DB write.
+    (async () => {
+      try {
+        const absentEmployees = await Employee.find({ _id: { $in: missing } })
+          .select("name email")
+          .lean();
+        const withEmail = absentEmployees.filter((e) => e?.email);
+        await Promise.allSettled(
+          withEmail.map((e) =>
+            sendAttendanceEmail({
+              to: e.email,
+              name: e.name,
+              type: "absent",
+            })
+          )
+        );
+        if (withEmail.length) {
+          const label = today.toDateString();
+          const names = withEmail.slice(0, 10).map((e) => e.name).join(", ");
+          await sendAdminNotificationEmail({
+            subject: `Attendance report — ${label}`,
+            text:
+              `The following ${withEmail.length} employee(s) were marked absent on ${label} ` +
+              `because no attendance was recorded before the cutoff time:\n\n${names}${withEmail.length > 10 ? "\n..." : ""}`,
+            html: `<p style="color:#4b5563;">The following <strong>${withEmail.length}</strong> employee(s) were marked absent on <strong>${escapeHtml(label)}</strong> because no attendance was recorded before the cutoff time:</p><ul>${withEmail
+              .slice(0, 10)
+              .map((e) => `<li>${escapeHtml(e.name)}</li>`)
+              .join("")}</ul>${withEmail.length > 10 ? `<p style="color:#9ca3af;">…and ${withEmail.length - 10} more.</p>` : ""}`,
+          });
+        }
+      } catch (err) {
+        console.error("Absent attendance email failed:", err.message);
+      }
+    })();
   }
 
   return { marked: missing.length };

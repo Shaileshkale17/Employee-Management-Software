@@ -1,4 +1,65 @@
 # Employee Management Software
+
+## Email Configuration
+
+The backend sends transactional emails (employee welcome, attendance notifications, password-reset / OTP codes, leave status, meeting invitations, calendar reminders) using **Nodemailer**. All credentials are read from environment variables and stay **server-side only** — they are never exposed to the frontend, API responses, or logs.
+
+### Required environment variables
+
+| Variable                  | Purpose                                                              |
+| ------------------------- | -------------------------------------------------------------------- |
+| `EMAIL_ADDRESS`           | SMTP username / sender account                                       |
+| `EMAIL_PASSWORD`          | SMTP password or app password for `EMAIL_ADDRESS`                    |
+| `YOURSELF_EMAIL_ADDRESS`  | Admin/system recipient for operational notifications (e.g. absent-employee digest) |
+
+### Optional environment variables
+
+| Variable           | Purpose                                                                                          | Default              |
+| ------------------ | ------------------------------------------------------------------------------------------------ | -------------------- |
+| `EMAIL_HOST`       | SMTP server hostname                                                                             | `smtp.gmail.com`     |
+| `EMAIL_PORT`       | SMTP server port (465 = SSL, 587 = STARTTLS)                                                     | `465`                |
+| `FRONTEND_URL`     | Base URL used to build links inside emails (login, reset, meeting join)                          | `http://localhost:5173` |
+
+> Note: `URL` is used as the **MongoDB connection string** in this project and must not be used for email link building. Application links in emails use `FRONTEND_URL`.
+
+### Configuring in Vercel
+
+Add the variables above under **Project → Settings → Environment Variables** in Vercel, then redeploy. For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) instead of your account password. If you use another SMTP provider (Outlook, Zoho, SES, etc.), set `EMAIL_HOST` and `EMAIL_PORT` accordingly.
+
+### Behavior
+
+- Emails are sent **after** the critical database operation succeeds; a temporary email provider failure is logged and never rolls back the database change.
+- At startup the backend validates that `EMAIL_ADDRESS`, `EMAIL_PASSWORD`, and `YOURSELF_EMAIL_ADDRESS` are configured and logs a clear server-side warning if any are missing (it does not crash and does not print values).
+- If SMTP is not configured, email sending is skipped (`[mail-skip]` log) and the rest of the application keeps working.
+- The SMTP transporter is created lazily and reused per process, making it safe for serverless (Vercel) deployments.
+
+## Cloudinary Configuration (Image / Media Uploads)
+
+All file uploads (company logos, resumes, calendar attachments, meeting messages, recordings) are uploaded to **Cloudinary** instead of the server disk. This keeps them working on serverless (Vercel) where a local filesystem is ephemeral.
+
+### Required environment variables
+
+| Variable                  | Purpose                                  |
+| ------------------------- | ---------------------------------------- |
+| `CLOUDINARY_CLOUD_NAME`   | Cloudinary cloud name                     |
+| `CLOUDINARY_API_KEY`      | Cloudinary API key                        |
+| `CLOUDINARY_API_SECRET`   | Cloudinary API secret                     |
+
+### Behavior
+
+- Files are read into memory via multer and streamed to Cloudinary; the returned secure URL (and public ID) is stored in the database.
+- If Cloudinary is **not configured**, uploads fall back to the local `Server/uploads` directory (served at `/uploads`) so local development still works.
+- Media is grouped under the `ems-uploads` Cloudinary folder.
+
+## Calendar Invites & Microsoft Teams Meetings
+
+Calendar events support **attendees** (invited by email) and an optional **Microsoft Teams meeting**.
+
+- In the event form, toggle **"Microsoft Teams meeting"** and add attendee emails. On save the backend reuses the existing meeting engine to create a real online meeting, exposes a join link, and emails every attendee an invitation (update/cancel emails follow on changes).
+- Attendees are stored per-event; matching company employees are also added as participants automatically.
+- Cancelling an event notifies attendees, closes the linked meeting, and marks attendees as cancelled. Deleting an event cleans up its linked meeting too.
+- The join link is built from `FRONTEND_URL` (e.g. `${FRONTEND_URL}/meeting/<id>`) and requires the **same** `MEETING_SECRET` used by the regular meeting/join flow, so no separate configuration is needed. Email sending follows the [Email Configuration](#email-configuration) rules — SMTP is optional and never blocks event creation.
+
 ## Demo Credentials
 
 Use the following credentials to test the system:

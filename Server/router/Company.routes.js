@@ -14,11 +14,11 @@ import {
   tenantMiddleware,
   authorize,
 } from "../Middlewares/AuthMiddleware.js";
-import { uploadLogo } from "../Middlewares/uploadMiddleware.js";
+import { uploadLogo, cloudinaryUpload } from "../Middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
-router.post("/register", uploadLogo, (req, res) => registerCompany(req, res));
+router.post("/register", uploadLogo, cloudinaryUpload, (req, res) => registerCompany(req, res));
 router.get("/verify-email", (req, res) => verifyCompanyEmail(req, res));
 router.get("/public/:slug", (req, res) => getPublicCompany(req, res));
 

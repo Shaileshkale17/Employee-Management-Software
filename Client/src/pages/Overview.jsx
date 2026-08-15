@@ -25,6 +25,7 @@ const formatEventDate = (value) => {
 
 const Overview = () => {
   const { user } = useSelector((state) => state.auth);
+  const isDark = useSelector((state) => state.theme?.mode === "dark");
   const role = user?.user?.role;
   const canManage = ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"].includes(role);
   const [stats, setStats] = useState(null);
@@ -119,21 +120,21 @@ const Overview = () => {
       legend: {
         position: "top",
         align: "end",
-        labels: { usePointStyle: true, pointStyle: "circle", color: "#71717A", font: { size: 11, family: "Inter", weight: 600 } },
+        labels: { usePointStyle: true, pointStyle: "circle", color: isDark ? "#94A3B8" : "#71717A", font: { size: 11, family: "Inter", weight: 600 } },
       },
       title: {
         display: false,
         text: "Meetings Held Each Month",
-        color: "#18181B",
+        color: isDark ? "#E2E8F0" : "#18181B",
         font: { size: 14, family: "Inter", weight: 600 },
       },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: "#A1A1AA", font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: isDark ? "#94A3B8" : "#A1A1AA", font: { size: 11 } } },
       y: {
         beginAtZero: true,
-        grid: { color: "rgba(13, 17, 28, 0.06)" },
-        ticks: { color: "#A1A1AA", font: { size: 11 } },
+        grid: { color: isDark ? "rgba(148, 163, 184, 0.12)" : "rgba(13, 17, 28, 0.06)" },
+        ticks: { color: isDark ? "#94A3B8" : "#A1A1AA", font: { size: 11 } },
       },
     },
   };
@@ -164,21 +165,21 @@ const Overview = () => {
       legend: {
         position: "top",
         align: "end",
-        labels: { usePointStyle: true, pointStyle: "circle", color: "#71717A", font: { size: 11, family: "Inter", weight: 600 } },
+        labels: { usePointStyle: true, pointStyle: "circle", color: isDark ? "#94A3B8" : "#71717A", font: { size: 11, family: "Inter", weight: 600 } },
       },
       title: {
         display: false,
         text: "Monthly Meetings by Employees",
-        color: "#18181B",
+        color: isDark ? "#E2E8F0" : "#18181B",
         font: { size: 14, family: "Inter", weight: 600 },
       },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: "#A1A1AA", font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: isDark ? "#94A3B8" : "#A1A1AA", font: { size: 11 } } },
       y: {
         beginAtZero: true,
-        grid: { color: "rgba(13, 17, 28, 0.06)" },
-        ticks: { color: "#A1A1AA", font: { size: 11 } },
+        grid: { color: isDark ? "rgba(148, 163, 184, 0.12)" : "rgba(13, 17, 28, 0.06)" },
+        ticks: { color: isDark ? "#94A3B8" : "#A1A1AA", font: { size: 11 } },
       },
     },
   };

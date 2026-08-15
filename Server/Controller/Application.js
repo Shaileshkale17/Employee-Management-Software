@@ -67,14 +67,14 @@ export const applyToJob = async (req, res) => {
         skills: normalize(skills),
         experience: experience || "",
         education: education || "",
-        resume: req.file ? `/uploads/${req.file.filename}` : (req.body.resume || ""),
+        resume: req.file?.url || (req.body.resume || ""),
         linkedin: linkedin || "",
         portfolio: portfolio || "",
         coverLetter: coverLetter || "",
         source: "career portal",
       });
     } else if (req.file) {
-      candidate.resume = `/uploads/${req.file.filename}`;
+      candidate.resume = req.file.url;
       candidate.coverLetter = coverLetter || candidate.coverLetter;
       candidate.linkedin = linkedin || candidate.linkedin;
       candidate.portfolio = portfolio || candidate.portfolio;

@@ -39,8 +39,12 @@ import { Employee } from "./model/Employee.model.js";
 import { Meeting } from "./model/Meeting.model.js";
 import { MeetingParticipant } from "./model/Participant.model.js";
 import { verifyGuestToken } from "./utils/meetingSecurity.js";
+import { validateEmailConfig } from "./utils/mailService.js";
 
 dotenv.config();
+
+// Server-side email configuration check (never exposes values).
+validateEmailConfig();
 
 const app = express();
 const server = http.createServer(app);

@@ -1,7 +1,7 @@
-import { cloneElement, useEffect, useMemo, useState } from "react";
+import { cloneElement, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { Upload, X } from "lucide-react";
+import { Plus, Upload, Video, X } from "lucide-react";
 import Button from "../Button";
 import InputBox from "../InputBox";
 import SelectBox from "../SelectBox";
@@ -62,6 +62,8 @@ const initialForm = (event, defaultStart, defaultEnd) => {
     categoryColor: event?.category?.color || "#7C3AED",
     location: event?.location || "",
     meetingLink: event?.meetingLink || event?.link || "",
+    teamsMeeting: Boolean(event?.meeting) || Boolean(event?.meetingId) || Boolean(event?.isOnlineMeeting && event?.meetingPlatform === "microsoft-teams"),
+    attendees: (event?.attendees || []).map((a) => a.email).filter(Boolean),
     tags: (event?.tags || []).join(", "),
     notes: event?.notes || "",
     agenda: event?.agenda || "",
@@ -87,14 +89,34 @@ const EventModal = ({ open, onClose, event, defaultStart, defaultEnd, occurrence
   const [attaching, setAttaching] = useState(false);
   const [files, setFiles] = useState([]);
   const [errors, setErrors] = useState({});
+  const [newAttendee, setNewAttendee] = useState("");
+  const [submitStage, setSubmitStage] = useState(0);
+  const stageTimer = useRef(null);
 
   useEffect(() => {
     if (open) {
       setForm(initialForm(event, defaultStart, defaultEnd));
       setErrors({});
       setFiles([]);
+      setNewAttendee("");
+      setSubmitStage(0);
     }
   }, [open, event, defaultStart, defaultEnd]);
+
+  useEffect(() => {
+    if (saving && !attaching) {
+      setSubmitStage(0);
+      stageTimer.current = setInterval(() => {
+        setSubmitStage((s) => Math.min(s + 1, 2));
+      }, 900);
+    }
+    return () => {
+      if (stageTimer.current) {
+        clearInterval(stageTimer.current);
+        stageTimer.current = null;
+      }
+    };
+  }, [saving, attaching]);
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -121,6 +143,24 @@ const EventModal = ({ open, onClose, event, defaultStart, defaultEnd, occurrence
 
   const toggleWeekday = (day) => {
     set("recurrenceDays", form.recurrenceDays.includes(day) ? form.recurrenceDays.filter((d) => d !== day) : [...form.recurrenceDays, day]);
+  };
+
+  const addAttendee = () => {
+    const email = newAttendee.trim().toLowerCase();
+    if (!email) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrors((prev) => ({ ...prev, attendees: `${email} is not a valid email` }));
+      return;
+    }
+    setErrors((prev) => ({ ...prev, attendees: "" }));
+    if (!form.attendees.includes(email)) {
+      set("attendees", [...form.attendees, email]);
+    }
+    setNewAttendee("");
+  };
+
+  const removeAttendee = (email) => {
+    set("attendees", form.attendees.filter((a) => a !== email));
   };
 
   const validate = () => {
@@ -166,7 +206,9 @@ const EventModal = ({ open, onClose, event, defaultStart, defaultEnd, occurrence
       status: form.status,
       category: { name: form.categoryName, color: form.categoryColor },
       location: form.location.trim(),
-      meetingLink: form.meetingLink.trim(),
+      meetingLink: form.teamsMeeting ? "" : form.meetingLink.trim(),
+      teamsMeeting: form.teamsMeeting,
+      attendees: form.attendees,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       notes: form.notes.trim(),
       agenda: form.agenda.trim(),
@@ -224,6 +266,13 @@ const EventModal = ({ open, onClose, event, defaultStart, defaultEnd, occurrence
   };
 
   if (!open) return null;
+
+  const hasStagedFlow = form.teamsMeeting && form.attendees.length > 0;
+  const loadingLabel = hasStagedFlow
+    ? ["Creating event…", "Creating Microsoft Teams meeting…", "Sending invitations…"][submitStage]
+    : isEdit
+      ? "Saving changes…"
+      : "Creating event…";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -328,16 +377,35 @@ const EventModal = ({ open, onClose, event, defaultStart, defaultEnd, occurrence
             <Field label="Location">
               <InputBox name="location" placeholder="Room, floor or address" getInput={form.location} setInput={(v) => set("location", v)} className="!gap-0" />
             </Field>
-            <Field label="Meeting link" hint="google meet, teams, zoom etc. detected automatically">
-              <InputBox
-                name="meetingLink"
-                placeholder="https://meet.google.com/..."
-                getInput={form.meetingLink}
-                setInput={(v) => set("meetingLink", v)}
-                error={errors.meetingLink}
-                className="!gap-0"
-              />
-            </Field>
+            {!form.teamsMeeting && (
+              <Field label="Meeting link" hint="google meet, teams, zoom etc. detected automatically">
+                <InputBox
+                  name="meetingLink"
+                  placeholder="https://meet.google.com/..."
+                  getInput={form.meetingLink}
+                  setInput={(v) => set("meetingLink", v)}
+                  error={errors.meetingLink}
+                  className="!gap-0"
+                />
+              </Field>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 rounded-xl bg-surface-100 px-4 py-3 ring-1 ring-ink-200/60">
+            <CheckBox
+              checked={form.teamsMeeting}
+              onChange={(c) => set("teamsMeeting", c)}
+              label=""
+            />
+            <div className="flex flex-1 items-center gap-2">
+              <Video className="h-4 w-4 text-brand-600" />
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-ink-800">Microsoft Teams meeting</span>
+                <span className="text-xs text-ink-400">
+                  {form.teamsMeeting ? "A Teams meeting link will be generated for this event." : "Add a Microsoft Teams-style meeting link to this event."}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -368,6 +436,53 @@ const EventModal = ({ open, onClose, event, defaultStart, defaultEnd, occurrence
               onChange={(e) => set("agenda", e.target.value)}
             />
           </Field>
+
+          <div>
+            <h3 className="text-[13px] font-semibold text-ink-800 mb-2">Attendees</h3>
+            <p className="text-xs text-ink-400 mb-2">
+              Invite people by email — they will receive an invitation for this event.
+            </p>
+            <div className="flex gap-2 w-full">
+              <div className="flex-1">
+                <InputBox
+                  name="attendeeEmail"
+                  type="email"
+                  placeholder="colleague@company.com"
+                  getInput={newAttendee}
+                  setInput={(v) => {
+                    setNewAttendee(v);
+                    setErrors((prev) => ({ ...prev, attendees: "" }));
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addAttendee();
+                    }
+                  }}
+                  className="!gap-0"
+                />
+              </div>
+              <Button type="button" variant="secondary" label="Add" onClick={addAttendee} className="shrink-0" />
+            </div>
+            {errors.attendees && <p className="text-red-500 text-xs mt-1">{errors.attendees}</p>}
+            {form.attendees.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {form.attendees.map((email) => (
+                  <span key={email} className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-500/15">
+                    <Plus className="h-3 w-3 rotate-45" strokeWidth={2.5} />
+                    {email}
+                    <button
+                      type="button"
+                      onClick={() => removeAttendee(email)}
+                      className="hover:text-red-500"
+                      aria-label={`Remove ${email}`}>
+                      <X className="h-3 w-3" strokeWidth={2.5} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div>
             <h3 className="text-[13px] font-semibold text-ink-800 mb-2">Participants</h3>
@@ -553,7 +668,12 @@ const EventModal = ({ open, onClose, event, defaultStart, defaultEnd, occurrence
 
           <div className="sticky bottom-0 -mx-6 -mb-5 flex items-center justify-end gap-3 border-t border-ink-200/70 bg-white/95 px-6 py-4 backdrop-blur-sm dark:bg-ink-200/95 dark:border-ink-700/40">
             <Button type="button" variant="ghost" label="Cancel" onClick={onClose} />
-            <Button type="submit" loading={saving || attaching} label={isEdit ? "Save changes" : "Create event"} />
+            <Button
+              type="submit"
+              loading={saving || attaching}
+              loadingLabel={attaching ? "Uploading attachments…" : loadingLabel}
+              label={isEdit ? "Save changes" : "Create event"}
+            />
           </div>
         </form>
       </div>

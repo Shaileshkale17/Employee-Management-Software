@@ -1,12 +1,5 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-import os from "os";
-
-const uploadDir = path.join(os.tmpdir(), "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+import { uploadMany } from "../utils/cloudinaryService.js";
 
 const ALLOWED_MIME = {
   "application/pdf": ".pdf",
@@ -23,16 +16,7 @@ const ALLOWED_MIME = {
   "image/svg+xml": ".svg",
 };
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const safeName = file.originalname
-      .replace(/[^a-zA-Z0-9.\-_]/g, "_")
-      .slice(0, 80);
-    const ext = ALLOWED_MIME[file.mimetype] || path.extname(safeName);
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  },
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIME[file.mimetype]) {
@@ -64,3 +48,20 @@ export const uploadLogo = multer({
     cb(new Error("Invalid image type"));
   },
 }).single("logo");
+
+export const cloudinaryUpload = async (req, res, next) => {
+  try {
+    const files = req.file ? [req.file] : req.files || [];
+    if (!files.length) return next();
+    const results = await uploadMany(files, req.folder || "ems-uploads");
+    results.forEach((result, i) => {
+      const file = files[i];
+      file.url = result.url;
+      file.publicId = result.publicId;
+      file.cloudinaryUrl = result.secure_url;
+    });
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
