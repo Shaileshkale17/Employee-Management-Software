@@ -165,7 +165,7 @@ const DetailLine = ({ line, record }) => {
     display = record?.[k] || "—";
   }
   return (
-    <p className="text-xs text-ink-500">
+    <p className="break-words text-xs text-ink-500">
       <span className="font-medium text-ink-600">{label}:</span> {display}
     </p>
   );

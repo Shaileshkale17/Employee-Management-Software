@@ -60,10 +60,11 @@ const NavList = ({ onNavigate }) => (
           className={({ isActive }) =>
             `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ease-smooth ${
               isActive
-                ? "bg-brand-50 text-brand-700 font-semibold dark:bg-brand-500/15 dark:text-brand-300"
+                ? "bg-brand-50 text-brand-700 font-semibold dark:bg-brand-200/15 dark:text-brand-100"
                 : "text-ink-600 hover:text-ink-950 hover:bg-ink-100/70 dark:text-ink-400 dark:hover:text-ink-100 dark:hover:bg-white/5"
             }`
-          }>
+          }
+        >
           <NavIcon name={item.name} />
           <span>{item.name}</span>
         </NavLink>
@@ -87,14 +88,18 @@ const SideNavbar = () => {
         className={`fixed inset-y-0 left-0 z-[70] w-72 transform bg-white shadow-popover transition-transform duration-300 md:hidden dark:bg-ink-100 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
-        aria-hidden={!open}>
+        aria-hidden={!open}
+      >
         <div className="flex h-16 items-center justify-between border-b border-ink-200/60 px-4">
-          <span className="text-sm font-bold text-ink-900 dark:text-ink-100">Menu</span>
+          <span className="text-sm font-bold text-ink-900 dark:text-ink-100">
+            Menu
+          </span>
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close menu"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-ink-100">
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-ink-100"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>

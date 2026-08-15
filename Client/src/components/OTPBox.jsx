@@ -24,7 +24,7 @@ const OTPBox = ({ index, otp, setOtp }) => {
       value={otp[index]}
       onChange={handleChange}
       onKeyDown={handleBackspace}
-      className={`w-11 h-13 h-[52px] text-center text-lg font-bold rounded-xl border-2 outline-none transition-all duration-200 ease-smooth ${
+      className={`w-full h-13 h-[52px] text-center text-lg font-bold rounded-xl border-2 outline-none transition-all duration-200 ease-smooth ${
         hasValue
           ? "border-brand-500 bg-brand-50/40 text-brand-700 shadow-glow-sm"
           : "border-ink-200 bg-white text-ink-900 hover:border-ink-300"

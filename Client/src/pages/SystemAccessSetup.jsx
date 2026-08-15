@@ -124,9 +124,9 @@ const SystemAccessSetup = () => {
                       <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 text-sm font-semibold ring-1 ring-brand-500/10">
                         {record.employee?.name?.split(" ").map((w) => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase() || "?"}
                       </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-ink-900">{record.employee?.name || "Unknown"}</h3>
-                        <p className="text-xs text-ink-500 mt-0.5">{record.employee?.email} &middot; {record.employee?.role}</p>
+                      <div className="min-w-0">
+                        <h3 className="truncate text-sm font-semibold text-ink-900">{record.employee?.name || "Unknown"}</h3>
+                        <p className="truncate text-xs text-ink-500 mt-0.5">{record.employee?.email} &middot; {record.employee?.role}</p>
                       </div>
                     </div>
 
@@ -141,7 +141,7 @@ const SystemAccessSetup = () => {
                                 {access.notes && <p className="text-xs text-ink-400 mt-0.5 truncate">{access.notes}</p>}
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="flex flex-wrap items-center justify-end gap-2 flex-shrink-0">
                               <span className={`chip ${accessStyles[access.status] || accessStyles.Pending}`}>
                                 {access.status}
                               </span>

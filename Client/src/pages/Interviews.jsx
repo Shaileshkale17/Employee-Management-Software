@@ -672,7 +672,7 @@ const Interviews = () => {
             >
               <form
                 onSubmit={handleFeedbackSubmit}
-                className="card-surface w-full max-w-md p-6 shadow-modal animate-scale-in"
+                className="card-surface max-h-[90vh] w-full max-w-md overflow-y-auto p-6 shadow-modal animate-scale-in"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="mb-4 flex items-center justify-between">

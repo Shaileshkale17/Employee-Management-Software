@@ -311,12 +311,12 @@ const ApplicantTracking = () => {
                       {selected.candidate?.firstName?.[0]}
                       {selected.candidate?.lastName?.[0]}
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h2 className="text-lg font-semibold text-ink-950">
                         {selected.candidate?.firstName}{" "}
                         {selected.candidate?.lastName}
                       </h2>
-                      <p className="text-sm text-ink-500">
+                      <p className="break-words text-sm text-ink-500">
                         {selected.candidate?.email}
                       </p>
                       {selected.candidate?.phone && (

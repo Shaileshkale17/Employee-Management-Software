@@ -25,9 +25,9 @@ const JobPostCart = ({
       />
       <div className="flex-1">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h2 className="text-base font-semibold text-ink-950 leading-snug">{jobTitle}</h2>
-          <span className="chip bg-ink-100 text-ink-500 flex-shrink-0">
-            <MapPin className="h-3 w-3" />
+          <h2 className="min-w-0 text-base font-semibold text-ink-950 leading-snug">{jobTitle}</h2>
+          <span className="chip bg-ink-100 text-ink-500 min-w-0 max-w-[45%] truncate flex-shrink-0">
+            <MapPin className="h-3 w-3 shrink-0" />
             {location}
           </span>
         </div>

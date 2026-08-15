@@ -438,14 +438,14 @@ const Meeting = () => {
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <InputBox
                 id="meetingSearch"
                 name="search"
                 placeholder="Search meetings..."
                 setInput={setSearch}
                 getInput={search}
-                className="!w-52"
+                className="w-full sm:!w-52"
               />
               <SelectBox
                 id="meetingStatus"
@@ -454,6 +454,7 @@ const Meeting = () => {
                 setInput={setStatus}
                 option={statusOptions}
                 placeholder="All statuses"
+                className="flex-1 sm:w-48 sm:flex-none"
               />
             </div>
           </div>

@@ -43,7 +43,7 @@ const Event = () => {
   return (
     <div className="flex min-h-screen bg-surface-100">
       {SideNav(user?.user?.role)}
-      <main className="flex-1 flex h-[calc(100vh-4rem)] bg-mesh-light">
+      <main className="flex-1 flex h-[100vh] h-[calc(100dvh-4rem)] bg-mesh-light">
         {clickShow && (
           <div
             className="fixed inset-0 z-30 bg-ink-950/50 backdrop-blur-sm md:hidden"

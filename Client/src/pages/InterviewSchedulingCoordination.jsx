@@ -175,7 +175,7 @@ const InterviewSchedulingCoordination = () => {
 
           {showModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/50 p-4 backdrop-blur-sm" onClick={() => setShowModal(false)}>
-              <div className="card-surface w-full max-w-lg p-6 shadow-modal animate-scale-in" onClick={(e) => e.stopPropagation()}>
+              <div className="card-surface max-h-[90vh] w-full max-w-lg overflow-y-auto p-6 shadow-modal animate-scale-in" onClick={(e) => e.stopPropagation()}>
                 <div className="mb-5 flex items-start justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-ink-950">Schedule Interview</h2>

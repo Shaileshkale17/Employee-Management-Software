@@ -256,8 +256,8 @@ const Task = () => {
             {loading ? (
               <div className="divide-y divide-ink-100">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-6 p-5">
-                    <div className="skeleton h-4 w-40" />
+                  <div key={i} className="flex flex-wrap items-center gap-6 p-5">
+                    <div className="skeleton h-4 w-full sm:w-40" />
                     <div className="skeleton h-6 w-20 rounded-full" />
                     <div className="skeleton h-4 w-24" />
                     <div className="skeleton h-4 w-20" />

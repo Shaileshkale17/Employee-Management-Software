@@ -12,14 +12,13 @@ const TitleCard = ({ icon, title, description, link, status }) => {
           ? "cursor-not-allowed border-dashed border-ink-200 bg-ink-50/60 opacity-70"
           : "cursor-pointer bg-white border-ink-200/70 shadow-card hover:-translate-y-1 hover:shadow-card-hover hover:border-brand-200"
       }`}>
-      <div
-        className={`mb-3.5 flex h-12 w-12 items-center justify-center rounded-xl ring-1 transition-all duration-300 ease-smooth group-hover:scale-105 ${
-          isComingSoon
-            ? "bg-ink-100 text-ink-400 ring-ink-500/10"
-            : "bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 ring-brand-500/10 group-hover:from-brand-600 group-hover:to-brand-700 group-hover:text-white group-hover:shadow-glow-sm"
-        }`}>
-        <img src={icon} alt="" aria-hidden="true" className="h-6 w-6" />
-      </div>
+        <div className={`mb-3.5 flex h-12 w-12 items-center justify-center rounded-xl ring-1 transition-all duration-300 ease-smooth group-hover:scale-105 ${isComingSoon ? "bg-ink-100 text-ink-400 ring-ink-500/10" : "bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 ring-brand-500/10 group-hover:from-brand-600 group-hover:to-brand-700 group-hover:text-white group-hover:shadow-glow-sm"}`}>
+          {typeof icon === "string" ? (
+            <img src={icon} alt="" aria-hidden="true" className="h-6 w-6" />
+          ) : (
+            icon
+          )}
+        </div>
       <h5 className="font-semibold text-sm text-ink-900">{title}</h5>
       {description && (
         <p className="text-xs text-ink-500 mt-1 leading-relaxed line-clamp-2">{description}</p>

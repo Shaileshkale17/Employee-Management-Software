@@ -70,8 +70,8 @@ const Careers = () => {
                 company?.name?.[0] || "C"
               )}
             </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">{company?.name || "Careers"}</h1>
+            <div className="min-w-0">
+              <h1 className="break-words text-3xl sm:text-4xl font-bold tracking-tight text-white">{company?.name || "Careers"}</h1>
               <p className="text-white/60 text-sm mt-1.5">
                 {jobs.length} open position{jobs.length === 1 ? "" : "s"} · Join our growing team
               </p>

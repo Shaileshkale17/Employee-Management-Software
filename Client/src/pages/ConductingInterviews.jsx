@@ -88,7 +88,7 @@ const ConductingInterviews = () => {
                 Run your scheduled interviews and capture candidate feedback
               </p>
             </div>
-            <div className="flex gap-1.5 rounded-xl bg-surface-100 p-1 ring-1 ring-ink-200/60">
+            <div className="flex flex-wrap gap-1.5 rounded-xl bg-surface-100 p-1 ring-1 ring-ink-200/60">
               {["Scheduled", "Completed", "Cancelled", "All"].map((f) => (
                 <button
                   key={f}
@@ -170,7 +170,7 @@ const ConductingInterviews = () => {
 
           {feedbackModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/50 p-4 backdrop-blur-sm" onClick={() => setFeedbackModal(null)}>
-              <div className="card-surface w-full max-w-lg p-6 shadow-modal animate-scale-in" onClick={(e) => e.stopPropagation()}>
+              <div className="card-surface max-h-[90vh] w-full max-w-lg overflow-y-auto p-6 shadow-modal animate-scale-in" onClick={(e) => e.stopPropagation()}>
                 <div className="mb-4 flex items-start justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-ink-950">Interview Feedback</h2>

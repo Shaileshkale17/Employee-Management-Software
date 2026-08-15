@@ -118,11 +118,11 @@ const CandidateDetail = () => {
                 <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-lg font-semibold text-white">
                   {candidate.firstName?.[0]}{candidate.lastName?.[0]}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h1 className="text-2xl font-bold tracking-tight text-ink-950 sm:text-3xl">
                     {candidate.firstName} {candidate.lastName}
                   </h1>
-                  <p className="text-sm text-ink-500">{candidate.email}</p>
+                  <p className="break-words text-sm text-ink-500">{candidate.email}</p>
                   {candidate.phone && <p className="text-xs text-ink-400">{candidate.phone}</p>}
                 </div>
               </div>

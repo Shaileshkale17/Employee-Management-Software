@@ -140,7 +140,7 @@ const CareerJobDetail = () => {
             </p>
           )}
 
-          <div className="flex items-center gap-3 pt-6 border-t border-ink-100">
+          <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-ink-100">
             <Button
               label="Apply for this position"
               size="lg"
