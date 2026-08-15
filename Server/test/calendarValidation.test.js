@@ -5,6 +5,7 @@ import {
   normalizeReminders,
   normalizeRecurrence,
   normalizeTags,
+  normalizeAttendees,
   detectMeetingPlatform,
   isValidHttpUrl,
 } from "../utils/calendarValidation.js";
@@ -140,4 +141,56 @@ test("invalid participants are filtered", () => {
     participants: ["507f1f77bcf86cd799439011", "not-an-objectid", 42, { _id: "507f1f77bcf86cd799439012" }],
   });
   assert.equal(data.participants.length, 2);
+});
+
+test("attendees pass through validation and normalize to lowercase", () => {
+  const { ok, errors, data } = validateEventPayload({
+    title: "X",
+    start: "2026-02-01T10:00:00.000Z",
+    attendees: ["Test@Example.com", "friend@work.com"],
+  });
+  assert.equal(ok, true);
+  assert.equal(errors.length, 0);
+  assert.equal(data.attendees[0].email, "test@example.com");
+  assert.equal(data.attendees[1].email, "friend@work.com");
+  assert.equal(data.attendees[0].required, true);
+});
+
+test("invalid attendee emails are rejected", () => {
+  const { ok, errors } = validateEventPayload({
+    title: "X",
+    start: "2026-02-01T10:00:00.000Z",
+    attendees: ["not-an-email"],
+  });
+  assert.equal(ok, false);
+  assert.ok(errors.some((e) => e.toLowerCase().includes("attendee")));
+});
+
+test("attendees containing invalid entries are rejected", () => {
+  const { ok, errors, data } = validateEventPayload({
+    title: "X",
+    start: "2026-02-01T10:00:00.000Z",
+    attendees: ["  A@B.com  ", "", 42, "nope", { email: "obj@work.com", required: false }],
+  });
+  assert.equal(ok, false);
+  assert.ok(errors.some((e) => e.toLowerCase().includes("attendee")));
+  assert.equal(data.attendees[0].email, "a@b.com");
+});
+
+test("normalizeAttendees handles strings and objects", () => {
+  const list = normalizeAttendees(["A@B.COM", { email: "c@d.com", name: "C D", required: false }]);
+  assert.equal(list[0].email, "a@b.com");
+  assert.equal(list[1].name, "C D");
+  assert.equal(list[1].required, false);
+  assert.deepEqual(normalizeAttendees(undefined), []);
+  assert.deepEqual(normalizeAttendees("x@y.com"), []);
+});
+
+test("isOnlineMeeting is derived from teamsMeeting flag", () => {
+  const { data } = validateEventPayload({
+    title: "X",
+    start: "2026-02-01T10:00:00.000Z",
+    teamsMeeting: true,
+  });
+  assert.equal(data.isOnlineMeeting, true);
 });

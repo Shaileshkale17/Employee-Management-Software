@@ -1,4 +1,5 @@
 import CalendarEvent from "../model/CalendarEvent.model.js";
+import Meeting from "../model/Meeting.model.js";
 import { Employee } from "../model/Employee.model.js";
 import Interview from "../model/Interview.model.js";
 import Task from "../model/Task.model.js";
@@ -7,11 +8,12 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { logActivity } from "../utils/activityLogger.js";
 import { notify } from "../utils/notificationService.js";
-import { isValidObjectId } from "../utils/validation.js";
+import { isValidObjectId, isValidEmail } from "../utils/validation.js";
 import {
   validateEventPayload,
   EVENT_STATUSES,
   detectMeetingPlatform,
+  normalizeAttendees,
 } from "../utils/calendarValidation.js";
 import {
   getOccurrencesInRange,
@@ -23,6 +25,17 @@ import {
   computeDurationMinutes,
   isRecurring,
 } from "../utils/recurrence.js";
+import {
+  createOnlineMeetingForCalendar,
+  cancelOnlineMeetingForCalendar,
+  deleteOnlineMeetingForCalendar,
+  toClientMeeting,
+} from "./Meeting.js";
+import {
+  sendCalendarInviteEmail,
+  sendCalendarUpdatedEmail,
+  sendCalendarCancelledEmail,
+} from "../utils/calendarInviteEmail.js";
 
 const HR_ROLES = ["Super Admin", "Company Admin", "HR", "HR Manager", "Recruiter"];
 
@@ -112,6 +125,122 @@ const toLegacyEvent = (ev) => {
   return plain;
 };
 
+const resolveAttendees = async (attendees, companyId) => {
+  const list = normalizeAttendees(attendees);
+  if (!list.length) return { attendees: [], participantIds: [] };
+  const emails = list.map((a) => a.email);
+  const employees = await Employee.find({
+    companyId,
+    email: { $in: emails },
+  }).select("_id name email");
+  const byEmail = {};
+  employees.forEach((emp) => {
+    byEmail[(emp.email || "").toLowerCase()] = emp;
+  });
+  const participantIds = [];
+  const resolved = list.map((a) => {
+    const emp = byEmail[a.email];
+    if (emp) {
+      participantIds.push(String(emp._id));
+      return { email: a.email, name: a.name || emp.name || "", required: a.required };
+    }
+    return { email: a.email, name: a.name || "", required: a.required };
+  });
+  return { attendees: resolved, participantIds };
+};
+
+const attachOnlineMeeting = async (req, event) => {
+  const meeting = await createOnlineMeetingForCalendar({
+    companyId: req.companyId,
+    organizerId: req.user.id,
+    title: event.title,
+    description: event.description,
+    agenda: event.agenda,
+    timezone: event.timezone,
+    start: event.start,
+    end: event.end,
+    duration: event.end ? Math.max(30, Math.round((new Date(event.end) - new Date(event.start)) / 60000)) : undefined,
+    calendarEventId: event._id,
+  });
+  const joinUrl = toClientMeeting(meeting).joinUrl;
+  event.meeting = meeting._id;
+  event.meetingId = meeting.meetingId;
+  event.meetingLink = joinUrl;
+  event.link = joinUrl;
+  event.meetingPlatform = "microsoft-teams";
+  event.isOnlineMeeting = true;
+  event.sourceRef = "Meeting";
+  event.sourceId = meeting._id;
+  return event;
+};
+
+const updateLinkedMeeting = async (event, changed) => {
+  if (!event.meeting) return null;
+  const meeting = await Meeting.findById(event.meeting);
+  if (!meeting) return null;
+  const fields = {
+    title: event.title,
+    description: event.description,
+    agenda: event.agenda,
+    timezone: event.timezone,
+    start: event.start,
+    end: event.end,
+    duration: event.end
+      ? Math.max(30, Math.round((new Date(event.end) - new Date(event.start)) / 60000))
+      : meeting.duration,
+  };
+  const picks = Object.keys(fields).filter((k) => changed && (changed[k] !== undefined || k === "title" || k === "start"));
+  let touched = false;
+  for (const key of picks) {
+    if (String(meeting[key] ?? "") !== String(fields[key] ?? "")) {
+      meeting[key] = fields[key];
+      touched = true;
+    }
+  }
+  if (touched) await meeting.save();
+  return meeting;
+};
+
+const sendCalendarInvites = async (event, organizerName) => {
+  if (!Array.isArray(event.attendees) || !event.attendees.length) return;
+  const meetingUrl = event.meetingLink || "";
+  for (const attendee of event.attendees) {
+    await sendCalendarInviteEmail({
+      to: attendee.email,
+      name: attendee.name,
+      event,
+      organizerName,
+      meetingUrl,
+    }).catch(() => {});
+  }
+};
+
+const sendCalendarUpdates = async (event, organizerName) => {
+  if (!Array.isArray(event.attendees) || !event.attendees.length) return;
+  const meetingUrl = event.meetingLink || "";
+  for (const attendee of event.attendees) {
+    await sendCalendarUpdatedEmail({
+      to: attendee.email,
+      name: attendee.name,
+      event,
+      organizerName,
+      meetingUrl,
+    }).catch(() => {});
+  }
+};
+
+const sendCalendarCancellations = async (event, organizerName) => {
+  if (!Array.isArray(event.attendees) || !event.attendees.length) return;
+  for (const attendee of event.attendees) {
+    await sendCalendarCancelledEmail({
+      to: attendee.email,
+      name: attendee.name,
+      event,
+      organizerName,
+    }).catch(() => {});
+  }
+};
+
 export const createEvent = async (req, res) => {
   try {
     const body = req.body || {};
@@ -122,7 +251,10 @@ export const createEvent = async (req, res) => {
       end: body.end,
       type: body.type || "meeting",
       meetingLink: body.meetingLink || body.link,
-      participants: body.participants || body.attendees || [],
+      participants: body.participants || [],
+      attendees: body.attendees,
+      teamsMeeting: body.teamsMeeting,
+      isOnlineMeeting: body.isOnlineMeeting,
       interview: body.interview || null,
       meetingPlatform: body.meetingPlatform || detectMeetingPlatform(body.meetingLink || body.link),
       visibility: body.visibility,
@@ -154,9 +286,15 @@ export const createEvent = async (req, res) => {
     const visibility =
       legacy.visibility === "company" && isHR(req) ? "company" : "private";
 
+    const { attendees, participantIds } = await resolveAttendees(body.attendees, company);
+    const wantsMeeting = Boolean(body.teamsMeeting || body.isOnlineMeeting);
+
     const event = await CalendarEvent.create({
       company,
       ...data,
+      isOnlineMeeting: data.isOnlineMeeting || Boolean(data.meetingLink),
+      participants: [...new Set([...data.participants, ...participantIds])],
+      attendees: attendees.length ? attendees : undefined,
       visibility,
       organizer: req.user.id,
       source: legacy.source,
@@ -169,6 +307,10 @@ export const createEvent = async (req, res) => {
 
     if (legacy.interview && isValidObjectId(legacy.interview)) {
       event.interview = legacy.interview;
+    }
+
+    if (wantsMeeting) {
+      await attachOnlineMeeting(req, event);
     }
     pushHistory(event, "created", "", null, null, req.user.id);
     await event.save();
@@ -193,6 +335,8 @@ export const createEvent = async (req, res) => {
         link: `/calendar?event=${populated._id}`,
       });
     }
+
+    await sendCalendarInvites(populated, populated.organizer?.name || req.employee?.name || "");
 
     await logActivity({
       companyId: company,
@@ -242,6 +386,9 @@ export const getEvents = async (req, res) => {
       occurrences = occurrences.filter((o) => {
         const organizerName = (o.organizer?.name || "").toLowerCase();
         const participantNames = (o.participants || []).map((p) => (p.name || "").toLowerCase()).join(" ");
+        const attendeeText = (o.attendees || [])
+          .map((a) => `${a.name || ""} ${a.email || ""}`.toLowerCase())
+          .join(" ");
         return [
           o.title,
           o.description,
@@ -250,6 +397,7 @@ export const getEvents = async (req, res) => {
           (o.tags || []).join(" "),
           organizerName,
           participantNames,
+          attendeeText,
         ]
           .join(" ")
           .toLowerCase()
@@ -721,7 +869,8 @@ export const updateEvent = async (req, res) => {
     }
 
     const old = event.toObject();
-    const { ok, errors, data } = validateEventPayload({ ...old, ...(req.body || {}) });
+    const body = req.body || {};
+    const { ok, errors, data } = validateEventPayload({ ...old, ...body });
     if (!ok) {
       return res.status(400).json(new ApiError(400, errors.join(". "), errors));
     }
@@ -729,12 +878,58 @@ export const updateEvent = async (req, res) => {
     if (data.visibility === "company" && !isHR(req)) {
       data.visibility = event.visibility;
     }
-    if (data.meetingLink) {
+    if (data.meetingLink && data.meetingLink !== old.meetingLink) {
       data.meetingPlatform = data.meetingPlatform || detectMeetingPlatform(data.meetingLink);
+    }
+
+    let participantIds = [];
+    if (body.attendees !== undefined) {
+      const resolved = await resolveAttendees(body.attendees, req.companyId);
+      data.attendees = resolved.attendees;
+      participantIds = resolved.participantIds;
+      data.participants = [...new Set([...(data.participants || []), ...participantIds])];
     }
 
     const changed = diffFields(old, data);
     Object.assign(event, data);
+
+    const wantsMeeting =
+      Boolean(body.teamsMeeting) ||
+      (body.teamsMeeting === undefined && Boolean(event.meeting));
+    if (wantsMeeting) {
+      if (event.meeting) {
+        await updateLinkedMeeting(event, changed);
+        const linked = await Meeting.findById(event.meeting);
+        const joinUrl = linked ? toClientMeeting(linked).joinUrl : "";
+        if (joinUrl) {
+          event.meetingLink = joinUrl;
+          event.link = joinUrl;
+        } else if (!event.meetingLink) {
+          event.meetingLink = old.meetingLink || "";
+        }
+      } else {
+        await attachOnlineMeeting(req, event);
+      }
+    } else if (body.teamsMeeting === false && event.meeting) {
+      await cancelOnlineMeetingForCalendar({ meetingId: event.meeting });
+      event.meeting = null;
+      event.meetingId = "";
+      event.sourceRef = null;
+      event.sourceId = null;
+      event.meetingLink = data.meetingLink || "";
+      event.link = data.meetingLink || "";
+      event.meetingPlatform = data.meetingPlatform || detectMeetingPlatform(data.meetingLink);
+    }
+
+    const becameCancelled = event.status === "Cancelled" && old.status !== "Cancelled";
+    if (becameCancelled && event.meeting) {
+      await cancelOnlineMeetingForCalendar({ meetingId: event.meeting });
+    }
+    event.isOnlineMeeting = Boolean(event.meeting || event.meetingLink);
+    if (event.meeting) {
+      event.meetingPlatform = "microsoft-teams";
+    }
+
     pushHistory(event, "updated", "", changed, null, req.user.id);
     if (event.status === "Completed" && !event.completedAt) {
       event.completedAt = new Date();
@@ -757,6 +952,18 @@ export const updateEvent = async (req, res) => {
       type: "system",
       link: `/calendar?event=${populated._id}`,
     });
+
+    const organizerName = populated.organizer?.name || req.employee?.name || "";
+    if (becameCancelled) {
+      await sendCalendarCancellations(populated, organizerName);
+    } else if (
+      populated.attendees?.length &&
+      Object.keys(changed).some((k) =>
+        ["title", "start", "end", "meetingLink", "location", "description", "timezone"].includes(k)
+      )
+    ) {
+      await sendCalendarUpdates(populated, organizerName);
+    }
 
     await logActivity({
       companyId: req.companyId,
@@ -840,6 +1047,9 @@ export const deleteEvent = async (req, res) => {
     }
 
     const snapshot = event.toObject();
+    if (event.meeting) {
+      await deleteOnlineMeetingForCalendar({ meetingId: event.meeting });
+    }
     await event.deleteOne();
     emitCalendar(req.io, "calendar:event:deleted", snapshot, [
       req.user.id,
@@ -883,6 +1093,7 @@ export const duplicateEvent = async (req, res) => {
       }))
       .filter((r) => Number.isFinite(r.minutesBefore) && r.minutesBefore >= 0);
 
+    const hasLinkedMeeting = Boolean(source.meeting);
     const copy = await CalendarEvent.create({
       company: req.companyId || source.company,
       title: `${source.title} (Copy)`,
@@ -896,8 +1107,10 @@ export const duplicateEvent = async (req, res) => {
       priority: source.priority || "Medium",
       status: "Scheduled",
       location: source.location || "",
-      meetingLink: source.meetingLink || "",
-      meetingPlatform: source.meetingPlatform || "",
+      isOnlineMeeting: hasLinkedMeeting ? false : Boolean(source.isOnlineMeeting || source.meetingLink),
+      meetingLink: hasLinkedMeeting ? "" : (source.meetingLink || ""),
+      meetingPlatform: hasLinkedMeeting ? "" : (source.meetingPlatform || ""),
+      attendees: source.attendees || [],
       tags: source.tags || [],
       notes: source.notes || "",
       agenda: source.agenda || "",
@@ -958,6 +1171,28 @@ export const updateEventStatus = async (req, res) => {
     event.status = status;
     if (status === "Completed" && !event.completedAt) event.completedAt = new Date();
     if (status !== "Completed") event.completedAt = null;
+
+    if (status === "Cancelled" && oldStatus !== "Cancelled") {
+      if (event.meeting) {
+        await cancelOnlineMeetingForCalendar({ meetingId: event.meeting });
+      }
+      if (Array.isArray(event.attendees) && event.attendees.length) {
+        event.attendees = event.attendees.map((a) => ({ ...a, status: "cancelled" }));
+      }
+      await event.save();
+      const cancelled = await event.populate("organizer", "name email role profileImg");
+      await sendCalendarCancellations(
+        cancelled.toObject(),
+        cancelled.organizer?.name || req.employee?.name || ""
+      );
+      await notifyParticipants(req, cancelled, {
+        title: `Cancelled: ${cancelled.title}`,
+        message: `"${cancelled.title}" was cancelled by ${req.employee?.name || "the organizer"}`,
+        type: "system",
+        link: `/calendar?event=${cancelled._id}`,
+      });
+    }
+
     pushHistory(event, "updated", "status", oldStatus, status, req.user.id);
     await event.save();
     const populated = await event.populate("organizer participants", "name email role profileImg");

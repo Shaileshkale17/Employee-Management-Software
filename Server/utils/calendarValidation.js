@@ -1,4 +1,4 @@
-import { isValidObjectId, isDate, sanitizeString } from "./validation.js";
+import { isValidObjectId, isDate, isValidEmail, sanitizeString } from "./validation.js";
 
 export const EVENT_TYPES = [
   "meeting",
@@ -135,6 +135,24 @@ export const normalizeParticipants = (value) => {
     .filter((p) => typeof p === "string" && isValidObjectId(p));
 };
 
+export const normalizeAttendees = (value) => {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const item of value) {
+    const isObj = item && typeof item === "object";
+    const email = String(isObj ? item.email : item || "").trim().toLowerCase();
+    if (!email || seen.has(email)) continue;
+    seen.add(email);
+    out.push({
+      email,
+      name: sanitizeString(isObj ? item.name : "", 120),
+      required: !(isObj && item.required === false),
+    });
+  }
+  return out;
+};
+
 export const validateEventPayload = (body = {}) => {
   const errors = [];
 
@@ -180,6 +198,13 @@ export const validateEventPayload = (body = {}) => {
 
   const reminders = normalizeReminders(body.reminders, start);
 
+  const attendees = normalizeAttendees(body.attendees);
+  for (const attendee of attendees) {
+    if (!isValidEmail(attendee.email)) {
+      errors.push(`Invalid attendee email: ${attendee.email}`);
+    }
+  }
+
   return {
     ok: errors.length === 0,
     errors,
@@ -195,8 +220,10 @@ export const validateEventPayload = (body = {}) => {
       priority,
       status,
       location: sanitizeString(body.location, 300),
+      isOnlineMeeting: Boolean(body.isOnlineMeeting) || Boolean(body.teamsMeeting),
       meetingLink,
       meetingPlatform,
+      attendees,
       tags: normalizeTags(body.tags),
       notes: sanitizeString(body.notes, 5000),
       agenda: sanitizeString(body.agenda, 5000),

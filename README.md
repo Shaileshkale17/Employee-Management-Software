@@ -51,6 +51,15 @@ All file uploads (company logos, resumes, calendar attachments, meeting messages
 - If Cloudinary is **not configured**, uploads fall back to the local `Server/uploads` directory (served at `/uploads`) so local development still works.
 - Media is grouped under the `ems-uploads` Cloudinary folder.
 
+## Calendar Invites & Microsoft Teams Meetings
+
+Calendar events support **attendees** (invited by email) and an optional **Microsoft Teams meeting**.
+
+- In the event form, toggle **"Microsoft Teams meeting"** and add attendee emails. On save the backend reuses the existing meeting engine to create a real online meeting, exposes a join link, and emails every attendee an invitation (update/cancel emails follow on changes).
+- Attendees are stored per-event; matching company employees are also added as participants automatically.
+- Cancelling an event notifies attendees, closes the linked meeting, and marks attendees as cancelled. Deleting an event cleans up its linked meeting too.
+- The join link is built from `FRONTEND_URL` (e.g. `${FRONTEND_URL}/meeting/<id>`) and requires the **same** `MEETING_SECRET` used by the regular meeting/join flow, so no separate configuration is needed. Email sending follows the [Email Configuration](#email-configuration) rules — SMTP is optional and never blocks event creation.
+
 ## Demo Credentials
 
 Use the following credentials to test the system:

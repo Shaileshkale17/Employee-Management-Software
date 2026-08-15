@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Video } from "lucide-react";
 import { getHours, hourLabel, isToday, formatDate } from "../../utils/dateUtils";
 import { TYPE_META } from "./calendarMeta";
 
@@ -49,6 +50,7 @@ const DayView = ({ day, events, onEventClick, onNewEventAt }) => {
                 className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-all hover:brightness-95"
                 style={{ backgroundColor: `${color}14`, color }}>
                 <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
+                {ev.meetingLink && <Video className="h-3 w-3 flex-shrink-0" strokeWidth={2.5} />}
                 {ev.title}
               </button>
             );
@@ -82,7 +84,10 @@ const DayView = ({ day, events, onEventClick, onNewEventAt }) => {
               className="absolute left-16 right-3 overflow-hidden rounded-lg border-l-2 px-2 py-1 text-left transition-all hover:z-10 hover:brightness-95"
               style={{ top, height, borderColor: color, backgroundColor: `${color}14` }}
               title={ev.title}>
-              <p className="truncate text-xs font-semibold" style={{ color }}>{ev.title}</p>
+              <p className="truncate text-xs font-semibold" style={{ color }}>
+                {ev.meetingLink && <Video className="mr-1 inline h-3 w-3 align-[-1px]" strokeWidth={2.5} />}
+                {ev.title}
+              </p>
               <p className="truncate text-[10px] text-ink-500">
                 {new Date(ev.start).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} –{" "}
                 {new Date(ev.end).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}

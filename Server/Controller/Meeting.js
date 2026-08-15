@@ -184,6 +184,72 @@ const log = async (req, meeting, action, details = "") =>
     ip: req.ip,
   });
 
+/**
+ * Creates a real scheduled Meeting record for a Calendar event (the same
+ * mechanism used by the Meeting module) and links it back via calendarEventId.
+ * Returns the created meeting.
+ */
+export const createOnlineMeetingForCalendar = async ({
+  companyId,
+  organizerId,
+  title,
+  description = "",
+  agenda = "",
+  timezone = "",
+  start,
+  end,
+  duration,
+  calendarEventId,
+}) => {
+  const startDate = start ? new Date(start) : new Date();
+  const endDate = end ? new Date(end) : new Date(startDate.getTime() + 60 * 60000);
+  const meetingId = generateMeetingId();
+  const meeting = await Meeting.create({
+    company: companyId,
+    title: String(title || "Meeting").trim().slice(0, 200),
+    description: String(description || "").slice(0, 2000),
+    agenda: String(agenda || "").slice(0, 2000),
+    timezone: String(timezone || "").slice(0, 80),
+    start: startDate,
+    end: endDate,
+    duration: Math.max(5, Math.min(1440, Number(duration) || Math.max(30, Math.round((endDate - startDate) / 60000)) || 60)),
+    type: "scheduled",
+    meetingId,
+    status: "upcoming",
+    encryptedLink: signMeetingLink({ meetingId, purpose: "join" }),
+    organizer: organizerId,
+    calendarEventId,
+  });
+  await createChannelForMeeting({ companyId, meeting, organizer: organizerId });
+  return meeting;
+};
+
+/** Cancels a linked meeting (used when its calendar event is cancelled). */
+export const cancelOnlineMeetingForCalendar = async ({ meetingId }) => {
+  if (!meetingId) return null;
+  const meeting = await Meeting.findById(meetingId);
+  if (!meeting) return null;
+  if (meeting.status !== "cancelled") {
+    meeting.status = "cancelled";
+    meeting.endedAt = new Date();
+    await meeting.save();
+  }
+  return meeting;
+};
+
+/** Deletes a linked meeting and its related records (no orphaned records). */
+export const deleteOnlineMeetingForCalendar = async ({ meetingId }) => {
+  if (!meetingId) return null;
+  const meeting = await Meeting.findById(meetingId);
+  if (!meeting) return null;
+  await MeetingChannel.deleteMany({ meeting: meeting._id });
+  await MeetingMessage.deleteMany({ meeting: meeting._id });
+  await MeetingParticipant.deleteMany({ meeting: meeting._id });
+  await MeetingInvitation.deleteMany({ meeting: meeting._id });
+  await meeting.deleteOne();
+  return meeting;
+};
+
 export const createMeeting = async (req, res) => {
   try {
     const { ok, errors, data } = validateMeetingPayload(req.body || {});

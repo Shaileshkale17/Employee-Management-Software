@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Video } from "lucide-react";
 import { isToday, relativeDayLabel, formatTime } from "../../utils/dateUtils";
 import { TYPE_META, PRIORITY_META } from "./calendarMeta";
 import EmptyState from "../EmptyState";
@@ -22,7 +22,10 @@ const AgendaEvent = ({ event, onClick }) => {
         </span>
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">{event.title}</p>
+        <p className="truncate text-sm font-semibold text-ink-900 group-hover:text-brand-700 transition-colors">
+          {event.meetingLink && <Video className="mr-1 inline h-3.5 w-3.5 align-[-2px] text-brand-600" strokeWidth={2.5} />}
+          {event.title}
+        </p>
         <p className="mt-0.5 flex items-center gap-2 text-xs text-ink-400">
           {!event.allDay && <span className="font-medium">{formatTime(event.start)}</span>}
           {event.allDay && <span>All day</span>}
