@@ -192,7 +192,7 @@ const Job_Postings = () => {
                     status={item.status}
                   />
                   {canManage && (
-                    <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-1 opacity-0 transition-opacity duration-200 focus-within:opacity-100 group-hover:opacity-100">
+                    <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-1 opacity-100 transition-opacity duration-200 focus-within:opacity-100 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100">
                       <div className="flex gap-1">
                         <button
                           onClick={() => navigate(`/Job-post-form/${item._id}`)}

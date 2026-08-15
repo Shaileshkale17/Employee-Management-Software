@@ -117,7 +117,7 @@ const Navbar = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           <span
             className={`hidden xl:inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ${
               isOnline

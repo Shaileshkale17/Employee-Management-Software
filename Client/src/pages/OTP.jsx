@@ -151,7 +151,7 @@ const OtpPage = () => {
                 <p className="text-[13px] font-semibold text-ink-700 mb-3 text-center">
                   Enter Your OTP
                 </p>
-                <div className="flex justify-center gap-2.5">
+                <div className="mx-auto grid w-full max-w-[320px] grid-cols-6 gap-1.5 sm:gap-2.5">
                   {otp.map((value, index) => (
                     <OTPBox
                       key={index}

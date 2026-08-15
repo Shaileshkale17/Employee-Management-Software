@@ -82,8 +82,9 @@ const WeekView = ({ week, events, onEventClick, onSelectDay, onNewEventAt }) => 
   }, [days, events]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-ink-200/70 bg-white shadow-card">
-      <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-ink-200/70 bg-surface-50/80">
+    <div className="overflow-x-auto overflow-y-hidden rounded-2xl border border-ink-200/70 bg-white shadow-card scrollbar-thin">
+      <div className="min-w-[720px]">
+        <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))] border-b border-ink-200/70 bg-surface-50/80">
         <div className="py-2.5 text-center text-[10px] text-ink-400" />
         {days.map((d) => {
           const today = isToday(d);
@@ -107,7 +108,7 @@ const WeekView = ({ week, events, onEventClick, onSelectDay, onNewEventAt }) => 
         })}
       </div>
 
-      <div className="grid grid-cols-[56px_repeat(7,1fr)]">
+      <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))]">
         <div className="border-r border-ink-200/50">
           {hours.map((h) => (
             <div key={h} className="relative h-12 border-b border-ink-200/40">
@@ -149,6 +150,7 @@ const WeekView = ({ week, events, onEventClick, onSelectDay, onNewEventAt }) => 
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

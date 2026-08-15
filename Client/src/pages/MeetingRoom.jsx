@@ -432,7 +432,7 @@ const MeetingRoom = () => {
             )}
           </div>
           {rtc.mediaError && (
-            <div className="absolute bottom-4 left-1/2 flex max-w-md -translate-x-1/2 items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-950/90 px-4 py-2.5 text-xs text-amber-200 shadow-lg">
+            <div className="absolute bottom-4 left-4 right-4 z-10 mx-auto flex max-w-md flex-wrap items-center justify-center gap-3 rounded-xl border border-amber-400/40 bg-amber-950/90 px-4 py-2.5 text-xs text-amber-200 shadow-lg">
               <span>{rtc.mediaError}</span>
               <button
                 onClick={rtc.retryMedia}
@@ -512,7 +512,7 @@ const MeetingRoom = () => {
       </div>
 
       <footer className="flex flex-wrap items-center justify-center gap-3 border-t border-ink-800 px-4 py-3">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <ToolbarButton active={rtc.micOn} label={rtc.micOn ? "Mute" : "Unmute"} onClick={rtc.toggleMic}>
             <Mic className="h-5 w-5" />
           </ToolbarButton>
@@ -527,7 +527,7 @@ const MeetingRoom = () => {
           </ToolbarButton>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <ToolbarButton active={rtcRaised} label="Raise hand" onClick={toggleRaise}>
             <Hand className="h-5 w-5" />
           </ToolbarButton>
@@ -547,7 +547,7 @@ const MeetingRoom = () => {
           </ToolbarButton>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={handleLeave}
             className="rounded-xl bg-ink-800 px-4 py-2.5 text-sm font-semibold text-ink-200 transition-colors hover:bg-ink-700">

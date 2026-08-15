@@ -293,7 +293,7 @@ const GlobalSearch = ({ open, onClose, onRequestOpen }) => {
           )}
         </div>
 
-        <div className="flex items-center gap-3 border-t border-ink-200/70 px-4 py-2.5 text-[11px] text-ink-400">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-ink-200/70 px-4 py-2.5 text-[11px] text-ink-400">
           <span>
             <kbd className="rounded border border-ink-300 bg-surface-50 px-1 py-0.5 dark:border-ink-600 dark:bg-surface-800/50">↑↓</kbd>{" "}
             Navigate

@@ -190,8 +190,8 @@ const Message = () => {
   return (
     <div className="flex min-h-screen bg-surface-100">
       {SideNav(role)}
-      <main className="flex-1 flex h-[calc(100vh-4rem)] bg-mesh-light">
-        <div className={`${mobileView === "chat" ? "hidden md:flex" : "flex"} w-80 flex-shrink-0 bg-white/80 backdrop-blur-sm border-r border-ink-200/60 flex-col dark:bg-white/5 dark:border-ink-700/40`}>
+      <main className="flex-1 flex h-[100vh] h-[calc(100dvh-4rem)] bg-mesh-light">
+        <div className={`${mobileView === "chat" ? "hidden md:flex" : "flex"} w-full sm:w-72 lg:w-80 flex-shrink-0 bg-white/80 backdrop-blur-sm border-r border-ink-200/60 flex-col dark:bg-white/5 dark:border-ink-700/40`}>
           <div className="p-4 border-b border-ink-100 space-y-3">
             <h1 className="text-lg font-semibold text-ink-950 flex items-center gap-2">
               <MessageSquare className="h-5 w-5 text-brand-600" />

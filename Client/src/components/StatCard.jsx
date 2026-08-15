@@ -46,7 +46,7 @@ const StatCard = ({ label, value, icon, color = "brand", subtitle, trend, trendL
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">{label}</p>
-        <p className="mt-1.5 text-[26px] leading-none font-bold tracking-tight text-ink-950 tabular-nums">
+        <p className="mt-1.5 break-words text-xl leading-none font-bold tracking-tight text-ink-950 tabular-nums sm:text-[26px]">
           {value ?? 0}
         </p>
         {subtitle && <p className="mt-1.5 text-xs text-ink-400">{subtitle}</p>}

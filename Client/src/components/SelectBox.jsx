@@ -1,9 +1,9 @@
-const SelectBox = ({ name, id, label, ariaLabel, setInput, getInput, option = [], placeholder }) => {
+const SelectBox = ({ name, id, label, ariaLabel, setInput, getInput, option = [], placeholder, className }) => {
   const handleChange = (event) => {
     setInput(event.target.value);
   };
   return (
-    <div className="flex flex-col items-start gap-1.5 w-full">
+    <div className={`flex flex-col items-start gap-1.5 w-full ${className || ""}`}>
       {label && (
         <label htmlFor={id} className="text-[13px] font-semibold text-ink-800">
           {label}

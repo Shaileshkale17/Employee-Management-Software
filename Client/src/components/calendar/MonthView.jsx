@@ -4,8 +4,24 @@ import { TYPE_META } from "./calendarMeta";
 
 const MAX_CHIPS = 3;
 
-const EventChip = ({ event, compact, onClick }) => {
+const compactTime = (d) => {
+  const date = new Date(d);
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const suffix = h >= 12 ? "PM" : "AM";
+  const hour = ((h + 11) % 12) + 1;
+  return m === 0 ? `${hour}${suffix}` : `${hour}:${String(m).padStart(2, "0")}${suffix}`;
+};
+
+const timeRange = (start, end) => {
+  if (!start) return "";
+  if (!end || new Date(end) <= new Date(start)) return compactTime(start);
+  return `${compactTime(start)}–${compactTime(end)}`;
+};
+
+const EventChip = ({ event, onClick }) => {
   const meta = TYPE_META[event.type] || TYPE_META.meeting;
+  const time = timeRange(event.start, event.end);
   return (
     <button
       type="button"
@@ -15,12 +31,12 @@ const EventChip = ({ event, compact, onClick }) => {
       }}
       className="group flex w-full items-center gap-1 rounded-md px-1.5 py-0.5 text-left text-[11px] font-medium transition-all hover:brightness-95"
       style={{ backgroundColor: `${event.category?.color || meta.dot}1A`, color: event.category?.color || meta.dot }}
-      title={event.title}>
+      title={`${event.title}${time ? ` · ${time}` : ""}`}>
       <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ backgroundColor: event.category?.color || meta.dot }} />
       <span className="truncate">{event.title}</span>
-      {!compact && !event.allDay && (
-        <span className="ml-auto flex-shrink-0 text-[10px] opacity-70">
-          {new Date(event.start).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+      {time && (
+        <span className="ml-auto flex-shrink-0 rounded bg-white/60 px-1 text-[9px] font-semibold leading-3 opacity-80">
+          {time}
         </span>
       )}
     </button>
@@ -52,7 +68,7 @@ const DayCell = ({ date, events, inMonth, onSelectDay, onEventClick }) => {
       </div>
       <div className="flex flex-col gap-0.5 overflow-hidden">
         {events.slice(0, MAX_CHIPS).map((ev) => (
-          <EventChip key={`${ev._id}-${ev.start}`} event={ev} compact={events.length > MAX_CHIPS} onClick={onEventClick} />
+          <EventChip key={`${ev._id}-${ev.start}`} event={ev} onClick={onEventClick} />
         ))}
         {events.length > MAX_CHIPS && (
           <span className="px-1.5 text-[11px] font-semibold text-brand-600">
