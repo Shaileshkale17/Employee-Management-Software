@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import InputBox from "../components/InputBox";
 import Button from "../components/Button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { login, setPendingMfa } from "../redux/slices/authSlice";
@@ -25,6 +25,7 @@ const Login = () => {
   const emailRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     emailRef.current?.focus();
@@ -70,14 +71,14 @@ const Login = () => {
         sessionStorage.setItem("mfa_email", Email.trim());
         dispatch(setPendingMfa(true));
         toast.info("Enter the verification code sent to your email");
-        navigate("/otp", { state: { mode: "mfa" } });
+        navigate("/otp", { state: { mode: "mfa", from: location.state?.from } });
         return;
       }
 
       const info = { token: res.data.token, user: res.data.user };
       toast.success("Welcome back!");
       dispatch(login(info));
-      navigate("/overview");
+      navigate(location.state?.from || "/overview", { replace: true });
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Login failed. Please try again.",

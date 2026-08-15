@@ -110,7 +110,7 @@ const OtpPage = () => {
 
         dispatch(login({ token: res.data.token, user: res.data.user }));
         toast.success("Verification successful!");
-        navigate("/overview");
+        navigate(location.state?.from || "/overview", { replace: true });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Invalid or expired code");

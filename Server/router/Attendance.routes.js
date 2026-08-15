@@ -11,12 +11,17 @@ import {
   getAttendanceCalendar,
   getAttendanceTodaySummary,
   autoMarkAbsent,
+  generateQrSession,
+  validateQrSession,
 } from "../Controller/Attendance.js";
 import { authMiddleware, tenantMiddleware, authorize } from "../Middlewares/AuthMiddleware.js";
 
 const router = express.Router();
 
 router.use(authMiddleware, tenantMiddleware);
+
+router.get("/qr/session", (req, res) => generateQrSession(req, res));
+router.post("/qr/validate", (req, res) => validateQrSession(req, res));
 
 router.post("/clock-in", (req, res) => clockIn(req, res, req.app.locals.io));
 router.post("/clock-out", (req, res) => clockOut(req, res, req.app.locals.io));

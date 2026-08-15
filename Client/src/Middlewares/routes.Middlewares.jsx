@@ -6,7 +6,13 @@ const ProtectedRoute = ({ children, role }) => {
   const location = useLocation();
 
   if (!user || !user.token) {
-    return <Navigate to="/" replace />;
+    return (
+      <Navigate
+        to="/"
+        replace
+        state={{ from: location.pathname + location.search }}
+      />
+    );
   }
 
   if (location.pathname === "/") {
