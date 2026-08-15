@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Calendar, CircleCheck, CircleX, Clock, Users } from "lucide-react";
 import SideNavbar from "../components/SideNavber";
@@ -47,6 +48,7 @@ const approvalChip = (status) => {
 
 const Attendance_Info = () => {
   const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const role = user?.user?.role;
   const isHR = HR_ROLES.includes(role);
 
@@ -183,6 +185,12 @@ const Attendance_Info = () => {
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 animate-fade-in-down">
             <Heading heading="Attendance Info" subtitle="Track your check-ins, breaks and monthly attendance." />
             <div className="flex items-end gap-3">
+              <Button
+                variant="secondary"
+                label="Smart Check-In"
+                onClick={() => navigate("/attendance/smart-checkin")}
+                className="shrink-0"
+              />
               <div className="w-40">
                 <SelectBox
                   id="month"

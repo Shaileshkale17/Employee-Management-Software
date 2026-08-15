@@ -1,11 +1,16 @@
 import { Attendance } from "../model/Attendance.model.js";
 import { Employee } from "../model/Employee.model.js";
+import { Company } from "../model/Company.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { notify } from "../utils/notificationService.js";
 import { isValidObjectId } from "../utils/validation.js";
 import { logActivity } from "../utils/activityLogger.js";
 import { sendAttendanceEmail, sendAdminNotificationEmail, escapeHtml } from "../utils/mailService.js";
+import {
+  signAttendanceQrToken,
+  verifyAttendanceQrToken,
+} from "../utils/attendanceQr.js";
 
 const startOfDay = (date = new Date()) => {
   const d = new Date(date);
@@ -268,6 +273,63 @@ export const getTodayAttendance = async (req, res) => {
     });
     return res.status(200).json(
       new ApiResponse(200, data || null, "Today's attendance fetched")
+    );
+  } catch (error) {
+    return res.status(500).json(new ApiError(500, error.message));
+  }
+};
+
+/**
+ * Issues the rotating QR for a Smart Check-In terminal. The token only proves
+ * the terminal is official; whoever scans it is still clocked in/out with their
+ * own authenticated session, so a scan can never record time for someone else.
+ */
+export const generateQrSession = async (req, res) => {
+  try {
+    const company = await Company.findById(req.companyId).select("name").lean();
+    const label = company?.name || "Office Terminal";
+    const token = signAttendanceQrToken({
+      companyId: String(req.companyId),
+      label,
+    });
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { token, label, expiresIn: 90 },
+        "QR session generated"
+      )
+    );
+  } catch (error) {
+    return res.status(500).json(new ApiError(500, error.message));
+  }
+};
+
+export const validateQrSession = async (req, res) => {
+  try {
+    const { token } = req.body || {};
+    if (!token || typeof token !== "string") {
+      return res.status(400).json(new ApiError(400, "Token is required"));
+    }
+    const decoded = verifyAttendanceQrToken(token);
+    if (!decoded) {
+      return res.status(400).json(
+        new ApiError(
+          400,
+          "This QR code is invalid or has expired. Please rescan a fresh code."
+        )
+      );
+    }
+    if (decoded.companyId && String(decoded.companyId) !== String(req.companyId)) {
+      return res
+        .status(403)
+        .json(new ApiError(403, "This QR code belongs to another company"));
+    }
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { valid: true, label: decoded.label || "Office Terminal" },
+        "QR session valid"
+      )
     );
   } catch (error) {
     return res.status(500).json(new ApiError(500, error.message));

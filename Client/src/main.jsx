@@ -18,6 +18,7 @@ import Meeting from "./pages/Meeting";
 import MeetingRoom from "./pages/MeetingRoom";
 import GuestJoin from "./pages/GuestJoin";
 import Attendance_Info from "./pages/Attendance_Info";
+import SmartCheckIn from "./pages/SmartCheckIn";
 import Leaves from "./pages/Leaves";
 import Report from "./pages/Report";
 import Event from "./pages/Event";
@@ -202,6 +203,14 @@ const routers = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Attendance_Info />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/attendance/smart-checkin",
+        element: (
+          <ProtectedRoute>
+            <SmartCheckIn />
           </ProtectedRoute>
         ),
       },
