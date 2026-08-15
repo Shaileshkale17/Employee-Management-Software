@@ -53,7 +53,7 @@ const InputBox = forwardRef(
             onBlur={onBlur}
             onKeyDown={onKeyDown}
             value={getInput}
-            className={`${icon ? "pl-10 pr-4" : "px-4"} ${
+            className={`${icon ? "pl-10 pr-3" : "p-3"} ${
               error
                 ? "!border-red-300 focus:!border-red-400 focus:!ring-4 focus:!ring-red-500/10"
                 : ""

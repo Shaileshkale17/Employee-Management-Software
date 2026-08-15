@@ -1,5 +1,6 @@
 import { Attendance } from "../model/Attendance.model.js";
 import { Employee } from "../model/Employee.model.js";
+import { Shift } from "../model/Shift.model.js";
 import { Company } from "../model/Company.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -24,12 +25,35 @@ const endOfDay = (date = new Date()) => {
   return d;
 };
 
-const WORK_START_MINUTES = 9 * 60; // 09:00
-const WORK_END_MINUTES = 18 * 60; // 18:00
+const WORK_START_MINUTES = 9 * 60; // 09:00 fallback
+const WORK_END_MINUTES = 18 * 60;  // 18:00 fallback
 
 const toDayMinutes = (date) => {
   const d = new Date(date);
   return d.getHours() * 60 + d.getMinutes();
+};
+
+/**
+ * Resolves the work window for the employee on the given day. Uses the
+ * employee's assigned Shift (if one exists for that day) and falls back to the
+ * fixed 09:00-18:00 schedule when no shift is scheduled. Overnight shifts
+ * (shiftEnd before shiftStart) are treated as spanning midnight.
+ */
+const getShiftWindowFor = async (employeeId, now = new Date()) => {
+  try {
+    const shift = await Shift.findOne({
+      employeeId,
+      status: { $ne: "Cancelled" },
+      shiftStart: { $gte: startOfDay(now), $lte: endOfDay(now) },
+    }).sort({ shiftStart: -1 });
+    if (!shift) return { start: WORK_START_MINUTES, end: WORK_END_MINUTES };
+    const start = toDayMinutes(shift.shiftStart);
+    let end = toDayMinutes(shift.shiftEnd);
+    if (end <= start) end += 24 * 60;
+    return { start, end };
+  } catch {
+    return { start: WORK_START_MINUTES, end: WORK_END_MINUTES };
+  }
 };
 
 /**
@@ -38,7 +62,7 @@ const toDayMinutes = (date) => {
  * fixed 09:00-18:00 schedule. Open breaks only count when the user is still
  * clocked in.
  */
-const finalizeWork = (record) => {
+const finalizeWork = (record, window = { start: WORK_START_MINUTES, end: WORK_END_MINUTES }) => {
   if (!record?.checkIn) return;
   const now = record.checkOut || new Date();
   const totalMs = Math.max(0, now - record.checkIn);
@@ -57,9 +81,9 @@ const finalizeWork = (record) => {
   const totalMinutes = Math.max(0, Math.round((totalMs - breakMs) / 60000));
   const checkInMin = toDayMinutes(record.checkIn);
   const checkOutMin = record.checkOut ? toDayMinutes(record.checkOut) : null;
-  const lateMinutes = Math.max(0, checkInMin - WORK_START_MINUTES);
-  const earlyExitMinutes = record.checkOut ? Math.max(0, WORK_END_MINUTES - checkOutMin) : 0;
-  const overtimeMinutes = record.checkOut ? Math.max(0, checkOutMin - WORK_END_MINUTES) : 0;
+  const lateMinutes = Math.max(0, checkInMin - window.start);
+  const earlyExitMinutes = record.checkOut ? Math.max(0, window.end - checkOutMin) : 0;
+  const overtimeMinutes = record.checkOut ? Math.max(0, checkOutMin - window.end) : 0;
 
   record.totalMinutes = totalMinutes;
   record.breakMinutes = breakMinutes;
@@ -83,7 +107,8 @@ export const clockIn = async (req, res) => {
       return res.status(400).json(new ApiError(400, "You have already clocked out today"));
     }
 
-    const lateMinutes = Math.max(0, toDayMinutes(now) - WORK_START_MINUTES);
+    const workWindow = await getShiftWindowFor(req.user.id, now);
+    const lateMinutes = Math.max(0, toDayMinutes(now) - workWindow.start);
     const derived = {
       totalMinutes: 0,
       breakMinutes: 0,
@@ -184,7 +209,8 @@ export const clockOut = async (req, res) => {
     if (openBreak) openBreak.end = existing.checkOut;
     existing.checkHoldIn = null;
     existing.checkHoldOut = null;
-    finalizeWork(existing);
+    const workWindow = await getShiftWindowFor(req.user.id, existing.checkIn || new Date());
+    finalizeWork(existing, workWindow);
     await existing.save();
 
     if (existing.overtimeMinutes > 0) {
@@ -247,7 +273,8 @@ export const toggleBreak = async (req, res) => {
       openBreak.end = new Date();
       record.checkHoldIn = null;
       record.checkHoldOut = null;
-      finalizeWork(record);
+      const workWindow = await getShiftWindowFor(req.user.id, record.checkIn || new Date());
+      finalizeWork(record, workWindow);
       await record.save();
       return res.status(200).json(new ApiResponse(200, record, "Break ended"));
     }
@@ -458,7 +485,11 @@ export const updateAttendance = async (req, res) => {
     if (!data) return res.status(404).json(new ApiError(404, "Attendance record not found"));
 
     if (data.checkIn) {
-      finalizeWork(data);
+      const workWindow = await getShiftWindowFor(
+        data.employeeId || existing.employeeId,
+        data.checkIn
+      );
+      finalizeWork(data, workWindow);
       await data.save();
     }
 

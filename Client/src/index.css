@@ -158,8 +158,8 @@
   .input-base {
     @apply w-full py-2.5 rounded-lg border text-sm bg-white outline-none
       transition-all duration-200 placeholder:text-ink-400
-      border-ink-200 hover:border-ink-300
-      focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10;
+      border-ink-200 hover:border-ink-300 
+      focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 ;
   }
 
   /* ---- Chips & badges ---- */

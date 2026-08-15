@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import HoreImage from "../assets/Group 427318876.svg";
+import HoreImage from "../assets/Group 427318876.png";
 import Button from "../components/Button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Heading from "../components/Heading";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import InputBox from "../components/InputBox";
-import HoreImage from "../assets/Group 427318876.svg";
+import HoreImage from "../assets/Group 427318876.png";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import Heading from "../components/Heading";

@@ -24,13 +24,21 @@ export const getBalance = async (employeeId) => {
   const employee = await Employee.findById(employeeId).select("Sick Casual Paid Unpaid");
   const used = await Leave.aggregate([
     { $match: { employeeId, status: "Approved" } },
-    { $group: { _id: "$leaveType", days: { $sum: 1 } } },
+    {
+      $project: {
+        leaveType: 1,
+        days: {
+          $add: [
+            { $divide: [{ $subtract: ["$endDate", "$startDate"] }, 86400000] },
+            1,
+          ],
+        },
+      },
+    },
+    { $group: { _id: "$leaveType", days: { $sum: "$days" } } },
   ]);
   const usedMap = {};
-  for (const u of used) {
-    const days = u._id ? daysBetween(u._id, u._id) : u.days;
-    usedMap[u._id] = u.days;
-  }
+  for (const u of used) usedMap[u._id] = Math.round(u.days);
   const totals = {
     Sick: Number(employee?.Sick || 14),
     Casual: Number(employee?.Casual || 14),

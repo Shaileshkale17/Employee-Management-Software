@@ -13,7 +13,6 @@ const ALLOWED_MIME = {
   "image/png": ".png",
   "image/jpeg": ".jpg",
   "image/webp": ".webp",
-  "image/svg+xml": ".svg",
 };
 
 const storage = multer.memoryStorage();
@@ -22,7 +21,7 @@ const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIME[file.mimetype]) {
     return cb(null, true);
   }
-  cb(new Error("Invalid file type. Only PDF, DOC, DOCX, TXT allowed"));
+  cb(new Error("Invalid file type"));
 };
 
 export const uploadResume = multer({
@@ -41,7 +40,7 @@ export const uploadLogo = multer({
   storage,
   limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = ["image/png", "image/jpeg", "image/svg+xml", "image/webp"];
+    const allowed = ["image/png", "image/jpeg", "image/webp"];
     if (allowed.includes(file.mimetype)) {
       return cb(null, true);
     }

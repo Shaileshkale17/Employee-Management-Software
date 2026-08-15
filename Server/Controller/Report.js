@@ -43,8 +43,15 @@ export const getEmployeeReport = async (req, res) => {
       Employee.find(req.companyId ? { companyId: req.companyId } : {}).select("name employeeId department designation").lean(),
     ]);
 
+    const recordsByEmployee = new Map();
+    for (const r of records) {
+      const key = String(r.employeeId?._id);
+      if (!recordsByEmployee.has(key)) recordsByEmployee.set(key, []);
+      recordsByEmployee.get(key).push(r);
+    }
+
     const summary = employees.map((e) => {
-      const mine = records.filter((r) => String(r.employeeId?._id) === String(e._id));
+      const mine = recordsByEmployee.get(String(e._id)) || [];
       const present = mine.filter((r) => r.status === "Present").length;
       const absent = mine.filter((r) => r.status === "Absent").length;
       const leave = mine.filter((r) => r.status === "Leave").length;

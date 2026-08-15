@@ -52,20 +52,20 @@ const EmployeeSchema = new mongoose.Schema(
       },
     ],
     Sick: {
-      type: String,
-      default: "14",
+      type: Number,
+      default: 14,
     },
     Casual: {
-      type: String,
-      default: "14",
+      type: Number,
+      default: 14,
     },
     Paid: {
-      type: String,
-      default: "14",
+      type: Number,
+      default: 14,
     },
     Unpaid: {
-      type: String,
-      default: "14",
+      type: Number,
+      default: 14,
     },
     joiningDate: { type: Date, default: Date.now },
     dateOfBirth: { type: Date, default: null },

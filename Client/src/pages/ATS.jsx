@@ -173,7 +173,7 @@ const ApplicantTracking = () => {
                   type="text"
                   placeholder="Search candidates..."
                   aria-label="Search candidates"
-                  className="input-base pl-10 pr-4 sm:w-56"
+                  className="input-base pl-10 p-3 sm:w-56"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -182,7 +182,7 @@ const ApplicantTracking = () => {
                 value={jobFilter}
                 onChange={(e) => setJobFilter(e.target.value)}
                 aria-label="Filter by job"
-                className="input-base appearance-none cursor-pointer pr-10 sm:w-auto"
+                className="input-base appearance-none cursor-pointer p-3 sm:w-auto"
                 style={selectChevron}
               >
                 <option value="">All jobs</option>
@@ -196,7 +196,7 @@ const ApplicantTracking = () => {
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
                 aria-label="Sort applications"
-                className="input-base appearance-none cursor-pointer pr-10 sm:w-auto"
+                className="input-base appearance-none cursor-pointer p-3 sm:w-auto"
                 style={selectChevron}
               >
                 {sortOptions.map((o) => (
@@ -408,7 +408,10 @@ const ApplicantTracking = () => {
                 </div>
 
                 <form onSubmit={handleAddNote} className="mb-6">
-                  <label htmlFor="ats-note" className="mb-2 block text-xs font-semibold text-ink-700">
+                  <label
+                    htmlFor="ats-note"
+                    className="mb-2 block text-xs font-semibold text-ink-700"
+                  >
                     Add note
                   </label>
                   <div className="flex gap-2">

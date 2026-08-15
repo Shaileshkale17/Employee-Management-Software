@@ -66,6 +66,28 @@ app.use(
   )
 );
 
+// In production, scrub internal details (Mongoose/cast messages, file paths)
+// from any 500 response body before it leaves the server. Validation errors
+// (4xx) are left intact. Details still go to the server logs via the central
+// error handler below.
+if (process.env.NODE_ENV === "production") {
+  app.use((req, res, next) => {
+    const originalJson = res.json;
+    res.json = function (body) {
+      if (
+        res.statusCode === 500 &&
+        body &&
+        typeof body === "object"
+      ) {
+        if (body.message) body.message = "Internal Server Error";
+        if (body.error) body.error = "Internal Server Error";
+      }
+      return originalJson.call(this, body);
+    };
+    next();
+  });
+}
+
 app.use("/uploads", express.static(path.resolve("uploads")));
 
 app.use("/api", globalLimiter);

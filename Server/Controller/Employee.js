@@ -105,11 +105,9 @@ export const createEmployee = async (req, res) => {
       return res.status(400).json(new ApiError(400, "Employee already exists"));
     }
 
-    const employeeId = await generateEmployeeId();
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newEmployee = await Employee.create({
-      employeeId,
+    const payload = {
       name: sanitizeString(name, 100),
       email: String(email).toLowerCase().trim(),
       password: hashedPassword,
@@ -132,7 +130,19 @@ export const createEmployee = async (req, res) => {
         paymentFrequency: salary.paymentFrequency || "Monthly",
       },
       status: "Active",
-    });
+    };
+
+    // employeeId must be unique; retry with a fresh id on a duplicate-key race.
+    let newEmployee;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        newEmployee = await Employee.create({ ...payload, employeeId: await generateEmployeeId() });
+        break;
+      } catch (error) {
+        if (error?.code === 11000 && attempt < 2) continue;
+        throw error;
+      }
+    }
 
     if (req.companyId && newEmployee._id) {
       await notify({

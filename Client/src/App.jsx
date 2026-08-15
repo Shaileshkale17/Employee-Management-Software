@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Navber from "./components/Navber";
 import Footer from "./components/Footer";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
+import { LoaderCircle } from "lucide-react";
 import { logout } from "./redux/slices/authSlice";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -57,7 +58,15 @@ function App() {
         pauseOnHover
         theme={mode === "dark" ? "dark" : "light"}
       />
-      <Outlet />
+      <Suspense
+        fallback={
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <LoaderCircle className="animate-spin h-6 w-6 text-brand-600" />
+          </div>
+        }
+      >
+        <Outlet />
+      </Suspense>
       {user?.token && <Footer />}
     </div>
   );
