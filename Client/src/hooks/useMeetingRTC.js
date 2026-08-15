@@ -116,6 +116,22 @@ export const useMeetingRTC = ({ socket, meetingId, meetingDbId, active = false }
     []
   );
 
+  // Adds the outgoing track for `kind` to the peer, or swaps it in place when a
+  // sender already exists (e.g. after retryMedia restarts media or a camera
+  // device is switched). replaceTrack avoids a full renegotiation.
+  const ensureSender = useCallback((pc, kind, track, stream) => {
+    const sender = pc.getSenders().find((s) => s.track?.kind === kind);
+    if (sender) {
+      if (sender.track !== track) {
+        sender.replaceTrack(track).catch(() => {});
+      }
+      return;
+    }
+    if (track) {
+      pc.addTrack(track, stream || (localStreamRef.current || (localStreamRef.current = new MediaStream())));
+    }
+  }, []);
+
   const updateLocalPreview = useCallback(() => {
     const videoTrack = getOutgoingVideoTrack();
     const audioTrack = getOutgoingAudioTrack();
@@ -197,17 +213,14 @@ export const useMeetingRTC = ({ socket, meetingId, meetingDbId, active = false }
   }, [socket, meetingId]);
 
   const syncTracksToPeers = useCallback(() => {
+    const audio = getOutgoingAudioTrack();
+    const video = getOutgoingVideoTrack();
+    const stream = localStreamRef.current || (localStreamRef.current = new MediaStream());
     peersRef.current.forEach(({ pc }) => {
-      const audio = getOutgoingAudioTrack();
-      const video = getOutgoingVideoTrack();
-      if (audio && !pc.getSenders().some((s) => s.track?.kind === "audio")) {
-        pc.addTrack(audio, localStreamRef.current || (localStreamRef.current = new MediaStream()));
-      }
-      if (video && !pc.getSenders().some((s) => s.track?.kind === "video")) {
-        pc.addTrack(video, localStreamRef.current || (localStreamRef.current = new MediaStream()));
-      }
+      ensureSender(pc, "audio", audio, stream);
+      ensureSender(pc, "video", video, stream);
     });
-  }, [getOutgoingAudioTrack, getOutgoingVideoTrack]);
+  }, [getOutgoingAudioTrack, getOutgoingVideoTrack, ensureSender]);
 
   const retryMedia = useCallback(async () => {
     if (mediaStartedRef.current) {
@@ -282,14 +295,11 @@ export const useMeetingRTC = ({ socket, meetingId, meetingDbId, active = false }
     (pc) => {
       const audio = getOutgoingAudioTrack();
       const video = getOutgoingVideoTrack();
-      if (audio && !pc.getSenders().some((s) => s.track?.kind === "audio")) {
-        pc.addTrack(audio, localStreamRef.current || (localStreamRef.current = new MediaStream()));
-      }
-      if (video && !pc.getSenders().some((s) => s.track?.kind === "video")) {
-        pc.addTrack(video, localStreamRef.current || (localStreamRef.current = new MediaStream()));
-      }
+      const stream = localStreamRef.current || (localStreamRef.current = new MediaStream());
+      ensureSender(pc, "audio", audio, stream);
+      ensureSender(pc, "video", video, stream);
     },
-    [getOutgoingAudioTrack, getOutgoingVideoTrack]
+    [getOutgoingAudioTrack, getOutgoingVideoTrack, ensureSender]
   );
 
   const createPeer = useCallback(

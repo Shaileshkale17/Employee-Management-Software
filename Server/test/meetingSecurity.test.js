@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
+
+process.env.JWT_SECRET = "meeting-test-secret";
+
+const {
   generateMeetingId,
   isValidMeetingId,
   generateOtp,
@@ -8,7 +11,7 @@ import {
   verifyMeetingLink,
   signGuestToken,
   verifyGuestToken,
-} from "../utils/meetingSecurity.js";
+} = await import("../utils/meetingSecurity.js");
 
 test("generateMeetingId returns the abc-def-ghi shape", () => {
   const id = generateMeetingId();
