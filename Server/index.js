@@ -50,8 +50,21 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
+// Allow list is read from ORIGIN (comma-separated). When unset, keep the
+// permissive default so existing local/dev setups keep working.
+const allowedOrigins = (process.env.ORIGIN || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 app.use(express.json({ limit: "10mb" }));
-app.use(cors());
+app.use(
+  cors(
+    allowedOrigins.length
+      ? { origin: allowedOrigins, credentials: true }
+      : {}
+  )
+);
 
 app.use("/uploads", express.static(path.resolve("uploads")));
 
@@ -61,8 +74,9 @@ app.use("/api/company/register", authLimiter);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.ORIGIN || "*",
+    origin: allowedOrigins.length ? allowedOrigins : "*",
     methods: ["GET", "POST"],
+    ...(allowedOrigins.length ? { credentials: true } : {}),
   },
 });
 

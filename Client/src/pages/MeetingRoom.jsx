@@ -179,16 +179,11 @@ const MeetingRoom = () => {
   const [rtcRaised, setRtcRaised] = useState(false);
   const [startedAt] = useState(() => Date.now());
   const [elapsed, setElapsed] = useState(0);
-  const joiningRef = useRef(true);
 
   useEffect(() => {
     const timer = setInterval(() => setElapsed(Math.floor((Date.now() - startedAt) / 1000)), 1000);
     return () => clearInterval(timer);
   }, [startedAt]);
-
-  useEffect(() => {
-    joiningRef.current = joining;
-  }, [joining]);
 
   const loadMeeting = useCallback(async () => {
     try {
@@ -224,12 +219,8 @@ const MeetingRoom = () => {
       socket.emit("authenticate", { token: getToken() });
       if (userId) socket.emit("register", String(userId));
       setConnected(true);
-      if (isGuest) {
-        socket.emit("meeting:join", { meetingId, token: getGuestToken() });
-      } else if (!joiningRef.current) {
-        socket.emit("meeting:join", { meetingId, token: "" });
-      }
     });
+    socket.on("disconnect", () => setConnected(false));
     socket.on("meeting:presence", (present) => {
       setPresence(present || []);
     });
@@ -256,9 +247,13 @@ const MeetingRoom = () => {
   }, [meetingId, userId, isGuest, navigate]);
 
   useEffect(() => {
-    if (isGuest || !socketInstance || joining) return;
-    socketInstance.emit("meeting:join", { meetingId, token: "" });
-  }, [socketInstance, joining, isGuest, meetingId]);
+    if (!socketInstance || !connected || joining) return;
+    if (isGuest) {
+      socketInstance.emit("meeting:join", { meetingId, token: getGuestToken() });
+    } else {
+      socketInstance.emit("meeting:join", { meetingId, token: "" });
+    }
+  }, [socketInstance, connected, joining, isGuest, meetingId]);
 
   const rtc = useMeetingRTC({
     socket: socketInstance,

@@ -2,7 +2,12 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const JWT_SECRET = process.env.JWT_SECRET || "meeting-secret-fallback";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error(
+    "JWT_SECRET must be set in the environment. Refusing to sign meeting/guest tokens with a public fallback."
+  );
+}
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS = "0123456789";
