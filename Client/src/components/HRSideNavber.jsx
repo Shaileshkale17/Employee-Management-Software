@@ -152,7 +152,7 @@ const NavList = ({ onNavigate }) => {
               `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ease-smooth ${
               isActive
                 ? "bg-brand-50 text-brand-700 font-semibold dark:bg-brand-500/15 dark:text-brand-300"
-                : "text-ink-600 hover:text-ink-950 hover:bg-ink-100/70 dark:text-ink-400 dark:hover:text-ink-100 dark:hover:bg-white/5"
+                : "text-ink-600 hover:text-ink-950 hover:bg-ink-100/70 dark:text-ink-400 dark:hover:text-ink-900 dark:hover:bg-white/5"
               }`
             }>
             <NavIcon name={item.icon || item.name} />
@@ -162,7 +162,7 @@ const NavList = ({ onNavigate }) => {
           <div>
             <button
               onClick={() => toggleSection(item.name)}
-              className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-950 hover:bg-ink-100/70 transition-all duration-200 focus-ring dark:text-ink-300 dark:hover:text-ink-100 dark:hover:bg-white/5"
+              className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-950 hover:bg-ink-100/70 transition-all duration-200 focus-ring dark:text-ink-500 dark:hover:text-ink-900 dark:hover:bg-white/5"
               aria-expanded={!!openSections[item.name]}>
               <span className="flex items-center gap-3 truncate">
                 <NavIcon name={item.icon || item.name} />
@@ -181,7 +181,7 @@ const NavList = ({ onNavigate }) => {
                         `block px-3 py-2 rounded-lg text-[13px] transition-all duration-200 ${
                           isActive
                             ? "bg-brand-50 text-brand-700 font-semibold dark:bg-brand-500/15 dark:text-brand-300"
-                            : "text-ink-500 hover:text-ink-900 hover:bg-ink-100/70 dark:text-ink-400 dark:hover:text-ink-100 dark:hover:bg-white/5"
+                            : "text-ink-500 hover:text-ink-900 hover:bg-ink-100/70 dark:text-ink-400 dark:hover:text-ink-900 dark:hover:bg-white/5"
                         }`
                       }>
                       {sub.name}
@@ -210,17 +210,17 @@ const HRSideNavber = () => {
   return (
     <>
       <div
-        className={`fixed inset-y-0 left-0 z-[70] w-72 transform bg-white shadow-popover transition-transform duration-300 md:hidden dark:bg-ink-100 ${
+        className={`fixed inset-y-0 left-0 z-[70] w-72 transform bg-surface-50 shadow-popover transition-transform duration-300 md:hidden dark:bg-surface-300 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-hidden={!mobileOpen}>
-        <div className="flex h-16 items-center justify-between border-b border-ink-200/60 px-4">
-          <span className="text-sm font-bold text-ink-900 dark:text-ink-100">Menu</span>
+        <div className="flex h-16 items-center justify-between border-b border-ink-200/60 px-4 dark:border-ink-700/40">
+          <span className="text-sm font-bold text-ink-900">Menu</span>
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
             aria-label="Close menu"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-ink-100">
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-ink-900">
             <X className="h-5 w-5" />
           </button>
         </div>

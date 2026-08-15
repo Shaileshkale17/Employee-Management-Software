@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 import SideNavbar from "../components/SideNavber";
@@ -17,10 +18,14 @@ const Message = () => {
   const role = user?.user?.role;
   const userId = user?.user?.id;
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const withParam = searchParams.get("with");
+
   const SideNav = (r) => (HR_ROLES.includes(r) ? <HRSideNavber /> : <SideNavbar />);
 
   const socketRef = useRef(null);
   const activeIdRef = useRef(null);
+  const autoOpenedRef = useRef(null);
 
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -134,29 +139,50 @@ const Message = () => {
     activeIdRef.current = activeId;
   }, [activeId]);
 
-  const findUser = (id) => {
-    const conv = conversations.find((c) => String(c._id) === String(id));
-    if (conv?.user) return conv.user;
-    return directory.find((d) => String(d._id) === String(id)) || { _id: id, name: id };
-  };
+  const findUser = useCallback(
+    (id) => {
+      const conv = conversations.find((c) => String(c._id) === String(id));
+      if (conv?.user) return conv.user;
+      return directory.find((d) => String(d._id) === String(id)) || { _id: id, name: id };
+    },
+    [conversations, directory]
+  );
 
-  const openConversation = async (id) => {
-    setActiveId(id);
-    setActiveUser(findUser(id));
-    setMobileView("chat");
-    setChatLoading(true);
-    setIsTyping(false);
-    try {
-      const res = await api.get("/message", { params: { with: id } });
-      setMessages(res.data.data || []);
-      await api.put("/message/read", { with: id });
-      fetchConversations();
-    } catch {
-      toast.error("Failed to load messages");
-    } finally {
-      setChatLoading(false);
-    }
-  };
+  const openConversation = useCallback(
+    async (id) => {
+      setActiveId(id);
+      setActiveUser(findUser(id));
+      setMobileView("chat");
+      setChatLoading(true);
+      setIsTyping(false);
+      try {
+        const res = await api.get("/message", { params: { with: id } });
+        setMessages(res.data.data || []);
+        await api.put("/message/read", { with: id });
+        fetchConversations();
+      } catch {
+        toast.error("Failed to load messages");
+      } finally {
+        setChatLoading(false);
+      }
+    },
+    [findUser, fetchConversations]
+  );
+
+  // Auto-open a conversation when arriving via /message?with=<employeeId>
+  useEffect(() => {
+    if (!withParam || String(withParam) === String(userId)) return;
+    if (String(autoOpenedRef.current) === String(withParam)) return;
+    const known =
+      directory.some((d) => String(d._id) === String(withParam)) ||
+      conversations.some((c) => String(c._id) === String(withParam));
+    if (!known) return;
+    autoOpenedRef.current = withParam;
+    openConversation(withParam);
+    const next = new URLSearchParams(searchParams);
+    next.delete("with");
+    setSearchParams(next, { replace: true });
+  }, [withParam, userId, directory, conversations, openConversation, searchParams, setSearchParams]);
 
   const emitTyping = (typing) => {
     if (!activeId) return;

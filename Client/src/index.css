@@ -5,6 +5,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --ink-50: 250 250 250;
     --ink-100: 244 244 245;
     --ink-200: 229 231 235;
@@ -29,6 +30,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     --ink-50: 11 17 32;
     --ink-100: 17 24 39;
     --ink-200: 23 32 51;
@@ -251,6 +253,21 @@
 }
 
 /* ---- Dark mode overrides ---- */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0f1522 inset;
+  -webkit-text-fill-color: #e2e8f0;
+  caret-color: #e2e8f0;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 .dark .glass {
   background-color: rgba(11, 17, 32, 0.82);
   border-color: rgba(255, 255, 255, 0.1);

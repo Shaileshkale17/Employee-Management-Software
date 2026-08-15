@@ -1,41 +1,67 @@
-const EmployeeProfile = ({ index, image, name, role, email, phone, status }) => {
-  const isActive = status === "Active";
+import { Mail, MapPin } from "lucide-react";
+import { getInitials, mapEmployeeSummary, presenceMeta, statusMeta } from "../utils/employeeMappers";
+
+const EmployeeProfile = ({ item, onClick }) => {
+  const s = mapEmployeeSummary(item);
+  const presence = presenceMeta(s.presence);
+  const subtitle = [s.designation, s.department].filter(Boolean).join(" · ");
 
   return (
-    <div
-      key={index}
-      className={`group relative overflow-hidden rounded-2xl border bg-white p-4 transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-card-hover ${
-        isActive ? "border-ink-200/70 hover:border-emerald-200" : "border-ink-200/70 hover:border-red-200"
-      }`}>
-      <div
-        className={`absolute inset-x-0 top-0 h-0.5 ${
-          isActive ? "bg-gradient-to-r from-emerald-500 to-emerald-400/40" : "bg-gradient-to-r from-red-400 to-red-400/40"
-        } opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
-        aria-hidden="true"
-      />
-      <div className="relative overflow-hidden rounded-xl bg-surface-100 mb-3.5">
-        <img
-          src={image}
-          alt={name}
-          className="h-36 w-full object-cover transition-transform duration-500 ease-smooth group-hover:scale-[1.03]"
-        />
+    <button
+      type="button"
+      onClick={() => onClick?.(item)}
+      aria-label={`View profile of ${s.name || "employee"}`}
+      className="card-surface group w-full p-4 text-left focus-ring transition-all duration-300 ease-smooth hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover dark:border-ink-700/40 dark:bg-surface-200">
+      <div className="flex items-start gap-3">
+        {s.profileImg ? (
+          <img
+            src={s.profileImg}
+            alt={s.name}
+            className="h-12 w-12 flex-shrink-0 rounded-full object-cover ring-1 ring-ink-200 dark:ring-ink-700/60"
+          />
+        ) : (
+          <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-600 text-sm font-bold text-white ring-1 ring-ink-200 dark:ring-ink-700/60">
+            {getInitials(s.name)}
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <h3 className="truncate text-sm font-semibold text-ink-950">{s.name || "—"}</h3>
+            <span
+              className={`relative flex h-2 w-2 flex-shrink-0 rounded-full ${presence.dot}`}
+              title={presence.label}
+              aria-label={presence.label}
+            />
+          </div>
+          {s.designation && <p className="truncate text-xs font-medium text-brand-600">{s.designation}</p>}
+          {subtitle && <p className="mt-0.5 truncate text-xs text-ink-400">{subtitle}</p>}
+        </div>
       </div>
-      <div className="flex items-start justify-between gap-2 mb-1">
-        <h2 className="text-sm font-semibold text-ink-950 truncate">{name}</h2>
-        <span
-          className={`chip flex-shrink-0 ring-1 ${
-            isActive
-              ? "bg-emerald-50 text-emerald-700 ring-emerald-500/20"
-              : "bg-red-50 text-red-600 ring-red-500/20"
-          }`}>
-          <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-red-400"}`} />
-          {status}
-        </span>
+      <div className="mt-3 space-y-1.5 border-t border-ink-100 pt-3 dark:border-ink-700/40">
+        {s.email && (
+          <p className="flex items-center gap-2 truncate text-xs text-ink-500 dark:text-ink-400">
+            <Mail className="h-3.5 w-3.5 flex-shrink-0 text-ink-300 dark:text-ink-600" />
+            <span className="truncate">{s.email}</span>
+          </p>
+        )}
+        {s.workLocation && (
+          <p className="flex items-center gap-2 truncate text-xs text-ink-500 dark:text-ink-400">
+            <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-ink-300 dark:text-ink-600" />
+            <span className="truncate">{s.workLocation}</span>
+          </p>
+        )}
+        <div className="flex items-center justify-between gap-2 pt-1">
+          {s.employeeId && (
+            <span className="text-[11px] font-medium text-ink-400 dark:text-ink-500">ID: {s.employeeId}</span>
+          )}
+          {s.status && (
+            <span className={`chip ring-1 ${statusMeta(s.status)}`}>
+              {s.status}
+            </span>
+          )}
+        </div>
       </div>
-      <p className="text-xs font-semibold text-brand-600 mb-1">{role}</p>
-      <p className="text-xs text-ink-400 truncate">{email}</p>
-      <p className="text-xs text-ink-400">{phone}</p>
-    </div>
+    </button>
   );
 };
 
