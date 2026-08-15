@@ -13,7 +13,7 @@ const CheckBox = ({ label, checked, onChange, className }) => {
         <span
           aria-hidden="true"
           className="w-[18px] h-[18px] rounded-md border transition-all duration-200 ease-smooth
-            bg-white border-ink-300 group-hover:border-brand-400
+            bg-white border-ink-300 group-hover:border-brand-400 dark:border-ink-600
             peer-checked:bg-brand-600 peer-checked:border-brand-600
             peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 peer-focus-visible:ring-offset-1
             flex items-center justify-center">

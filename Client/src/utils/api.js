@@ -1,11 +1,17 @@
 import axios from "axios";
 
 export const BASE_URL = (
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api"
+  import.meta.env.VITE_BACKEND_URL ||
+  (import.meta.env.PROD
+    ? "https://employee-management-software-backend.vercel.app/api"
+    : "http://localhost:3000/api")
 ).replace(/\/$/, "");
 
 export const SOCKET_URL = (
-  import.meta.env.VITE_SOCKET_URL || "http://localhost:3000"
+  import.meta.env.VITE_SOCKET_URL ||
+  (import.meta.env.PROD
+    ? "https://employee-management-software-backend.vercel.app"
+    : "http://localhost:3000")
 ).replace(/\/$/, "");
 
 export const api = axios.create({

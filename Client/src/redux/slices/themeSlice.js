@@ -11,7 +11,11 @@ const getInitialTheme = () => {
 };
 
 const applyTheme = (mode) => {
-  document.documentElement.classList.toggle("dark", mode === "dark");
+  const root = document.documentElement;
+  const dark = mode === "dark";
+  root.classList.toggle("dark", dark);
+  root.style.colorScheme = dark ? "dark" : "light";
+  root.style.backgroundColor = dark ? "#0b1120" : "#f8f9fc";
 };
 
 const initialMode = getInitialTheme();

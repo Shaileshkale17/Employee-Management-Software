@@ -11,7 +11,15 @@
       try {
         var t = localStorage.getItem("theme");
         if (t !== "dark" && t !== "light") t = "dark";
-        if (t === "dark") document.documentElement.classList.add("dark");
+        var root = document.documentElement;
+        if (t === "dark") {
+          root.classList.add("dark");
+          root.style.colorScheme = "dark";
+          root.style.backgroundColor = "#0b1120";
+        } else {
+          root.style.colorScheme = "light";
+          root.style.backgroundColor = "#f8f9fc";
+        }
       } catch (e) {}
     })();
   </script>

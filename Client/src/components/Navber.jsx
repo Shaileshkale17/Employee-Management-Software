@@ -103,7 +103,7 @@ const Navbar = () => {
       <div className="mx-auto flex items-center justify-between px-4 lg:px-6 h-16">
         <div className="flex items-center gap-3">
           <button
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-600 transition-colors hover:bg-ink-100 md:hidden dark:text-ink-300 dark:hover:bg-white/10"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-600 transition-colors hover:bg-ink-100 md:hidden dark:hover:bg-white/10"
             onClick={() => window.dispatchEvent(new Event("open-mobile-nav"))}
             title="Menu"
             aria-label="Open menu">
@@ -129,7 +129,7 @@ const Navbar = () => {
           </span>
 
           <button
-            className="hidden md:flex items-center gap-2 rounded-full bg-white/80 px-3.5 py-2 text-sm text-ink-500 ring-1 ring-ink-200 shadow-sm transition-all duration-200 hover:bg-brand-50 hover:ring-brand-200 hover:text-ink-700 active:scale-95 dark:bg-white/10 dark:ring-ink-700/60 dark:text-ink-400 dark:hover:bg-white/15 dark:hover:text-ink-100"
+            className="hidden md:flex items-center gap-2 rounded-full bg-white/80 px-3.5 py-2 text-sm text-ink-500 ring-1 ring-ink-200 shadow-sm transition-all duration-200 hover:bg-brand-50 hover:ring-brand-200 hover:text-ink-700 active:scale-95 dark:bg-white/10 dark:ring-ink-700/60 dark:text-ink-400 dark:hover:bg-white/15 dark:hover:text-ink-900"
             onClick={() => setSearchOpen(true)}
             title="Search (Ctrl+K)"
             aria-label="Search">

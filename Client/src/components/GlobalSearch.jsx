@@ -278,7 +278,7 @@ const GlobalSearch = ({ open, onClose, onRequestOpen }) => {
                       <item.Icon className="h-4 w-4" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-ink-900 dark:text-ink-100">
+                      <span className="block truncate text-sm font-medium text-ink-900">
                         {item.title}
                       </span>
                       <span className="block truncate text-xs text-ink-400">{item.subtitle}</span>

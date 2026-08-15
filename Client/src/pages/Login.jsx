@@ -166,7 +166,7 @@ const Login = () => {
                   />
                   <span
                     aria-hidden="true"
-                    className="flex h-[18px] w-[18px] items-center justify-center rounded-md border border-ink-300 bg-white transition-all duration-200 group-hover:border-brand-400 peer-checked:border-brand-600 peer-checked:bg-brand-600"
+                    className="flex h-[18px] w-[18px] items-center justify-center rounded-md border border-ink-300 bg-white transition-all duration-200 group-hover:border-brand-400 peer-checked:border-brand-600 peer-checked:bg-brand-600 dark:border-ink-600"
                   >
                     <Check className="h-3 w-3 text-white" strokeWidth={3.5} />
                   </span>
