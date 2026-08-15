@@ -15,11 +15,11 @@ import {
   tenantMiddleware,
   authorize,
 } from "../Middlewares/AuthMiddleware.js";
-import { uploadResume } from "../Middlewares/uploadMiddleware.js";
+import { uploadResume, cloudinaryUpload } from "../Middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
-router.post("/apply/:slug/:jobId", uploadResume, (req, res) => applyToJob(req, res));
+router.post("/apply/:slug/:jobId", uploadResume, cloudinaryUpload, (req, res) => applyToJob(req, res));
 
 router.use(authMiddleware, tenantMiddleware);
 

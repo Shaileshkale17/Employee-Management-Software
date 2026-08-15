@@ -34,7 +34,7 @@ export const createRecording = async (req, res) => {
       companyId: meeting.company,
       meeting: meeting._id,
       name: req.body?.name || `${meeting.title} recording`,
-      url: file ? `/uploads/${file.filename}` : "",
+      url: file?.url || "",
       filename: file?.originalname || "",
       size: file?.size || 0,
       duration: Number(req.body?.duration) || 0,

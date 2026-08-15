@@ -1016,7 +1016,7 @@ export const uploadAttachment = async (req, res) => {
     }
     const attachments = files.map((f) => ({
       name: f.originalname || f.filename,
-      url: `/uploads/${f.filename}`,
+      url: f.url,
       size: f.size || 0,
     }));
     event.attachments = [...(event.attachments || []), ...attachments];

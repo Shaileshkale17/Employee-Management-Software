@@ -75,11 +75,11 @@ export const registerCompany = async (req, res) => {
     if (company) {
       company = await Company.create({
         ...companyDoc,
-        logo: req.file ? `/uploads/${req.file.filename}` : "",
+        logo: req.file?.url || "",
         slug: `${slug}-${Math.floor(Math.random() * 9999)}`,
       });
     } else {
-      company = await Company.create({ ...companyDoc, logo: req.file ? `/uploads/${req.file.filename}` : "", slug });
+      company = await Company.create({ ...companyDoc, logo: req.file?.url || "", slug });
     }
 
     const generalDept = await Department.findOneAndUpdate(

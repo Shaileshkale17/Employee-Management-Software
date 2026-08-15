@@ -16,7 +16,7 @@ import {
   getEventsByInterview,
 } from "../Controller/CalendarEvent.js";
 import { authMiddleware, tenantMiddleware } from "../Middlewares/AuthMiddleware.js";
-import { uploadAttachments } from "../Middlewares/uploadMiddleware.js";
+import { uploadAttachments, cloudinaryUpload } from "../Middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -35,7 +35,7 @@ router.put("/update/:id", (req, res) => updateEvent(req, res));
 router.patch("/:id/status", (req, res) => updateEventStatus(req, res));
 router.post("/:id/duplicate", (req, res) => duplicateEvent(req, res));
 router.post("/:id/snooze", (req, res) => snoozeEvent(req, res));
-router.post("/:id/attachments", uploadAttachments, (req, res) => uploadAttachment(req, res));
+router.post("/:id/attachments", uploadAttachments, cloudinaryUpload, (req, res) => uploadAttachment(req, res));
 
 router.delete("/delete/:id", (req, res) => deleteEvent(req, res));
 
